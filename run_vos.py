@@ -50,6 +50,21 @@ for _lib_root in (SCRIPT_DIR, SCRIPT_DIR.parent):
 
 from lib.vos_decay import apply_age_decay  # noqa: E402
 
+# --- Phase 1 refactor: the VOS engine is being extracted into the vosball
+# package. Moved names are re-imported here so existing importers
+# (`import run_vos as v2`, lib/draft_score.py) and the code still living in this
+# module keep resolving them unchanged. Output is unchanged — guarded by
+# tests/test_golden.py.
+from vosball.engine import (  # noqa: E402
+    normalize_to_20_80,
+    _normalization_params,
+    classify_vos_tier,
+    tier_for_player_role,
+    _resolve_tier_bands,
+    resolve_float,
+    resolve_int,
+)
+
 # -----------------------------------------------------------------------------
 # Paths and constants
 # -----------------------------------------------------------------------------
@@ -300,23 +315,7 @@ def load_league_api_base_urls(config_dir: Path) -> Dict[str, str]:
             for k, v in raw.items() if k and v}
 
 
-def resolve_float(row: Dict[str, str], *col_candidates: str) -> Optional[float]:
-    for col in col_candidates:
-        if col not in row:
-            continue
-        val = row.get(col, "").strip()
-        if val == "" or val.upper() in ("NA", "N/A", "."):
-            continue
-        try:
-            return float(val)
-        except (TypeError, ValueError):
-            continue
-    return None
-
-
-def resolve_int(row: Dict[str, str], col: str) -> Optional[int]:
-    v = resolve_float(row, col)
-    return int(v) if v is not None else None
+# resolve_float, resolve_int -> vosball/engine/rows.py (imported at module top).
 
 
 def load_player_data(data_dir: Path, league: str,
@@ -561,107 +560,16 @@ def apply_park_adjustments(
 
 # -----------------------------------------------------------------------------
 # Normalization (20-80 sigmoid)
+#   normalize_to_20_80, _normalization_params -> vosball/engine/normalization.py
+#   (imported at module top).
 # -----------------------------------------------------------------------------
-
-def normalize_to_20_80(
-    raw_score: float,
-    center: float = 50.0,
-    scale: float = 15.0,
-    floor: float = 20.0,
-    ceiling: float = 80.0,
-) -> float:
-    shifted = raw_score - center
-    denom = scale * (1.0 + abs(shifted / scale))
-    normalized = (shifted / denom) * 30.0
-    out = center + normalized
-    return max(floor, min(ceiling, out))
-
-
-def _normalization_params(cfg: Dict[str, Any]) -> Tuple[float, float, float, float]:
-    n = (cfg.get("normalization") or {})
-    return (
-        float(n.get("target_center", 50.0)),
-        float(n.get("scale_parameter", 15.0)),
-        float(n.get("hard_floor", 20.0)),
-        float(n.get("hard_ceiling", 80.0)),
-    )
 
 
 # -----------------------------------------------------------------------------
-# VOS tier classification (ported from vos_v2.py for drop-in compatibility)
+# VOS tier classification
+#   classify_vos_tier, tier_for_player_role, _resolve_tier_bands and the default
+#   tier bands -> vosball/engine/tiers.py (imported at module top).
 # -----------------------------------------------------------------------------
-# Tier bands map a 20-80 score onto a human-readable label. v6 Reach is a
-# logistic-mapped probability rather than the v2 Pot*-weighted composite, so
-# the same band may carry different distribution mass — recalibration against
-# the v6 Reach distribution is a follow-up. Default bands kept identical to
-# vos_v2 so consumers reading VOS_Tier / VOS_Potential_Tier see the same labels.
-
-_DEFAULT_HITTER_TIERS: List[Dict[str, Any]] = [
-    {"min": 65.0, "label": "Star"},
-    {"min": 58.0, "label": "Above-Avg Regular"},
-    {"min": 52.0, "label": "Reliable Starter"},
-    {"min": 47.0, "label": "Fringe Regular"},
-    {"min": 42.0, "label": "Bench"},
-    {"min": 37.0, "label": "Replacement"},
-    {"min": 0.0,  "label": "Org Filler"},
-]
-_DEFAULT_PITCHER_TIERS: List[Dict[str, Any]] = [
-    {"min": 58.0, "label": "Ace"},
-    {"min": 51.0, "label": "#2/#3 Starter"},
-    {"min": 46.0, "label": "Mid-Rotation"},
-    {"min": 41.0, "label": "Back-End / Setup"},
-    {"min": 36.0, "label": "Long Relief / Swing"},
-    {"min": 31.0, "label": "Replacement"},
-    {"min": 0.0,  "label": "Org Filler"},
-]
-
-
-def _resolve_tier_bands(cfg: Optional[Dict[str, Any]], role: str) -> List[Dict[str, Any]]:
-    """Return tier bands for 'hitter' or 'pitcher' from cfg, falling back to defaults."""
-    role_key = "pitcher" if role == "pitcher" else "hitter"
-    tiers_cfg = (cfg or {}).get("tiers") or {}
-    bands = tiers_cfg.get(role_key)
-    if not isinstance(bands, list) or not bands:
-        return _DEFAULT_PITCHER_TIERS if role_key == "pitcher" else _DEFAULT_HITTER_TIERS
-    return bands
-
-
-def classify_vos_tier(
-    score: Any,
-    role: str = "hitter",
-    cfg: Optional[Dict[str, Any]] = None,
-) -> str:
-    """Map a numeric VOS-style score to a role-aware tier label.
-
-    role: 'hitter' for batting/positional/hitter-overall scores, 'pitcher' for SP/RP
-    or pitcher-overall scores. Bands are read from cfg['tiers'][role] (top-down,
-    first band whose 'min' is <= score wins). Returns empty string for missing /
-    non-numeric scores so downstream display can stay clean.
-    """
-    try:
-        if score is None or score == "":
-            return ""
-        val = float(score)
-    except (TypeError, ValueError):
-        return ""
-    bands = _resolve_tier_bands(cfg, role)
-    sorted_bands = sorted(bands, key=lambda b: float(b.get("min", 0.0)), reverse=True)
-    for band in sorted_bands:
-        try:
-            if val >= float(band.get("min", 0.0)):
-                return str(band.get("label", ""))
-        except (TypeError, ValueError):
-            continue
-    return ""
-
-
-def tier_for_player_role(row_or_pos: Any) -> str:
-    """Return 'pitcher' or 'hitter' given either a Pos string or a dict-like row."""
-    if isinstance(row_or_pos, dict):
-        pos = (row_or_pos.get("Pos") or "").strip().upper()
-    else:
-        pos = (str(row_or_pos or "")).strip().upper()
-    return "pitcher" if pos in ("SP", "RP", "CL", "P") else "hitter"
 
 
 # -----------------------------------------------------------------------------
