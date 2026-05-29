@@ -1,0 +1,10 @@
+{
+  "wwoba": "https://atl-01.statsplus.net/wwoba/api",
+  "woba": "https://atl-01.statsplus.net/woba/api",
+  "tlg": "https://atl-02.statsplus.net/tlg/api",
+  "sahl": "https://statsplus.net/sahl/api",
+  "sdmb": "https://statsplus.net/sdmbootp/api",
+  "uba": "https://statsplus.net/uba/api",
+  "ndl": "https://atl-02.statsplus.net/therealndl/api",
+  "bwb": "https://atl-02.statsplus.net/bwb/api"
+}

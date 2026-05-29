@@ -1,0 +1,22 @@
+{
+  "_comment": "NLD division structure for league projection rollups.",
+  "_comment_2": "Team display names must match the eval CSV's Org column and the park-factors teams[] keys.",
+
+  "American League": {
+    "East":    ["New England Spitters", "Connecticut Steady Habits", "Miami Vice",
+                "Walnut Grove Wildcats", "Sheltown Shockers"],
+    "Central": ["Steel City Bulldogs", "North Dakota Bison", "Anchorage Seawolves",
+                "Alabama Bears", "Kansas City Kings"],
+    "West":    ["Philadelphia Cheesesteaks", "Sugar Land Space Cowboys", "Daytona Beach Speed",
+                "Duluth Diamond Dawgs", "Oklahoma City Drifters"]
+  },
+
+  "National League": {
+    "East":    ["Indianapolis Alleycats", "Kalamazoo Kangaroos", "Fountain Hills 23ers",
+                "Cookeville Cubs", "Charlotte Mullet Mafia"],
+    "Central": ["Austin City Vegans", "Cleveland Fighting Amish", "Las Vegas Gamblers",
+                "Richmond Greeks", "Louisville Thoroughbreds"],
+    "West":    ["Seattle Whalers", "Tucson Oilmen", "San Diego Hops",
+                "San Francisco Gulls", "Daly City Spartans"]
+  }
+}

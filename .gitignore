@@ -1,0 +1,50 @@
+# VOSBall refactor sandbox — tracks all live code + config + docs.
+# Excludes secrets, bulky raw inputs, and anything the tools regenerate.
+
+# ===== Secrets / credentials — never commit =====
+config/statsplus_tokens.json
+config/statsplus_session.json
+config/*-gm-slack.json
+cookie_*.txt
+cookie_*.txt.txt
+api.txt
+
+# ===== Generated league output (the tools rewrite these every run) =====
+/ndl/
+/sahl/
+/tlg/
+/uba/
+/sdmb/
+/woba/
+/wwoba/
+/bwb/
+/cache/
+/reports/
+/archive/
+
+# ===== Bulky raw inputs (kept on disk; tests use a small committed fixture) =====
+data/PlayerData-*.csv
+data/*draft*pool*.csv
+data/sahl-draft-pool.csv
+
+# ===== Stray sample/scratch artifacts copied from the old root =====
+/evaluation_summary_*.csv
+/draft-wwoba.csv
+/min_eval_*.csv
+/min_eval_*.md
+/min_vos_eval.*
+
+# ===== Test scratch =====
+tests/_tmp/
+_smoke*.csv
+
+# ===== Python / editors / OS =====
+__pycache__/
+*.pyc
+*.pyo
+.obsidian/
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

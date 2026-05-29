@@ -1,0 +1,518 @@
+{
+  "_comment": "VOS (VOS Optimized Score) Configuration v2.0",
+  "_comment_2": "All rating inputs are expected on the 20-80 scale",
+  "_comment_3": "Tool weights within each category should sum to 1.0 for clarity",
+  "hitters": {
+    "tool_categories": {
+      "_comment": "Weights for each tool within its category (should sum to ~1.0)",
+      "batting": {
+        "_comment": "Contact (Gap/Ks) is king in OOTP. Eye matters more than raw power for most positions.",
+        "Gap": 0.22,
+        "Pow": 0.25,
+        "Eye": 0.3,
+        "Ks": 0.18
+      },
+      "defense": {
+        "_comment": "Position-specific defensive tool weights",
+        "C": {
+          "_comment": "Catchers: Arm is most important, then framing, then blocking",
+          "CArm": 0.45,
+          "CFrm": 0.3,
+          "CBlk": 0.25
+        },
+        "1B": {
+          "_comment": "1B: Error avoidance is everything, range barely matters",
+          "IFE": 0.8,
+          "IFA": 0.2,
+          "IFR": 0.0,
+          "TDP": 0.0
+        },
+        "2B": {
+          "_comment": "2B: Range and turn DP are critical, arm less so",
+          "IFR": 0.4,
+          "TDP": 0.35,
+          "IFE": 0.2,
+          "IFA": 0.05
+        },
+        "3B": {
+          "_comment": "3B: Arm is king, then range, then error avoidance",
+          "IFA": 0.5,
+          "IFR": 0.3,
+          "IFE": 0.2,
+          "TDP": 0.0
+        },
+        "SS": {
+          "_comment": "SS: Range is paramount, then turn DP, then error/arm",
+          "IFR": 0.5,
+          "TDP": 0.3,
+          "IFE": 0.15,
+          "IFA": 0.05
+        },
+        "LF": {
+          "_comment": "LF: Range most important, arm less critical",
+          "OFR": 0.5,
+          "OFE": 0.35,
+          "OFA": 0.15
+        },
+        "CF": {
+          "_comment": "CF: Range is everything, error avoidance second",
+          "OFR": 0.7,
+          "OFE": 0.25,
+          "OFA": 0.05
+        },
+        "RF": {
+          "_comment": "RF: Arm matters most, then range",
+          "OFA": 0.5,
+          "OFR": 0.3,
+          "OFE": 0.2
+        }
+      },
+      "baserunning": {
+        "_comment": "Speed and baserunning instinct matter most. Steal rating is situational.",
+        "Speed": 0.4,
+        "Run": 0.35,
+        "StealAbi": 0.2,
+        "StlRt": 0.05
+      }
+    },
+    "position_category_weights": {
+      "_comment": "How much each position values batting/defense/baserunning (should sum to ~1.0)",
+      "_comment_2": "These reflect positional scarcity and defensive importance",
+      "C": {
+        "batting": 0.45,
+        "defense": 0.54,
+        "baserunning": 0.01
+      },
+      "1B": {
+        "_comment": "1B is almost pure offense - you need a bat to justify the position",
+        "batting": 0.92,
+        "defense": 0.06,
+        "baserunning": 0.02
+      },
+      "2B": {
+        "batting": 0.55,
+        "defense": 0.35,
+        "baserunning": 0.1
+      },
+      "3B": {
+        "batting": 0.65,
+        "defense": 0.30,
+        "baserunning": 0.05
+      },
+      "SS": {
+        "_comment": "SS is premium defense, but modern SS need some bat",
+        "batting": 0.42,
+        "defense": 0.53,
+        "baserunning": 0.05
+      },
+      "LF": {
+        "batting": 0.75,
+        "defense": 0.15,
+        "baserunning": 0.1
+      },
+      "CF": {
+        "_comment": "CF needs elite defense, but bat still matters",
+        "batting": 0.3,
+        "defense": 0.65,
+        "baserunning": 0.05
+      },
+      "RF": {
+        "batting": 0.75,
+        "defense": 0.15,
+        "baserunning": 0.1
+      },
+      "DH": {
+        "_comment": "DH is pure bat",
+        "batting": 1.0,
+        "defense": 0.0,
+        "baserunning": 0.0
+      }
+    },
+    "positional_standards": {
+      "_comment": "Minimum expected ratings at each position to avoid penalties",
+      "_comment_2": "Used to determine if a player is truly viable at a position",
+      "C": {
+        "CArm": 40,
+        "CFrm": 35
+      },
+      "1B": {
+        "IFE": 40
+      },
+      "2B": {
+        "IFR": 45,
+        "TDP": 50,
+        "IFE": 40
+      },
+      "3B": {
+        "IFA": 60,
+        "IFR": 45,
+        "IFE": 45
+      },
+      "SS": {
+        "_comment": "SS has the highest defensive standards",
+        "IFR": 65,
+        "TDP": 45,
+        "IFE": 50,
+        "IFA": 50
+      },
+      "LF": {
+        "OFR": 40,
+        "OFE": 40,
+        "OFA": 45
+      },
+      "CF": {
+        "OFR": 65,
+        "OFE": 45
+      },
+      "RF": {
+        "OFA": 55
+      }
+    },
+    "dh_assignment": {
+      "_comment": "DH assignment override: if a player has quality field options, require DH to be meaningfully better.",
+      "min_field_quality": 50,
+      "min_dh_margin_over_field": 6
+    },
+    "projection_insights": {
+      "_comment": "Configurable knobs for projected-position separation and flexibility summary columns.",
+      "margin_tiers": {
+        "tieish_max": 0.49,
+        "lean_max": 1.49,
+        "clear_max": 2.99
+      },
+      "flexibility": {
+        "_comment": "Viable projected positions are within this many points of top projected position.",
+        "relative_band": 5.0,
+        "include_dh": false
+      }
+    }
+  },
+  "pitchers": {
+    "ability_weights": {
+      "_comment": "Weights for pitch ability ratings (should sum to 1.0)",
+      "SP": {
+        "_comment": "SPs: Movement and Control are king. Stuff matters but less than you think.",
+        "Stuff": 0.1,
+        "Movement": 0.4,
+        "Control": 0.3,
+        "HR_Avoid": 0.2
+      },
+      "RP": {
+        "_comment": "RPs: Stuff becomes more important, control less critical in short bursts",
+        "Stuff": 0.45,
+        "Movement": 0.3,
+        "Control": 0.15,
+        "HR_Avoid": 0.1
+      }
+    },
+    "arsenal_evaluation": {
+      "_comment": "How to evaluate pitch arsenal quality and diversity",
+      "pitch_type_values": {
+        "_comment": "Relative value of each pitch type (normalized to Fastball = 1.0)",
+        "Fastball": 1.0,
+        "Sinker": 0.95,
+        "Cutter": 0.9,
+        "Slider": 0.95,
+        "Curve": 0.9,
+        "Changeup": 0.9,
+        "Splitter": 0.85,
+        "Forkball": 0.75,
+        "Circle_Change": 0.9,
+        "Screwball": 0.65,
+        "Knuckle_Curve": 0.7,
+        "Knuckleball": 0.6
+      },
+      "pitch_slot_weights": {
+        "_comment": "How much each pitch in a pitcher's arsenal matters",
+        "SP": {
+          "_comment": "SP needs 3-4 quality pitches with declining importance",
+          "primary": 0.4,
+          "secondary": 0.3,
+          "tertiary": 0.2,
+          "quaternary": 0.1
+        },
+        "RP": {
+          "_comment": "RP can survive on 2-3 pitches, primary pitch is critical",
+          "primary": 0.55,
+          "secondary": 0.3,
+          "tertiary": 0.15
+        }
+      },
+      "diversity_requirements": {
+        "_comment": "Arsenal composition requirements for optimal scoring",
+        "SP": {
+          "min_pitches": 3,
+          "optimal_pitches": 4,
+          "min_velocity_tiers": 2,
+          "min_break_planes": 2
+        },
+        "RP": {
+          "min_pitches": 2,
+          "optimal_pitches": 3,
+          "min_velocity_tiers": 2,
+          "min_break_planes": 1
+        }
+      },
+      "diversity_modifiers": {
+        "_comment": "Bonuses/penalties for arsenal construction",
+        "velocity_tier_bonus": 1.5,
+        "break_plane_bonus": 1.5,
+        "insufficient_pitches_penalty": -5.0
+      }
+    },
+    "role_balance": {
+      "_comment": "How to weight ability vs arsenal for each role",
+      "SP": {
+        "ability_weight": 0.75,
+        "arsenal_weight": 0.25
+      },
+      "RP": {
+        "_comment": "RPs lean slightly more on arsenal (2-3 great pitches)",
+        "ability_weight": 0.9,
+        "arsenal_weight": 0.1
+      }
+    },
+    "stamina_requirements": {
+      "_comment": "Stamina penalties for starters who can't go deep",
+      "SP": {
+        "minimum_stamina": 50,
+        "penalty_per_point_below": 1.0
+      }
+    }
+  },
+  "adjustments": {
+    "_comment": "Contextual adjustments that apply to final scores",
+    "development_trajectory": {
+      "_comment": "Bonus/penalty based on current performance vs potential",
+      "_comment_2": "Ratio = (avg current ratings) / (avg potential ratings)",
+      "hitter": {
+        "thresholds": {
+          "exceeding_potential": 0.85,
+          "meeting_potential": 0.7,
+          "developing_normally": 0.5,
+          "underperforming": 0.5
+        },
+        "modifiers": {
+          "exceeding_potential": 2.0,
+          "meeting_potential": 1.0,
+          "developing_normally": 0.0,
+          "underperforming": -2.0
+        },
+        "minimum_potential_for_bonus": 45
+      },
+      "pitcher": {
+        "thresholds": {
+          "exceeding_potential": 0.85,
+          "meeting_potential": 0.7,
+          "developing_normally": 0.5,
+          "underperforming": 0.5
+        },
+        "modifiers": {
+          "exceeding_potential": 2.0,
+          "meeting_potential": 1.0,
+          "developing_normally": 0.0,
+          "underperforming": -2.0
+        },
+        "minimum_potential_for_bonus": 45
+      },
+      "_draft_mode_note": "draft_mode_dampener (0-1) multiplies dev_adj when --draft is set; 1.0=no change, 0.7=30% damp",
+      "draft_mode_dampener": 0.7
+    },
+    "age_vs_level": {
+      "_comment": "Adjustment for players ahead/behind the curve for their level",
+      "hitter": {
+        "level_targets": {
+          "ML": {
+            "target_age": 27,
+            "tolerance_band": 2.5
+          },
+          "AAA": {
+            "target_age": 26,
+            "tolerance_band": 2.0
+          },
+          "AA": {
+            "target_age": 24,
+            "tolerance_band": 1.5
+          },
+          "A+": {
+            "target_age": 22,
+            "tolerance_band": 1.5
+          },
+          "A": {
+            "target_age": 21,
+            "tolerance_band": 1.2
+          },
+          "A-": {
+            "target_age": 20,
+            "tolerance_band": 1.0
+          },
+          "Rookie": {
+            "target_age": 19,
+            "tolerance_band": 0.8
+          }
+        },
+        "max_bonus": 3.0,
+        "max_penalty": -3.0
+      },
+      "pitcher": {
+        "_comment": "Pitchers develop slower, targets are ~1 year older",
+        "level_targets": {
+          "ML": {
+            "target_age": 28,
+            "tolerance_band": 2.5
+          },
+          "AAA": {
+            "target_age": 27,
+            "tolerance_band": 2.0
+          },
+          "AA": {
+            "target_age": 25,
+            "tolerance_band": 1.5
+          },
+          "A+": {
+            "target_age": 23,
+            "tolerance_band": 1.5
+          },
+          "A": {
+            "target_age": 22,
+            "tolerance_band": 1.2
+          },
+          "A-": {
+            "target_age": 21,
+            "tolerance_band": 1.0
+          },
+          "Rookie": {
+            "target_age": 20,
+            "tolerance_band": 0.8
+          }
+        },
+        "max_bonus": 2.5,
+        "max_penalty": -3.0
+      }
+    },
+    "personality_impact": {
+      "_comment": "Personality cells in CSV are U (unknown), H (high), N (normal), L (low). U = no modifier.",
+      "trait_modifiers": {
+        "Intelligence": {
+          "high": 1.5,
+          "normal": 0.0,
+          "low": -1.0
+        },
+        "Work_Ethic": {
+          "high": 2.0,
+          "normal": 0.0,
+          "low": -2.5
+        },
+        "Greed": {
+          "_comment": "Greed is slightly negative when high (harder to sign/extend)",
+          "high": -0.5,
+          "normal": 0.0,
+          "low": 0.5
+        },
+        "Loyalty": {
+          "high": 0.5,
+          "normal": 0.0,
+          "low": -0.5
+        },
+        "Leadership": {
+          "high": 1.5,
+          "normal": 0.0,
+          "low": -0.5
+        }
+      }
+    },
+    "draft_role_penalties": {
+      "_comment": "Applied only in --draft mode. Use negatives to push certain roles down draft boards.",
+      "RP": -2.0
+    },
+    "readiness": {
+      "_comment": "Rewards draftees whose CURRENT profile is MLB-ready. Applied only when --draft mode is enabled. Feeds into both VOS_Score and VOS_Potential.",
+      "pitcher": {
+        "enabled": true,
+        "min_age": 20,
+        "floor_tiers": [
+          {
+            "min_avg": 55,
+            "min_min": 50,
+            "bonus": 3.0
+          },
+          {
+            "min_avg": 50,
+            "min_min": 45,
+            "bonus": 2.0
+          },
+          {
+            "min_avg": 45,
+            "min_min": 40,
+            "bonus": 1.0
+          }
+        ],
+        "plus_pitch_threshold": 55,
+        "elite_pitch_threshold": 70,
+        "per_plus_pitch": 0.5,
+        "max_plus_pitch_bonus": 2.0,
+        "per_elite_pitch": 1.0,
+        "sp_stamina_floor": 45,
+        "sp_stamina_penalty_mult": 0.5
+      },
+      "hitter": {
+        "enabled": true,
+        "min_age": 20,
+        "floor_tiers": [
+          {
+            "min_avg": 55,
+            "min_min": 50,
+            "bonus": 3.0
+          },
+          {
+            "min_avg": 50,
+            "min_min": 45,
+            "bonus": 2.0
+          },
+          {
+            "min_avg": 45,
+            "min_min": 40,
+            "bonus": 1.0
+          }
+        ],
+        "plus_tool_threshold": 55,
+        "elite_tool_threshold": 70,
+        "per_plus_tool": 0.4,
+        "max_plus_tool_bonus": 2.0,
+        "per_elite_tool": 1.0,
+        "position_ready_bonus": 1.0,
+        "multi_position_bonus": 0.5,
+        "multi_position_threshold": 3
+      }
+    }
+  },
+  "normalization": {
+    "_comment": "Settings for normalizing raw scores to the 20-80 scale",
+    "method": "sigmoid",
+    "target_center": 50.0,
+    "scale_parameter": 15.0,
+    "hard_floor": 20.0,
+    "hard_ceiling": 80.0
+  },
+  "tiers": {
+    "_comment": "VOS-score tier labels. Bands are evaluated top-down: first band whose 'min' is <= score wins. Hitter cutoffs apply to position-player VOS and to per-position scores. Pitcher cutoffs apply to SP/RP VOS and to pitcher role scores. Calibrated from TLG ML distribution (Feb 2026).",
+    "hitter": [
+      {"min": 65.0, "label": "Star"},
+      {"min": 58.0, "label": "Above-Avg Regular"},
+      {"min": 52.0, "label": "Reliable Starter"},
+      {"min": 47.0, "label": "Fringe Regular"},
+      {"min": 42.0, "label": "Bench"},
+      {"min": 37.0, "label": "Replacement"},
+      {"min": 0.0,  "label": "Org Filler"}
+    ],
+    "pitcher": [
+      {"min": 58.0, "label": "Ace"},
+      {"min": 51.0, "label": "#2/#3 Starter"},
+      {"min": 46.0, "label": "Mid-Rotation"},
+      {"min": 41.0, "label": "Back-End / Setup"},
+      {"min": 36.0, "label": "Long Relief / Swing"},
+      {"min": 31.0, "label": "Replacement"},
+      {"min": 0.0,  "label": "Org Filler"}
+    ]
+  }
+}

@@ -1,0 +1,742 @@
+{
+  "1": {
+    "Name": "Hudson Valley",
+    "Nickname": "Renegades",
+    "Parent": 0
+  },
+  "2": {
+    "Name": "New Orleans",
+    "Nickname": "Crawdaddy's",
+    "Parent": 0
+  },
+  "3": {
+    "Name": "Chihuahua",
+    "Nickname": "Guerreros",
+    "Parent": 0
+  },
+  "4": {
+    "Name": "Arizona",
+    "Nickname": "Diamond Scorchers",
+    "Parent": 0
+  },
+  "5": {
+    "Name": "Brick",
+    "Nickname": "Barracudas",
+    "Parent": 0
+  },
+  "6": {
+    "Name": "San Diego",
+    "Nickname": "Groot",
+    "Parent": 0
+  },
+  "7": {
+    "Name": "Antelope Valley",
+    "Nickname": "Raptors",
+    "Parent": 0
+  },
+  "8": {
+    "Name": "Norfolk",
+    "Nickname": "Atlantics",
+    "Parent": 0
+  },
+  "9": {
+    "Name": "Atlanta",
+    "Nickname": "Black Crackers",
+    "Parent": 0
+  },
+  "10": {
+    "Name": "Philadelphia",
+    "Nickname": "Hornets",
+    "Parent": 0
+  },
+  "11": {
+    "Name": "Toronto",
+    "Nickname": "Beavers",
+    "Parent": 0
+  },
+  "12": {
+    "Name": "Appalachian",
+    "Nickname": "Black Bears",
+    "Parent": 0
+  },
+  "13": {
+    "Name": "Adams League",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "14": {
+    "Name": "Zotti League",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "15": {
+    "Name": "Arizona Bay",
+    "Nickname": "Lizards",
+    "Parent": 10
+  },
+  "16": {
+    "Name": "Warminster",
+    "Nickname": "Warriors",
+    "Parent": 5
+  },
+  "17": {
+    "Name": "Detroit",
+    "Nickname": "Wheels",
+    "Parent": 11
+  },
+  "18": {
+    "Name": "Bowie",
+    "Nickname": "Baysox",
+    "Parent": 4
+  },
+  "19": {
+    "Name": "Mexico City",
+    "Nickname": "Diablos Rojos",
+    "Parent": 9
+  },
+  "20": {
+    "Name": "Somerville",
+    "Nickname": "Fluff",
+    "Parent": 6
+  },
+  "21": {
+    "Name": "Las Vegas",
+    "Nickname": "Lightning",
+    "Parent": 7
+  },
+  "22": {
+    "Name": "Pukalani",
+    "Nickname": "Paniolos",
+    "Parent": 2
+  },
+  "23": {
+    "Name": "Cleveland",
+    "Nickname": "Spiders",
+    "Parent": 12
+  },
+  "24": {
+    "Name": "Charleston",
+    "Nickname": "Frasers",
+    "Parent": 8
+  },
+  "25": {
+    "Name": "Kensington",
+    "Nickname": "Wolfpack",
+    "Parent": 1
+  },
+  "26": {
+    "Name": "Kankakee",
+    "Nickname": "Fishers",
+    "Parent": 3
+  },
+  "27": {
+    "Name": "Sub League 1",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "28": {
+    "Name": "Sub League 2",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "29": {
+    "Name": "Akron",
+    "Nickname": "Wheels",
+    "Parent": 11
+  },
+  "30": {
+    "Name": "Frederick",
+    "Nickname": "Keys",
+    "Parent": 4
+  },
+  "31": {
+    "Name": "New Providence",
+    "Nickname": "Cannons",
+    "Parent": 8
+  },
+  "32": {
+    "Name": "Peoria",
+    "Nickname": "Butterflies",
+    "Parent": 6
+  },
+  "33": {
+    "Name": "Amsterdam",
+    "Nickname": "Rugmakers",
+    "Parent": 9
+  },
+  "34": {
+    "Name": "Sacramento",
+    "Nickname": "Falcons",
+    "Parent": 7
+  },
+  "35": {
+    "Name": "Flatbush",
+    "Nickname": "Pups",
+    "Parent": 1
+  },
+  "36": {
+    "Name": "Spreckelsville",
+    "Nickname": "Sharks",
+    "Parent": 2
+  },
+  "37": {
+    "Name": "Moose Jaw",
+    "Nickname": "Rumrunners",
+    "Parent": 5
+  },
+  "38": {
+    "Name": "Kalmar",
+    "Nickname": "Unionists",
+    "Parent": 10
+  },
+  "39": {
+    "Name": "Arlen",
+    "Nickname": "Longhorns",
+    "Parent": 3
+  },
+  "40": {
+    "Name": "Queensland",
+    "Nickname": "Dingos",
+    "Parent": 12
+  },
+  "41": {
+    "Name": "Sub League 1",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "42": {
+    "Name": "Sub League 2",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "43": {
+    "Name": "Bridgetown",
+    "Nickname": "Rum Runners",
+    "Parent": 8
+  },
+  "44": {
+    "Name": "Brighton Beach",
+    "Nickname": "Yippers",
+    "Parent": 1
+  },
+  "45": {
+    "Name": "Long Island",
+    "Nickname": "Spuds",
+    "Parent": 6
+  },
+  "46": {
+    "Name": "Marietta",
+    "Nickname": "Mammoths",
+    "Parent": 11
+  },
+  "47": {
+    "Name": "Tisdale",
+    "Nickname": "Prarie Sox",
+    "Parent": 5
+  },
+  "48": {
+    "Name": "Delmarva",
+    "Nickname": "Shorebirds",
+    "Parent": 4
+  },
+  "49": {
+    "Name": "Senoia",
+    "Nickname": "Walkers",
+    "Parent": 3
+  },
+  "50": {
+    "Name": "Caprica",
+    "Nickname": "Buccaneers",
+    "Parent": 10
+  },
+  "51": {
+    "Name": "Wailuku",
+    "Nickname": "Whales",
+    "Parent": 2
+  },
+  "52": {
+    "Name": "Tennessee",
+    "Nickname": "Smokies",
+    "Parent": 9
+  },
+  "53": {
+    "Name": "Atlanta",
+    "Nickname": "Farthings",
+    "Parent": 12
+  },
+  "54": {
+    "Name": "Fresno",
+    "Nickname": "Eagles",
+    "Parent": 7
+  },
+  "55": {
+    "Name": "Sub League 1",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "56": {
+    "Name": "Sub League 2",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "57": {
+    "Name": "Faber College",
+    "Nickname": "Sunrays",
+    "Parent": 0
+  },
+  "58": {
+    "Name": "Colorado Springs College",
+    "Nickname": "Valleycats",
+    "Parent": 0
+  },
+  "59": {
+    "Name": "Wildwood Lake College",
+    "Nickname": "Colonials",
+    "Parent": 0
+  },
+  "60": {
+    "Name": "Raleigh College",
+    "Nickname": "Highlanders",
+    "Parent": 0
+  },
+  "61": {
+    "Name": "Modesto College",
+    "Nickname": "Bighorns",
+    "Parent": 0
+  },
+  "62": {
+    "Name": "Buechel College",
+    "Nickname": "Bison",
+    "Parent": 0
+  },
+  "63": {
+    "Name": "Durham College",
+    "Nickname": "Sheepdogs",
+    "Parent": 0
+  },
+  "64": {
+    "Name": "Scottsdale College",
+    "Nickname": "Weevils",
+    "Parent": 0
+  },
+  "65": {
+    "Name": "Louisville College",
+    "Nickname": "Sky Warriors",
+    "Parent": 0
+  },
+  "66": {
+    "Name": "Storm Lake College",
+    "Nickname": "Phoenix",
+    "Parent": 0
+  },
+  "67": {
+    "Name": "Norfolk College",
+    "Nickname": "Bluejackets",
+    "Parent": 0
+  },
+  "68": {
+    "Name": "Rochelle College",
+    "Nickname": "Beachcombers",
+    "Parent": 0
+  },
+  "69": {
+    "Name": "Riverside HS",
+    "Nickname": "Sandpipers",
+    "Parent": 0
+  },
+  "70": {
+    "Name": "Tulsa HS",
+    "Nickname": "Commanders",
+    "Parent": 0
+  },
+  "71": {
+    "Name": "Staten Island HS",
+    "Nickname": "Explorers",
+    "Parent": 0
+  },
+  "72": {
+    "Name": "Tampa HS",
+    "Nickname": "Loggers",
+    "Parent": 0
+  },
+  "73": {
+    "Name": "Newark HS",
+    "Nickname": "Bluffers",
+    "Parent": 0
+  },
+  "74": {
+    "Name": "Port Isabel HS",
+    "Nickname": "Ants",
+    "Parent": 0
+  },
+  "75": {
+    "Name": "Northwood HS",
+    "Nickname": "Jackals",
+    "Parent": 0
+  },
+  "76": {
+    "Name": "Paradise HS",
+    "Nickname": "Sentinels",
+    "Parent": 0
+  },
+  "77": {
+    "Name": "Paradise HS",
+    "Nickname": "Dodos",
+    "Parent": 0
+  },
+  "78": {
+    "Name": "Glendale HS",
+    "Nickname": "Goths",
+    "Parent": 0
+  },
+  "79": {
+    "Name": "Kansas City HS",
+    "Nickname": "Squirrels",
+    "Parent": 0
+  },
+  "80": {
+    "Name": "Toledo HS",
+    "Nickname": "Sea Dogs",
+    "Parent": 0
+  },
+  "81": {
+    "Name": "Birmingham College",
+    "Nickname": "Herons",
+    "Parent": 0
+  },
+  "82": {
+    "Name": "Oklahoma City College",
+    "Nickname": "Snipers",
+    "Parent": 0
+  },
+  "83": {
+    "Name": "Weston College",
+    "Nickname": "Flame",
+    "Parent": 0
+  },
+  "84": {
+    "Name": "Oakland College",
+    "Nickname": "Octopuses",
+    "Parent": 0
+  },
+  "85": {
+    "Name": "Omaha College",
+    "Nickname": "Ascenders",
+    "Parent": 0
+  },
+  "86": {
+    "Name": "Seattle College",
+    "Nickname": "Skyhawks",
+    "Parent": 0
+  },
+  "87": {
+    "Name": "Fresno College",
+    "Nickname": "Emissaries",
+    "Parent": 0
+  },
+  "88": {
+    "Name": "San Bernardino College",
+    "Nickname": "Ventures",
+    "Parent": 0
+  },
+  "89": {
+    "Name": "Little Cottonwood Creek Valley College",
+    "Nickname": "Rhinos",
+    "Parent": 0
+  },
+  "90": {
+    "Name": "Madison College",
+    "Nickname": "Red Dragons",
+    "Parent": 0
+  },
+  "91": {
+    "Name": "Hannahs Mill College",
+    "Nickname": "Spin Doctors",
+    "Parent": 0
+  },
+  "92": {
+    "Name": "Atoka College",
+    "Nickname": "Brawlers",
+    "Parent": 0
+  },
+  "93": {
+    "Name": "Hillsborough HS",
+    "Nickname": "Marshals",
+    "Parent": 0
+  },
+  "94": {
+    "Name": "Pittsburgh HS",
+    "Nickname": "Bombers",
+    "Parent": 0
+  },
+  "95": {
+    "Name": "Bountiful HS",
+    "Nickname": "Vendetta",
+    "Parent": 0
+  },
+  "96": {
+    "Name": "Las Lomas HS",
+    "Nickname": "Fantastic",
+    "Parent": 0
+  },
+  "97": {
+    "Name": "Chilhowie HS",
+    "Nickname": "Pillagers",
+    "Parent": 0
+  },
+  "98": {
+    "Name": "Holyoke HS",
+    "Nickname": "Challenge",
+    "Parent": 0
+  },
+  "99": {
+    "Name": "Atlanta HS",
+    "Nickname": "Snarl",
+    "Parent": 0
+  },
+  "100": {
+    "Name": "Montgomery HS",
+    "Nickname": "Steeds",
+    "Parent": 0
+  },
+  "101": {
+    "Name": "New York Mills HS",
+    "Nickname": "Padres",
+    "Parent": 0
+  },
+  "102": {
+    "Name": "Des Moines HS",
+    "Nickname": "Golden Knights",
+    "Parent": 0
+  },
+  "103": {
+    "Name": "Augusta-Richmond County HS",
+    "Nickname": "Archers",
+    "Parent": 0
+  },
+  "104": {
+    "Name": "Sunrise Manor HS",
+    "Nickname": "Soldiers",
+    "Parent": 0
+  },
+  "105": {
+    "Name": "Marine Park",
+    "Nickname": "Lupines",
+    "Parent": 1
+  },
+  "106": {
+    "Name": "Kihei",
+    "Nickname": "Keikis",
+    "Parent": 2
+  },
+  "107": {
+    "Name": "Mojave",
+    "Nickname": "Mustangs",
+    "Parent": 7
+  },
+  "108": {
+    "Name": "Boone Valley",
+    "Nickname": "Cubs",
+    "Parent": 12
+  },
+  "109": {
+    "Name": "Lexington",
+    "Nickname": "Kings",
+    "Parent": 5
+  },
+  "110": {
+    "Name": "Havana",
+    "Nickname": "Sugar Kings",
+    "Parent": 8
+  },
+  "111": {
+    "Name": "Delaware Valley",
+    "Nickname": "Vagabonds",
+    "Parent": 10
+  },
+  "112": {
+    "Name": "Fosston",
+    "Nickname": "Fighting Pike",
+    "Parent": 11
+  },
+  "113": {
+    "Name": "Seattle",
+    "Nickname": "Poppyseeds",
+    "Parent": 6
+  },
+  "114": {
+    "Name": "Aberdeen",
+    "Nickname": "Ironbirds",
+    "Parent": 4
+  },
+  "115": {
+    "Name": "Palookaville",
+    "Nickname": "Peewits",
+    "Parent": 9
+  },
+  "116": {
+    "Name": "Springfield",
+    "Nickname": "Isotopes",
+    "Parent": 3
+  },
+  "117": {
+    "Name": "Halifax",
+    "Nickname": "Privateers",
+    "Parent": 0
+  },
+  "118": {
+    "Name": "Colorado",
+    "Nickname": "Peaks",
+    "Parent": 0
+  },
+  "119": {
+    "Name": "Dayton",
+    "Nickname": "Bombers",
+    "Parent": 0
+  },
+  "120": {
+    "Name": "Washington",
+    "Nickname": "Patriots",
+    "Parent": 0
+  },
+  "121": {
+    "Name": "Saint John",
+    "Nickname": "Seals",
+    "Parent": 117
+  },
+  "122": {
+    "Name": "Rockport",
+    "Nickname": "Tridents",
+    "Parent": 117
+  },
+  "123": {
+    "Name": "Kingston",
+    "Nickname": "Norse",
+    "Parent": 117
+  },
+  "124": {
+    "Name": "Queens",
+    "Nickname": "Mutiny",
+    "Parent": 117
+  },
+  "125": {
+    "Name": "San Antonio",
+    "Nickname": "Blizzard",
+    "Parent": 118
+  },
+  "126": {
+    "Name": "Charlotte",
+    "Nickname": "Sabercats",
+    "Parent": 118
+  },
+  "127": {
+    "Name": "San Francisco",
+    "Nickname": "Canucks",
+    "Parent": 118
+  },
+  "128": {
+    "Name": "Jacksonville",
+    "Nickname": "Kangaroos",
+    "Parent": 118
+  },
+  "129": {
+    "Name": "Asheville",
+    "Nickname": "Spitfires",
+    "Parent": 119
+  },
+  "130": {
+    "Name": "Sherbrooke",
+    "Nickname": "Squadron",
+    "Parent": 119
+  },
+  "131": {
+    "Name": "Wilmington",
+    "Nickname": "Fighters",
+    "Parent": 119
+  },
+  "132": {
+    "Name": "Greenmont",
+    "Nickname": "Greenies",
+    "Parent": 119
+  },
+  "133": {
+    "Name": "Puget Sound",
+    "Nickname": "Northmen",
+    "Parent": 120
+  },
+  "134": {
+    "Name": "Portland",
+    "Nickname": "Blue Devils",
+    "Parent": 120
+  },
+  "135": {
+    "Name": "Tucson",
+    "Nickname": "Jesters",
+    "Parent": 120
+  },
+  "136": {
+    "Name": "San Diego",
+    "Nickname": "Red Wings",
+    "Parent": 120
+  },
+  "137": {
+    "Name": "Adams League",
+    "Nickname": "Future Stars",
+    "Parent": 0
+  },
+  "138": {
+    "Name": "Zotti League",
+    "Nickname": "Future Stars",
+    "Parent": 0
+  },
+  "139": {
+    "Name": "Mesa",
+    "Nickname": "Solar Sox",
+    "Parent": 0
+  },
+  "140": {
+    "Name": "Salt River",
+    "Nickname": "Rafters",
+    "Parent": 0
+  },
+  "141": {
+    "Name": "Scottsdale",
+    "Nickname": "Scorpions",
+    "Parent": 0
+  },
+  "142": {
+    "Name": "Peoria",
+    "Nickname": "Javelinas",
+    "Parent": 0
+  },
+  "143": {
+    "Name": "Surprise",
+    "Nickname": "Saguaros",
+    "Parent": 0
+  },
+  "144": {
+    "Name": "Glendale",
+    "Nickname": "Desert Dogs",
+    "Parent": 0
+  },
+  "145": {
+    "Name": "Flagstaff",
+    "Nickname": "Forest Rats",
+    "Parent": 0
+  },
+  "146": {
+    "Name": "Tempe",
+    "Nickname": "Terrors",
+    "Parent": 0
+  },
+  "147": {
+    "Name": "Eastern Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "148": {
+    "Name": "Western Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  }
+}

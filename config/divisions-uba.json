@@ -1,0 +1,22 @@
+{
+  "_comment": "UBA division structure for league projection rollups.",
+  "_comment_2": "Team display names must match the eval CSV's Org column, config/uba_orgs.json, and uba-park-factors.json teams[] keys.",
+
+  "Aaron Conference": {
+    "East":    ["Pittsburgh Champions", "Columbus Moon Walkers", "Philadelphia Brotherhood",
+                "Illinois Stoppers", "Florida Flamingos"],
+    "Central": ["Omaha Mammoths", "Orlando SunRays", "New Orleans Voodoo",
+                "San Antonio Armadillos"],
+    "West":    ["Portland Sea Dogs", "Oakland Oaks", "Sacramento Watchmen",
+                "Cardiff Bay Barrage", "Yellowknife Thieves"]
+  },
+
+  "Ruth Conference": {
+    "East":    ["Charleston Rebels", "Cape Fear Carnivores", "New York City Baseball Club",
+                "Atlanta Bandits"],
+    "Central": ["Eden Prairie Landsharks", "Toledo Troutheads", "Salt Lake Bees",
+                "Mexico City Red Devils", "Phoenix Firebirds"],
+    "West":    ["San Francisco Spartans", "Hollywood Stars", "Oregon Ducks",
+                "Seattle Steelheads", "Yakima Valley Pippins"]
+  }
+}

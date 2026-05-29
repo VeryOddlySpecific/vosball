@@ -1,0 +1,3143 @@
+{
+  "_comment": "UBA park factors by team for VOS Evaluation",
+  "_comment_2": "Team keys match config/uba_orgs.json. Atlanta Bandits uses AFLAC Ballpark OOTP data; remaining teams are neutral placeholders until team-specific park factors are entered",
+  "teams": {
+    "Atlanta Bandits": {
+      "_comment": "Park factors for Atlanta Bandits (UBA) - VOS Evaluation",
+      "_comment_2": "AFLAC Ballpark — retractable roof, grass, capacity 45,000 (OOTP park factors)",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Atlanta Bandits",
+        "team_code": "ATB",
+        "park_name": "AFLAC Ballpark"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.98,
+        "avg_rhb": 0.98,
+        "avg_lhb": 0.98,
+        "doubles": 1.055,
+        "triples": 1.05,
+        "hr_overall": 0.967,
+        "hr_rhb": 0.96,
+        "hr_lhb": 0.98
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "balanced_slight_gap",
+        "description": "AFLAC Ballpark (retractable roof, grass) suppresses batting average and home runs slightly while boosting doubles and triples. Favors gap hitters over pure power; modest RHB HR edge.",
+        "key_characteristics": [
+          "Modest HR suppression (-3.3% overall)",
+          "Modest doubles boost (+5.5%)",
+          "Modest triples boost (+5.0%)",
+          "Slight batting average depression (-2.0%)",
+          "Small RHB vs LHB HR split (~2.1% relative)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "These are calculated from raw park factors using conversion formulas",
+        "batting": {
+          "Pow": 0.98,
+          "_calculation_Pow": "1.0 + ((0.967 - 1.0) x 0.6) = 0.980 | Power worth 2.0% less",
+          "Gap": 1.043,
+          "_calculation_Gap": "1.0 + ((1.055 - 1.0) x 0.5) + ((1.050 - 1.0) x 0.3) = 1.043 | Gap worth 4.3% more",
+          "Eye": 0.994,
+          "_calculation_Eye": "1.0 + ((0.980 - 1.0) x 0.3) = 0.994 | Eye worth 0.6% less",
+          "Ks": 1.004,
+          "_calculation_Ks": "1.0 + ((0.980 - 1.0) x -0.2) = 1.004 | Avoiding Ks worth 0.4% more"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples with slightly depressed average — outfield range still matters for gaps",
+          "OFR": 1.04,
+          "_rationale_OFR": "Above-average 2B/3B rates reward outfield range on balls in the alleys",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly below-average average implies marginally fewer balls to infielders",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Modest doubles/triples environment rewards speed and reads slightly",
+          "Speed": 1.02,
+          "_rationale_Speed": "Extra-base opportunities slightly above average",
+          "Run": 1.03,
+          "_rationale_Run": "Triples rate nudges value of smart baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Park characteristics affect which pitcher skills are most valuable",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Some help limiting hard contact in the gaps",
+          "Control": 1.01,
+          "_rationale_Control": "Marginally more important with slightly depressed average",
+          "HR_Avoid": 0.98,
+          "_rationale_HR_Avoid": "Mild HR suppression — HR avoidance matters a bit less than in a big HR park"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB 0.960 vs LHB 0.980 HR factors — small split",
+        "_comment_2": "Optional handedness-specific adjustments - only used if use_handedness_splits is true",
+        "enabled": false,
+        "_rationale": "Splits are modest (~2% HR difference) — optional complexity",
+        "RHB": {
+          "Pow": 0.976,
+          "_calculation": "1.0 + ((0.960 - 1.0) x 0.6) = 0.976"
+        },
+        "LHB": {
+          "Pow": 0.988,
+          "_calculation": "1.0 + ((0.980 - 1.0) x 0.6) = 0.988"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Atlanta Bandits organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default — RHB/LHB HR gap is small",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "Use 50% strength as conservative starting point. 1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.990 instead of 0.980"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Consider if RHB/LHB HR factors differ by >10% (here ~2%)"
+      }
+    },
+    "Cape Fear Carnivores": {
+      "_comment": "Park factors for Cape Fear Carnivores (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Cape Fear Carnivores",
+        "team_code": "CFC",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Cape Fear Carnivores.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Cape Fear Carnivores organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Cardiff Bay Barrage": {
+      "_comment": "Park factors for Cardiff Bay Barrage (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Cardiff Bay Barrage",
+        "team_code": "CBB",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Cardiff Bay Barrage.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Cardiff Bay Barrage organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Charleston Rebels": {
+      "_comment": "Park factors for Charleston Rebels (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Charleston Rebels",
+        "team_code": "CHR",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Charleston Rebels.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Charleston Rebels organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Columbus Moon Walkers": {
+      "_comment": "Park factors for Columbus Moon Walkers (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Columbus Moon Walkers",
+        "team_code": "CMW",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Columbus Moon Walkers.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Columbus Moon Walkers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Eden Prairie Landsharks": {
+      "_comment": "Park factors for Eden Prairie Landsharks (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Eden Prairie Landsharks",
+        "team_code": "EPL",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Eden Prairie Landsharks.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Eden Prairie Landsharks organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Florida Flamingos": {
+      "_comment": "Park factors for Florida Flamingos (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Florida Flamingos",
+        "team_code": "FLF",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Florida Flamingos.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Florida Flamingos organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Hollywood Stars": {
+      "_comment": "Park factors for Hollywood Stars (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Hollywood Stars",
+        "team_code": "HWS",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Hollywood Stars.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Hollywood Stars organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Illinois Stoppers": {
+      "_comment": "Park factors for Illinois Stoppers (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Illinois Stoppers",
+        "team_code": "ILS",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Illinois Stoppers.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Illinois Stoppers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Mexico City Red Devils": {
+      "_comment": "Park factors for Mexico City Red Devils (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Mexico City Red Devils",
+        "team_code": "MCR",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Mexico City Red Devils.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Mexico City Red Devils organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "New Orleans Voodoo": {
+      "_comment": "Park factors for New Orleans Voodoo (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "New Orleans Voodoo",
+        "team_code": "NOV",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for New Orleans Voodoo.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in New Orleans Voodoo organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "New York City Baseball Club": {
+      "_comment": "Park factors for New York City Baseball Club (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "New York City Baseball Club",
+        "team_code": "NYC",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for New York City Baseball Club.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in New York City Baseball Club organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Oakland Oaks": {
+      "_comment": "Park factors for Oakland Oaks (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Oakland Oaks",
+        "team_code": "OAK",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Oakland Oaks.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Oakland Oaks organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Omaha Mammoths": {
+      "_comment": "Park factors for Omaha Mammoths (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Omaha Mammoths",
+        "team_code": "OMA",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Omaha Mammoths.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Omaha Mammoths organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Oregon Ducks": {
+      "_comment": "Park factors for Oregon Ducks (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Oregon Ducks",
+        "team_code": "ORG",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Oregon Ducks.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Oregon Ducks organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Orlando SunRays": {
+      "_comment": "Park factors for Orlando SunRays (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Orlando SunRays",
+        "team_code": "ORL",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Orlando SunRays.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Orlando SunRays organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Philadelphia Brotherhood": {
+      "_comment": "Park factors for Philadelphia Brotherhood (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Philadelphia Brotherhood",
+        "team_code": "PHB",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Philadelphia Brotherhood.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Philadelphia Brotherhood organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Phoenix Firebirds": {
+      "_comment": "Park factors for Phoenix Firebirds (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Phoenix Firebirds",
+        "team_code": "PHX",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Phoenix Firebirds.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Phoenix Firebirds organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Pittsburgh Champions": {
+      "_comment": "Park factors for Pittsburgh Champions (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Pittsburgh Champions",
+        "team_code": "PTC",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Pittsburgh Champions.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Pittsburgh Champions organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Portland Sea Dogs": {
+      "_comment": "Park factors for Portland Sea Dogs (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Portland Sea Dogs",
+        "team_code": "PSD",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Portland Sea Dogs.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Portland Sea Dogs organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Sacramento Watchmen": {
+      "_comment": "Park factors for Sacramento Watchmen (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Sacramento Watchmen",
+        "team_code": "SAC",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Sacramento Watchmen.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Sacramento Watchmen organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Salt Lake Bees": {
+      "_comment": "Park factors for Salt Lake Bees (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Salt Lake Bees",
+        "team_code": "SLB",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Salt Lake Bees.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Salt Lake Bees organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "San Antonio Armadillos": {
+      "_comment": "Park factors for San Antonio Armadillos (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "San Antonio Armadillos",
+        "team_code": "SAA",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for San Antonio Armadillos.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in San Antonio Armadillos organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "San Francisco Spartans": {
+      "_comment": "Park factors for San Francisco Spartans (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "San Francisco Spartans",
+        "team_code": "SFS",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for San Francisco Spartans.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in San Francisco Spartans organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Seattle Steelheads": {
+      "_comment": "Park factors for Seattle Steelheads (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Seattle Steelheads",
+        "team_code": "SEA",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Seattle Steelheads.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Seattle Steelheads organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Toledo Troutheads": {
+      "_comment": "Park factors for Toledo Troutheads (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Toledo Troutheads",
+        "team_code": "TOL",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Toledo Troutheads.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Toledo Troutheads organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Yakima Valley Pippins": {
+      "_comment": "Park factors for Yakima Valley Pippins (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Yakima Valley Pippins",
+        "team_code": "YVP",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Yakima Valley Pippins.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Yakima Valley Pippins organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Yellowknife Thieves": {
+      "_comment": "Park factors for Yellowknife Thieves (UBA) - VOS Evaluation",
+      "_comment_2": "PLACEHOLDER: neutral 1.000 raw factors until OOTP park data is supplied",
+      "_comment_3": "Each team should have its own park factors file (e.g., park-factors-{team-code}.json)",
+      "team_info": {
+        "team_name": "Yellowknife Thieves",
+        "team_code": "YKT",
+        "park_name": "Placeholder Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Placeholder Park registers as a true neutral venue: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average until UBA-specific OOTP park data is entered for Yellowknife Thieves.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: conversion formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Yellowknife Thieves organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league uba --park-factors uba-park-factors.json",
+        "creating_files_for_other_teams": "Copy this team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    }
+  }
+}

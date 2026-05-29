@@ -1,0 +1,3393 @@
+{
+  "_comment": "NLD park factors by team for VOS Evaluation",
+  "_comment_2": "PLACEHOLDER: all teams use neutral 1.0 raw factors until OOTP park data is supplied",
+  "teams": {
+    "Alabama Bears": {
+      "_comment": "Park factors for Alabama Bears (NLD) - VOS Evaluation",
+      "_comment_2": "Rocky Roads - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Gap-friendly profile with HR suppression; tool_adjustments follow SAHL conversion formulas",
+      "team_info": {
+        "team_name": "Alabama Bears",
+        "team_code": "ALA",
+        "park_name": "Rocky Roads"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.017,
+        "avg_rhb": 1.019,
+        "avg_lhb": 1.014,
+        "doubles": 1.107,
+        "triples": 1.117,
+        "hr_overall": 0.916,
+        "hr_rhb": 0.927,
+        "hr_lhb": 0.897
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Rocky Roads lifts batting average and especially doubles and triples while suppressing home runs for both hands. Favor gap hitters, contact, outfield range, and efficient baserunning over pure pull power.",
+        "key_characteristics": [
+          "Home run suppression (-8.4% overall)",
+          "Doubles boost (+10.7%)",
+          "Triples boost (+11.7%)",
+          "Batting average boost (+1.7%)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.95,
+          "_calculation_Pow": "1.0 + ((0.916 - 1.0) x 0.6) = 0.950 | Power worth 5.0% less",
+          "Gap": 1.089,
+          "_calculation_Gap": "1.0 + ((1.107 - 1.0) x 0.5) + ((1.117 - 1.0) x 0.3) = 1.089 | Gap worth 8.9% more",
+          "Eye": 1.005,
+          "_calculation_Eye": "1.0 + ((1.017 - 1.0) x 0.3) = 1.005 | Eye worth 0.5% more",
+          "Ks": 0.997,
+          "_calculation_Ks": "1.0 + ((1.017 - 1.0) x -0.2) = 0.997 | Avoiding Ks worth 0.3% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and contact increase outfield range value",
+          "OFR": 1.04,
+          "_rationale_OFR": "Boosted doubles/triples put a premium on outfield range and routes",
+          "IFR": 1.01,
+          "_rationale_IFR": "Slightly higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly environment rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "More doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward sound baserunning reads",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-suppressing park lowers marginal value of HR-avoidance specialization",
+          "Stuff": 1.0,
+          "Movement": 0.98,
+          "_rationale_Movement": "Park already depresses HRs; less premium on movement purely for fly-ball HR prevention",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.95,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.927 vs LHB HR 0.897 (~3.3% relative gap on HR factor)",
+        "_comment_2": "Modest split - optional to enable for fine-grained handedness valuation",
+        "enabled": false,
+        "_rationale": "~3.3% HR split is modest; keep disabled unless you want RHB/LHB power scaled separately",
+        "RHB": {
+          "Pow": 0.956,
+          "_calculation": "1.0 + ((0.927 - 1.0) x 0.6) = 0.956"
+        },
+        "LHB": {
+          "Pow": 0.938,
+          "_calculation": "1.0 + ((0.897 - 1.0) x 0.6) = 0.938"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Alabama Bears organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; enable if you want separate RHB/LHB power scaling",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.975 instead of 0.950"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "After real HR splits are entered, enable if RHB/LHB differ meaningfully"
+      }
+    },
+    "Anchorage Seawolves": {
+      "_comment": "Park factors for Anchorage Seawolves (NLD) - VOS Evaluation",
+      "_comment_2": "Montreal Stadium - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong gap/triples environment with HR suppression; large LHB vs RHB HR split",
+      "team_info": {
+        "team_name": "Anchorage Seawolves",
+        "team_code": "ANC",
+        "park_name": "Montreal Stadium"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.03,
+        "avg_rhb": 1.031,
+        "avg_lhb": 1.028,
+        "doubles": 1.245,
+        "triples": 1.256,
+        "hr_overall": 0.849,
+        "hr_rhb": 0.906,
+        "hr_lhb": 0.744
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Montreal Stadium is a strong gap and triples park with a solid batting-average lift and materially suppressed home runs, especially for left-handed pull power. Favor gap hitters, outfield defense, and baserunning; value handedness for power evaluation.",
+        "key_characteristics": [
+          "Home run suppression (-15.1% overall)",
+          "Major doubles boost (+24.5%)",
+          "Major triples boost (+25.6%)",
+          "Batting average boost (+3.0%)",
+          "Large RHB vs LHB HR gap (0.906 vs 0.744)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.909,
+          "_calculation_Pow": "1.0 + ((0.849 - 1.0) x 0.6) = 0.909 | Power worth 9.1% less (overall HR)",
+          "Gap": 1.199,
+          "_calculation_Gap": "1.0 + ((1.245 - 1.0) x 0.5) + ((1.256 - 1.0) x 0.3) = 1.199 | Gap worth 19.9% more",
+          "Eye": 1.009,
+          "_calculation_Eye": "1.0 + ((1.030 - 1.0) x 0.3) = 1.009 | Eye worth 0.9% more",
+          "Ks": 0.994,
+          "_calculation_Ks": "1.0 + ((1.030 - 1.0) x -0.2) = 0.994 | Avoiding Ks worth 0.6% less"
+        },
+        "defense": {
+          "_comment": "Very high doubles/triples rates sharply increase outfield range value",
+          "OFR": 1.09,
+          "_rationale_OFR": "Elite doubles/triples environment demands plus outfield range and routes",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extreme extra-base environment rewards speed and advancement",
+          "Speed": 1.06,
+          "_rationale_Speed": "Very high doubles/triples sharply increase speed payoff on balls in play",
+          "Run": 1.08,
+          "_rationale_Run": "Frequent extra-base opportunities reward aggressive, efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Deep HR suppression lowers marginal HR-avoidance premium; contact-rich park nudges control value",
+          "Stuff": 1.0,
+          "Movement": 0.94,
+          "_rationale_Movement": "Park strongly depresses HRs; less need for movement solely to limit fly-ball damage",
+          "Control": 0.99,
+          "_rationale_Control": "Above-average hits on balls in play keeps walk avoidance relevant",
+          "HR_Avoid": 0.91,
+          "_rationale_HR_Avoid": "With HRs already suppressed, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.906 vs LHB HR 0.744 (~21.8% relative to LHB factor)",
+        "_comment_2": "Large split - handedness-aware power scaling recommended",
+        "enabled": true,
+        "_rationale": "LHB HR factor is far below RHB; separate RHB/LHB power valuation improves accuracy",
+        "RHB": {
+          "Pow": 0.944,
+          "_calculation": "1.0 + ((0.906 - 1.0) x 0.6) = 0.944"
+        },
+        "LHB": {
+          "Pow": 0.846,
+          "_calculation": "1.0 + ((0.744 - 1.0) x 0.6) = 0.846"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Anchorage Seawolves organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to large RHB/LHB HR factor difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.955 instead of 0.909"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: RHB/LHB HR factors differ materially (0.906 vs 0.744)"
+      }
+    },
+    "Austin City Vegans": {
+      "_comment": "Park factors for Austin City Vegans (NLD) - VOS Evaluation",
+      "_comment_2": "Meat is Murder Stadium - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Near-neutral park: slight AVG/HR suppression, modest doubles/triples bump",
+      "team_info": {
+        "team_name": "Austin City Vegans",
+        "team_code": "AUS",
+        "park_name": "Meat is Murder Stadium"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.995,
+        "avg_rhb": 0.996,
+        "avg_lhb": 0.994,
+        "doubles": 1.037,
+        "triples": 1.05,
+        "hr_overall": 0.98,
+        "hr_rhb": 0.967,
+        "hr_lhb": 1.002
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "balanced_park",
+        "description": "Meat is Murder Stadium plays close to league average with a touch less batting average, a mild extra-base bump, and slightly suppressed home runs overall. RHB power is a bit more damped than LHB, but the split is small.",
+        "key_characteristics": [
+          "Slight batting average suppression (-0.5%)",
+          "Modest doubles boost (+3.7%)",
+          "Modest triples boost (+5.0%)",
+          "Slight home run suppression (-2.0% overall)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.988,
+          "_calculation_Pow": "1.0 + ((0.980 - 1.0) x 0.6) = 0.988 | Power worth 1.2% less",
+          "Gap": 1.034,
+          "_calculation_Gap": "1.0 + ((1.037 - 1.0) x 0.5) + ((1.050 - 1.0) x 0.3) = 1.034 | Gap worth 3.4% more",
+          "Eye": 0.999,
+          "_calculation_Eye": "1.0 + ((0.995 - 1.0) x 0.3) = 0.999 | Eye worth 0.1% less",
+          "Ks": 1.001,
+          "_calculation_Ks": "1.0 + ((0.995 - 1.0) x -0.2) = 1.001 | Avoiding Ks worth 0.1% more"
+        },
+        "defense": {
+          "_comment": "Mild extra-base lift with slightly lower AVG - small OF range premium, slight IFR dip",
+          "OFR": 1.02,
+          "_rationale_OFR": "Modest doubles/triples bump nudges outfield range value upward",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Light extra-base environment - minor speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Small doubles/triples increase slightly rewards speed on balls in play",
+          "Run": 1.01,
+          "_rationale_Run": "Modest extra-base rates offer a slight bump to advancement value",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression and slightly low AVG on BIP - small movement/HR-avoid tweaks",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in movement-for-HR-prevention premium",
+          "Control": 1.0,
+          "_rationale_Control": "Near-neutral run environment for free passes",
+          "HR_Avoid": 0.99,
+          "_rationale_HR_Avoid": "Slight HR suppression lowers marginal value of dedicated HR avoidance"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.967 vs LHB HR 1.002 (~3.6% vs overall HR 0.980)",
+        "_comment_2": "Small split - optional to enable; values precomputed if toggled on",
+        "enabled": false,
+        "_rationale": "~3.6% RHB/LHB HR gap is modest; keep disabled unless you want fine-grained handedness scaling",
+        "RHB": {
+          "Pow": 0.98,
+          "_calculation": "1.0 + ((0.967 - 1.0) x 0.6) = 0.980"
+        },
+        "LHB": {
+          "Pow": 1.001,
+          "_calculation": "1.0 + ((1.002 - 1.0) x 0.6) = 1.001"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Austin City Vegans organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; modest RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.994 instead of 0.988"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Optional: RHB/LHB HR differ slightly (0.967 vs 1.002) - usually keep disabled"
+      }
+    },
+    "Charlotte Mullet Mafia": {
+      "_comment": "Park factors for Charlotte Mullet Mafia (NLD) - VOS Evaluation",
+      "_comment_2": "Swallows Park - outdoor, grass, capacity 45,400 (OOTP)",
+      "_comment_3": "HR-friendly park with mild extra-base lift and slightly depressed batting average; meaningful LHB HR edge",
+      "team_info": {
+        "team_name": "Charlotte Mullet Mafia",
+        "team_code": "CHA",
+        "park_name": "Swallows Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.992,
+        "avg_rhb": 0.995,
+        "avg_lhb": 0.986,
+        "doubles": 1.009,
+        "triples": 1.043,
+        "hr_overall": 1.045,
+        "hr_rhb": 1.026,
+        "hr_lhb": 1.082
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "power_park",
+        "description": "Swallows Park boosts home runs overall with a modest doubles/triples tilt and slightly lower batting averages, especially for lefties. Left-handed pull power plays up more than right-handed. Favor power bats and HR-suppressing pitchers; outfield range gets a small bump from extra-base frequency.",
+        "key_characteristics": [
+          "Home run boost (+4.5% overall)",
+          "Slight batting average suppression (-0.8%)",
+          "Mild doubles boost (+0.9%)",
+          "Modest triples boost (+4.3%)",
+          "LHB HR factor notably above RHB (1.082 vs 1.026)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.027,
+          "_calculation_Pow": "1.0 + ((1.045 - 1.0) x 0.6) = 1.027 | Power worth 2.7% more",
+          "Gap": 1.017,
+          "_calculation_Gap": "1.0 + ((1.009 - 1.0) x 0.5) + ((1.043 - 1.0) x 0.3) = 1.017 | Gap worth 1.7% more",
+          "Eye": 0.998,
+          "_calculation_Eye": "1.0 + ((0.992 - 1.0) x 0.3) = 0.998 | Eye worth 0.2% less",
+          "Ks": 1.002,
+          "_calculation_Ks": "1.0 + ((0.992 - 1.0) x -0.2) = 1.002 | Avoiding Ks worth 0.2% more"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly lower AVG - modest OF premium, slight IFR dip",
+          "OFR": 1.02,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Modest extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly rewards speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement value bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-friendly park raises value of limiting long balls and quality of contact",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Elevated HR environment increases premium on movement and soft contact",
+          "Control": 1.01,
+          "_rationale_Control": "Slightly more important when balls leave the yard more often",
+          "HR_Avoid": 1.03,
+          "_rationale_HR_Avoid": "Park boosts HRs; pitchers who suppress homers gain extra value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.026 vs LHB HR 1.082 (~5.5% relative to RHB factor)",
+        "_comment_2": "Moderate split - separate LHB/RHB power scaling improves fit",
+        "enabled": true,
+        "_rationale": "LHB HR factor materially higher than RHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 1.016,
+          "_calculation": "1.0 + ((1.026 - 1.0) x 0.6) = 1.016"
+        },
+        "LHB": {
+          "Pow": 1.049,
+          "_calculation": "1.0 + ((1.082 - 1.0) x 0.6) = 1.049"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Charlotte Mullet Mafia organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.014 instead of 1.027"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 1.082 vs RHB HR 1.026"
+      }
+    },
+    "Cleveland Fighting Amish": {
+      "_comment": "Park factors for Cleveland Fighting Amish (NLD) - VOS Evaluation",
+      "_comment_2": "Geico Field - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Gap/triples-friendly with mild AVG lift and modest HR suppression; RHB/LHB HR nearly identical",
+      "team_info": {
+        "team_name": "Cleveland Fighting Amish",
+        "team_code": "CLE",
+        "park_name": "Geico Field"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.006,
+        "avg_rhb": 1.007,
+        "avg_lhb": 1.003,
+        "doubles": 1.083,
+        "triples": 1.101,
+        "hr_overall": 0.968,
+        "hr_rhb": 0.967,
+        "hr_lhb": 0.968
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Geico Field boosts doubles and triples with a slight batting-average lift while modestly suppressing home runs for both hands. Favor gap hitters, outfield range, and baserunning over pure fly-ball power; pitcher HR-avoidance is slightly less marginal than in neutral parks.",
+        "key_characteristics": [
+          "Home run suppression (-3.2% overall)",
+          "Doubles boost (+8.3%)",
+          "Triples boost (+10.1%)",
+          "Batting average boost (+0.6%)",
+          "RHB/LHB HR factors nearly equal (0.967 vs 0.968)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.981,
+          "_calculation_Pow": "1.0 + ((0.968 - 1.0) x 0.6) = 0.981 | Power worth 1.9% less",
+          "Gap": 1.072,
+          "_calculation_Gap": "1.0 + ((1.083 - 1.0) x 0.5) + ((1.101 - 1.0) x 0.3) = 1.072 | Gap worth 7.2% more",
+          "Eye": 1.002,
+          "_calculation_Eye": "1.0 + ((1.006 - 1.0) x 0.3) = 1.002 | Eye worth 0.2% more",
+          "Ks": 0.999,
+          "_calculation_Ks": "1.0 + ((1.006 - 1.0) x -0.2) = 0.999 | Avoiding Ks worth 0.1% less"
+        },
+        "defense": {
+          "_comment": "Strong doubles/triples with slightly higher AVG increases outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Elevated doubles/triples demand solid outfield range and routes",
+          "IFR": 1.01,
+          "_rationale_IFR": "Modest AVG boost slightly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly environment rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed payoff on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression lowers marginal HR-avoidance premium slightly",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs; small reduction in movement-for-HR-prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Slightly higher contact on BIP keeps walk avoidance modestly relevant",
+          "HR_Avoid": 0.97,
+          "_rationale_HR_Avoid": "HRs already a bit suppressed by park; incremental HR avoidance somewhat less valuable"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.967 vs LHB HR 0.968 (~0.1% relative difference)",
+        "_comment_2": "Negligible split - keep disabled unless you want microscopic handedness tuning",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.98,
+          "_calculation": "1.0 + ((0.967 - 1.0) x 0.6) = 0.980"
+        },
+        "LHB": {
+          "Pow": 0.981,
+          "_calculation": "1.0 + ((0.968 - 1.0) x 0.6) = 0.981"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Cleveland Fighting Amish organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.991 instead of 0.981"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.967 vs 0.968"
+      }
+    },
+    "Connecticut Steady Habits": {
+      "_comment": "Park factors for Connecticut Steady Habits (NLD) - VOS Evaluation",
+      "_comment_2": "Indeed Field - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "League-average AVG with strong doubles/triples; HR slightly down overall but LHB HR at 1.0 vs suppressed RHB",
+      "team_info": {
+        "team_name": "Connecticut Steady Habits",
+        "team_code": "CON",
+        "park_name": "Indeed Field"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.004,
+        "avg_lhb": 0.994,
+        "doubles": 1.077,
+        "triples": 1.105,
+        "hr_overall": 0.968,
+        "hr_rhb": 0.949,
+        "hr_lhb": 1.004
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Indeed Field is neutral on batting average in the aggregate while boosting doubles and triples. Home runs are modestly suppressed overall, but left-handed power sees league-average carry while right-handed power is damped. Favor gap profiles and outfield defense; use handedness-aware power for precision.",
+        "key_characteristics": [
+          "Batting average neutral overall (1.000)",
+          "Home run suppression (-3.2% overall)",
+          "Doubles boost (+7.7%)",
+          "Triples boost (+10.5%)",
+          "RHB HR below average (0.949); LHB HR at average (1.004)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.981,
+          "_calculation_Pow": "1.0 + ((0.968 - 1.0) x 0.6) = 0.981 | Power worth 1.9% less (overall HR)",
+          "Gap": 1.07,
+          "_calculation_Gap": "1.0 + ((1.077 - 1.0) x 0.5) + ((1.105 - 1.0) x 0.3) = 1.070 | Gap worth 7.0% more",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | neutral"
+        },
+        "defense": {
+          "_comment": "Strong doubles/triples with league-average overall AVG - OF range premium, neutral IFR",
+          "OFR": 1.05,
+          "_rationale_OFR": "Elevated doubles/triples increase demand on outfield range",
+          "IFR": 1.0,
+          "_rationale_IFR": "Overall AVG factor is league average; infield range baseline",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park - speed and advancement lift",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples reward speed on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Extra-base opportunities support aggressive, smart baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - slight movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs overall; small reduction in fly-ball HR prevention premium",
+          "Control": 1.0,
+          "_rationale_Control": "League-average overall AVG factor on contact",
+          "HR_Avoid": 0.97,
+          "_rationale_HR_Avoid": "HRs somewhat suppressed by park; incremental HR avoidance modestly less valuable"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.949 vs LHB HR 1.004 (~5.8% relative to RHB factor)",
+        "_comment_2": "Meaningful split - LHB power near neutral, RHB power clearly damped",
+        "enabled": true,
+        "_rationale": "Handedness HR factors diverge enough to justify separate RHB/LHB power scaling",
+        "RHB": {
+          "Pow": 0.969,
+          "_calculation": "1.0 + ((0.949 - 1.0) x 0.6) = 0.969"
+        },
+        "LHB": {
+          "Pow": 1.002,
+          "_calculation": "1.0 + ((1.004 - 1.0) x 0.6) = 1.002"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Connecticut Steady Habits organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to RHB vs LHB HR factor difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.991 instead of 0.981"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 1.004 vs RHB HR 0.949"
+      }
+    },
+    "Cookeville Cubs": {
+      "_comment": "Park factors for Cookeville Cubs (NLD) - VOS Evaluation",
+      "_comment_2": "PNC Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild gap tilt, slightly low AVG, modest HR suppression; small RHB/LHB HR gap",
+      "team_info": {
+        "team_name": "Cookeville Cubs",
+        "team_code": "COO",
+        "park_name": "PNC Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.998,
+        "avg_rhb": 0.999,
+        "avg_lhb": 0.996,
+        "doubles": 1.055,
+        "triples": 1.059,
+        "hr_overall": 0.968,
+        "hr_rhb": 0.963,
+        "hr_lhb": 0.979
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "PNC Park plays slightly pitcher-friendly on batting average with modest boosts to doubles and triples and mildly suppressed home runs. Right-handed power is a touch more damped than left-handed. Favor gap hitters and outfield range over pure fly-ball power.",
+        "key_characteristics": [
+          "Slight batting average suppression (-0.2%)",
+          "Modest doubles boost (+5.5%)",
+          "Modest triples boost (+5.9%)",
+          "Home run suppression (-3.2% overall)",
+          "RHB/LHB HR factors close (0.963 vs 0.979)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.981,
+          "_calculation_Pow": "1.0 + ((0.968 - 1.0) x 0.6) = 0.981 | Power worth 1.9% less",
+          "Gap": 1.045,
+          "_calculation_Gap": "1.0 + ((1.055 - 1.0) x 0.5) + ((1.059 - 1.0) x 0.3) = 1.045 | Gap worth 4.5% more",
+          "Eye": 0.999,
+          "_calculation_Eye": "1.0 + ((0.998 - 1.0) x 0.3) = 0.999 | Eye worth 0.1% less",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((0.998 - 1.0) x -0.2) = 1.000 | Avoiding Ks neutral (rounds at 3dp)"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly suppressed AVG",
+          "OFR": 1.03,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly low AVG factor modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Modest extra-base environment - small speed/advancement lift",
+          "Speed": 1.02,
+          "_rationale_Speed": "Elevated doubles/triples slightly reward speed on contact",
+          "Run": 1.02,
+          "_rationale_Run": "Light extra-base profile offers a small advancement bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid tweaks",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 1.0,
+          "_rationale_Control": "Near-neutral contact environment on walks vs balls in play",
+          "HR_Avoid": 0.97,
+          "_rationale_HR_Avoid": "HRs somewhat suppressed; incremental HR avoidance slightly less valuable"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.963 vs LHB HR 0.979 (~1.7% relative to RHB factor)",
+        "_comment_2": "Small split - optional; values precomputed if enabled",
+        "enabled": false,
+        "_rationale": "RHB/LHB HR gap is modest; keep disabled unless you want fine-grained handedness scaling",
+        "RHB": {
+          "Pow": 0.978,
+          "_calculation": "1.0 + ((0.963 - 1.0) x 0.6) = 0.978"
+        },
+        "LHB": {
+          "Pow": 0.987,
+          "_calculation": "1.0 + ((0.979 - 1.0) x 0.6) = 0.987"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Cookeville Cubs organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; small RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.991 instead of 0.981"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Optional: RHB/LHB HR 0.963 vs 0.979 - usually keep disabled"
+      }
+    },
+    "Daly City Spartans": {
+      "_comment": "Park factors for Daly City Spartans (NLD) - VOS Evaluation",
+      "_comment_2": "Gellert Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "HR-friendly with depressed AVG and slightly suppressed doubles/triples - power over gap",
+      "team_info": {
+        "team_name": "Daly City Spartans",
+        "team_code": "DAL",
+        "park_name": "Gellert Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.975,
+        "avg_rhb": 0.978,
+        "avg_lhb": 0.97,
+        "doubles": 0.988,
+        "triples": 0.999,
+        "hr_overall": 1.063,
+        "hr_rhb": 1.058,
+        "hr_lhb": 1.072
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "power_park",
+        "description": "Gellert Park suppresses batting average and modestly reduces doubles and triples while boosting home runs for both hands. Favor fly-ball power and pitchers who limit hard contact in the air; gap and speed profiles lose a bit of value.",
+        "key_characteristics": [
+          "Home run boost (+6.3% overall)",
+          "Batting average suppression (-2.5%)",
+          "Doubles slightly suppressed (-1.2%)",
+          "Triples slightly suppressed (-0.1%)",
+          "LHB HR slightly above RHB (1.072 vs 1.058)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.038,
+          "_calculation_Pow": "1.0 + ((1.063 - 1.0) x 0.6) = 1.038 | Power worth 3.8% more",
+          "Gap": 0.994,
+          "_calculation_Gap": "1.0 + ((0.988 - 1.0) x 0.5) + ((0.999 - 1.0) x 0.3) = 0.994 | Gap worth 0.6% less",
+          "Eye": 0.993,
+          "_calculation_Eye": "1.0 + ((0.975 - 1.0) x 0.3) = 0.993 | Eye worth 0.7% less",
+          "Ks": 1.005,
+          "_calculation_Ks": "1.0 + ((0.975 - 1.0) x -0.2) = 1.005 | Avoiding Ks worth 0.5% more"
+        },
+        "defense": {
+          "_comment": "Lower AVG and fewer extra-base hits reduce range pressure vs gap-heavy parks",
+          "OFR": 0.99,
+          "_rationale_OFR": "Slightly suppressed doubles/triples modestly reduce outfield range premium",
+          "IFR": 0.98,
+          "_rationale_IFR": "Lower batting average reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Fewer doubles/triples slightly depress speed and advancement value",
+          "Speed": 0.98,
+          "_rationale_Speed": "Suppressed extra-base rates reduce speed conversion on balls in play",
+          "Run": 0.97,
+          "_rationale_Run": "Less frequent extra-base opportunities temper aggressive advancement value",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-friendly park raises value of movement and HR suppression",
+          "Stuff": 1.0,
+          "Movement": 1.04,
+          "_rationale_Movement": "Elevated HR factor increases premium on limiting quality of aerial contact",
+          "Control": 1.01,
+          "_rationale_Control": "Slightly more important when home runs are easier",
+          "HR_Avoid": 1.05,
+          "_rationale_HR_Avoid": "Park boosts HRs; pitchers who suppress homers gain extra value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.058 vs LHB HR 1.072 (~1.3% relative to RHB factor)",
+        "_comment_2": "Small split - optional; values precomputed if enabled",
+        "enabled": false,
+        "_rationale": "RHB/LHB HR gap is minor; keep disabled unless you want handedness fine-tuning",
+        "RHB": {
+          "Pow": 1.035,
+          "_calculation": "1.0 + ((1.058 - 1.0) x 0.6) = 1.035"
+        },
+        "LHB": {
+          "Pow": 1.043,
+          "_calculation": "1.0 + ((1.072 - 1.0) x 0.6) = 1.043"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Daly City Spartans organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; small RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.019 instead of 1.038"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Optional: RHB/LHB HR 1.058 vs 1.072 - usually keep disabled"
+      }
+    },
+    "Daytona Beach Speed": {
+      "_comment": "Park factors for Daytona Beach Speed (NLD) - VOS Evaluation",
+      "_comment_2": "Chicago Fields - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Extreme fly-ball / HR environment with crushed AVG and suppressed doubles/triples",
+      "team_info": {
+        "team_name": "Daytona Beach Speed",
+        "team_code": "DAY",
+        "park_name": "Chicago Fields"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.958,
+        "avg_rhb": 0.96,
+        "avg_lhb": 0.955,
+        "doubles": 0.884,
+        "triples": 0.904,
+        "hr_overall": 1.15,
+        "hr_rhb": 1.132,
+        "hr_lhb": 1.185
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "extreme_power_park",
+        "description": "Chicago Fields is a pronounced home run park with steep batting-average suppression and materially fewer doubles and triples. Left-handed power plays up more than right-handed. Favor power bats and pitchers who limit fly-ball damage; gap, speed, and outfield-range profiles are deemphasized.",
+        "key_characteristics": [
+          "Major home run boost (+15.0% overall)",
+          "Strong batting average suppression (-4.2%)",
+          "Doubles heavily suppressed (-11.6%)",
+          "Triples suppressed (-9.6%)",
+          "LHB HR factor above RHB (1.185 vs 1.132)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.09,
+          "_calculation_Pow": "1.0 + ((1.150 - 1.0) x 0.6) = 1.090 | Power worth 9.0% more",
+          "Gap": 0.913,
+          "_calculation_Gap": "1.0 + ((0.884 - 1.0) x 0.5) + ((0.904 - 1.0) x 0.3) = 0.913 | Gap worth 8.7% less",
+          "Eye": 0.987,
+          "_calculation_Eye": "1.0 + ((0.958 - 1.0) x 0.3) = 0.987 | Eye worth 1.3% less",
+          "Ks": 1.008,
+          "_calculation_Ks": "1.0 + ((0.958 - 1.0) x -0.2) = 1.008 | Avoiding Ks worth 0.8% more"
+        },
+        "defense": {
+          "_comment": "Low doubles/triples and low AVG reduce outfield and infield range premium",
+          "OFR": 0.93,
+          "_rationale_OFR": "Heavily suppressed extra-base hits lower demand on elite outfield range",
+          "IFR": 0.97,
+          "_rationale_IFR": "Lower batting average reduces routine infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Fewer doubles/triples sharply reduce speed and advancement payoff",
+          "Speed": 0.94,
+          "_rationale_Speed": "Suppressed extra-base environment limits speed conversion on balls in play",
+          "Run": 0.92,
+          "_rationale_Run": "Rare doubles/triples reduce value of aggressive extra-base advancement",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Very HR-friendly park - strong premium on movement and HR suppression",
+          "Stuff": 1.0,
+          "Movement": 1.08,
+          "_rationale_Movement": "Large HR boost raises premium on limiting quality of contact in the air",
+          "Control": 1.02,
+          "_rationale_Control": "Homers easier; avoiding free baserunners matters more",
+          "HR_Avoid": 1.09,
+          "_rationale_HR_Avoid": "Park inflates HRs; pitchers who suppress homers gain substantial value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.132 vs LHB HR 1.185 (~4.7% relative to RHB factor)",
+        "_comment_2": "Meaningful split - LHB power valuation should differ from RHB",
+        "enabled": true,
+        "_rationale": "LHB HR factor materially higher; enable handedness-aware power scaling",
+        "RHB": {
+          "Pow": 1.079,
+          "_calculation": "1.0 + ((1.132 - 1.0) x 0.6) = 1.079"
+        },
+        "LHB": {
+          "Pow": 1.111,
+          "_calculation": "1.0 + ((1.185 - 1.0) x 0.6) = 1.111"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Daytona Beach Speed organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to RHB vs LHB HR factor gap",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.045 instead of 1.090"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 1.185 vs RHB HR 1.132"
+      }
+    },
+    "Duluth Diamond Dawgs": {
+      "_comment": "Park factors for Duluth Diamond Dawgs (NLD) - VOS Evaluation",
+      "_comment_2": "Park name shown as \"11\" in OOTP export - outdoor, grass, capacity 42,675",
+      "_comment_3": "Gap/triples-friendly with slight AVG lift and mild HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Duluth Diamond Dawgs",
+        "team_code": "DUL",
+        "park_name": "11"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.004,
+        "avg_rhb": 1.006,
+        "avg_lhb": 1.001,
+        "doubles": 1.079,
+        "triples": 1.091,
+        "hr_overall": 0.972,
+        "hr_rhb": 0.973,
+        "hr_lhb": 0.97
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Duluth's home park (OOTP label \"11\") lifts batting average slightly while boosting doubles and triples and modestly suppressing home runs. RHB and LHB HR factors are almost the same. Favor gap hitters, outfield range, and baserunning over pure fly-ball power.",
+        "key_characteristics": [
+          "Slight batting average boost (+0.4%)",
+          "Doubles boost (+7.9%)",
+          "Triples boost (+9.1%)",
+          "Home run suppression (-2.8% overall)",
+          "RHB/LHB HR factors nearly equal (0.973 vs 0.970)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.983,
+          "_calculation_Pow": "1.0 + ((0.972 - 1.0) x 0.6) = 0.983 | Power worth 1.7% less",
+          "Gap": 1.067,
+          "_calculation_Gap": "1.0 + ((1.079 - 1.0) x 0.5) + ((1.091 - 1.0) x 0.3) = 1.067 | Gap worth 6.7% more",
+          "Eye": 1.001,
+          "_calculation_Eye": "1.0 + ((1.004 - 1.0) x 0.3) = 1.001 | Eye worth 0.1% more",
+          "Ks": 0.999,
+          "_calculation_Ks": "1.0 + ((1.004 - 1.0) x -0.2) = 0.999 | Avoiding Ks worth 0.1% less"
+        },
+        "defense": {
+          "_comment": "Strong doubles/triples with slightly higher AVG - OF range premium, modest IFR bump",
+          "OFR": 1.05,
+          "_rationale_OFR": "Elevated doubles/triples increase demand on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Slight AVG lift modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly environment rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Extra-base opportunities reward sound baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Slightly higher contact environment nudges control relevance",
+          "HR_Avoid": 0.97,
+          "_rationale_HR_Avoid": "HRs somewhat suppressed by park; incremental HR avoidance slightly less valuable"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.973 vs LHB HR 0.970 (~0.3% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.984,
+          "_calculation": "1.0 + ((0.973 - 1.0) x 0.6) = 0.984"
+        },
+        "LHB": {
+          "Pow": 0.982,
+          "_calculation": "1.0 + ((0.970 - 1.0) x 0.6) = 0.982"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Duluth Diamond Dawgs organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.992 instead of 0.983"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.973 vs 0.970"
+      }
+    },
+    "Fountain Hills 23ers": {
+      "_comment": "Park factors for Fountain Hills 23ers (NLD) - VOS Evaluation",
+      "_comment_2": "Kenny Will Never Win Park - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Extreme doubles/triples and AVG lift with deep HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Fountain Hills 23ers",
+        "team_code": "FHL",
+        "park_name": "Kenny Will Never Win Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.039,
+        "avg_rhb": 1.045,
+        "avg_lhb": 1.029,
+        "doubles": 1.264,
+        "triples": 1.294,
+        "hr_overall": 0.808,
+        "hr_rhb": 0.806,
+        "hr_lhb": 0.812
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Kenny Will Never Win Park is a massive doubles and triples environment with a strong batting-average lift and severe home run suppression for both hands. Favor gap hitters, speed, and outfield range over raw power; pitcher HR-avoidance is less marginal than in HR-friendly parks.",
+        "key_characteristics": [
+          "Major home run suppression (-19.2% overall)",
+          "Major doubles boost (+26.4%)",
+          "Major triples boost (+29.4%)",
+          "Batting average boost (+3.9%)",
+          "RHB/LHB HR factors nearly equal (0.806 vs 0.812)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.885,
+          "_calculation_Pow": "1.0 + ((0.808 - 1.0) x 0.6) = 0.885 | Power worth 11.5% less",
+          "Gap": 1.22,
+          "_calculation_Gap": "1.0 + ((1.264 - 1.0) x 0.5) + ((1.294 - 1.0) x 0.3) = 1.220 | Gap worth 22.0% more",
+          "Eye": 1.012,
+          "_calculation_Eye": "1.0 + ((1.039 - 1.0) x 0.3) = 1.012 | Eye worth 1.2% more",
+          "Ks": 0.992,
+          "_calculation_Ks": "1.0 + ((1.039 - 1.0) x -0.2) = 0.992 | Avoiding Ks worth 0.8% less"
+        },
+        "defense": {
+          "_comment": "Very high doubles/triples and contact environment - strong OF range, modest IFR bump",
+          "OFR": 1.09,
+          "_rationale_OFR": "Elite extra-base rates demand plus outfield range and routes",
+          "IFR": 1.02,
+          "_rationale_IFR": "Higher batting average increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extreme extra-base environment heavily rewards speed and advancement",
+          "Speed": 1.06,
+          "_rationale_Speed": "Huge doubles/triples rates increase speed value on balls in play",
+          "Run": 1.08,
+          "_rationale_Run": "Frequent extra-base opportunities reward aggressive, efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Deep HR suppression lowers marginal HR-avoidance and movement-for-HR value",
+          "Stuff": 1.0,
+          "Movement": 0.94,
+          "_rationale_Movement": "Park already kills HRs; less premium on movement solely to prevent fly-ball homers",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact on BIP keeps walk avoidance modestly relevant",
+          "HR_Avoid": 0.9,
+          "_rationale_HR_Avoid": "With HRs heavily suppressed, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.806 vs LHB HR 0.812 (~0.7% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.884,
+          "_calculation": "1.0 + ((0.806 - 1.0) x 0.6) = 0.884"
+        },
+        "LHB": {
+          "Pow": 0.887,
+          "_calculation": "1.0 + ((0.812 - 1.0) x 0.6) = 0.887"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Fountain Hills 23ers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.943 instead of 0.885"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.806 vs 0.812"
+      }
+    },
+    "Indianapolis Alleycats": {
+      "_comment": "Park factors for Indianapolis Alleycats (NLD) - VOS Evaluation",
+      "_comment_2": "Alleycats Field - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples and AVG with mild HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Indianapolis Alleycats",
+        "team_code": "IND",
+        "park_name": "Alleycats Field"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.02,
+        "avg_rhb": 1.021,
+        "avg_lhb": 1.018,
+        "doubles": 1.11,
+        "triples": 1.137,
+        "hr_overall": 0.925,
+        "hr_rhb": 0.925,
+        "hr_lhb": 0.926
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Alleycats Field lifts batting average and boosts doubles and triples while modestly suppressing home runs for both hands. Favor gap hitters, outfield range, and baserunning over pure fly-ball power.",
+        "key_characteristics": [
+          "Batting average boost (+2.0%)",
+          "Doubles boost (+11.0%)",
+          "Triples boost (+13.7%)",
+          "Home run suppression (-7.5% overall)",
+          "RHB/LHB HR factors nearly equal (0.925 vs 0.926)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.955,
+          "_calculation_Pow": "1.0 + ((0.925 - 1.0) x 0.6) = 0.955 | Power worth 4.5% less",
+          "Gap": 1.096,
+          "_calculation_Gap": "1.0 + ((1.110 - 1.0) x 0.5) + ((1.137 - 1.0) x 0.3) = 1.096 | Gap worth 9.6% more",
+          "Eye": 1.006,
+          "_calculation_Eye": "1.0 + ((1.020 - 1.0) x 0.3) = 1.006 | Eye worth 0.6% more",
+          "Ks": 0.996,
+          "_calculation_Ks": "1.0 + ((1.020 - 1.0) x -0.2) = 0.996 | Avoiding Ks worth 0.4% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and AVG increase outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Strong extra-base environment puts a premium on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.98,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.95,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.925 vs LHB HR 0.926 (~0.1% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.955,
+          "_calculation": "1.0 + ((0.925 - 1.0) x 0.6) = 0.955"
+        },
+        "LHB": {
+          "Pow": 0.956,
+          "_calculation": "1.0 + ((0.926 - 1.0) x 0.6) = 0.956"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Indianapolis Alleycats organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.978 instead of 0.955"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.925 vs 0.926"
+      }
+    },
+    "Kalamazoo Kangaroos": {
+      "_comment": "Park factors for Kalamazoo Kangaroos (NLD) - VOS Evaluation",
+      "_comment_2": "Primate Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples and AVG with mild HR suppression; moderate RHB vs LHB HR gap",
+      "team_info": {
+        "team_name": "Kalamazoo Kangaroos",
+        "team_code": "KAL",
+        "park_name": "Primate Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.021,
+        "avg_rhb": 1.026,
+        "avg_lhb": 1.011,
+        "doubles": 1.107,
+        "triples": 1.138,
+        "hr_overall": 0.978,
+        "hr_rhb": 0.964,
+        "hr_lhb": 1.003
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Primate Park boosts batting average and especially doubles and triples while slightly suppressing home runs in the aggregate. Right-handed power is more damped than left-handed, which sits near league average for HR. Favor gap hitters, outfield range, and baserunning.",
+        "key_characteristics": [
+          "Batting average boost (+2.1%)",
+          "Doubles boost (+10.7%)",
+          "Triples boost (+13.8%)",
+          "Home run suppression (-2.2% overall)",
+          "RHB HR 0.964 vs LHB HR 1.003"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.987,
+          "_calculation_Pow": "1.0 + ((0.978 - 1.0) x 0.6) = 0.987 | Power worth 1.3% less",
+          "Gap": 1.095,
+          "_calculation_Gap": "1.0 + ((1.107 - 1.0) x 0.5) + ((1.138 - 1.0) x 0.3) = 1.095 | Gap worth 9.5% more",
+          "Eye": 1.006,
+          "_calculation_Eye": "1.0 + ((1.021 - 1.0) x 0.3) = 1.006 | Eye worth 0.6% more",
+          "Ks": 0.996,
+          "_calculation_Ks": "1.0 + ((1.021 - 1.0) x -0.2) = 0.996 | Avoiding Ks worth 0.4% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and AVG increase outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Strong extra-base environment puts a premium on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Slight HR suppression - mild movement/HR-avoid tweaks",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs overall; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.99,
+          "_rationale_HR_Avoid": "Slight HR suppression lowers marginal value of dedicated HR avoidance"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.964 vs LHB HR 1.003 (~4.0% relative to RHB factor)",
+        "_comment_2": "Moderate split - optional to enable for LHB vs RHB power",
+        "enabled": false,
+        "_rationale": "Split is meaningful but modest; disabled by default like similar NLD parks",
+        "RHB": {
+          "Pow": 0.978,
+          "_calculation": "1.0 + ((0.964 - 1.0) x 0.6) = 0.978"
+        },
+        "LHB": {
+          "Pow": 1.002,
+          "_calculation": "1.0 + ((1.003 - 1.0) x 0.6) = 1.002"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Kalamazoo Kangaroos organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; set true if you want RHB/LHB HR split applied",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.994 instead of 0.987"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Optional: LHB HR 1.003 vs RHB HR 0.964 - enable for stricter handedness power"
+      }
+    },
+    "Kansas City Kings": {
+      "_comment": "Park factors for Kansas City Kings (NLD) - VOS Evaluation",
+      "_comment_2": "Werner Trucking Park - retractable roof, artificial turf, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples and AVG with deep HR suppression; small RHB/LHB HR gap",
+      "team_info": {
+        "team_name": "Kansas City Kings",
+        "team_code": "KCK",
+        "park_name": "Werner Trucking Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.032,
+        "avg_rhb": 1.033,
+        "avg_lhb": 1.031,
+        "doubles": 1.128,
+        "triples": 1.126,
+        "hr_overall": 0.849,
+        "hr_rhb": 0.841,
+        "hr_lhb": 0.864
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Werner Trucking Park boosts batting average and both doubles and triples while strongly suppressing home runs. Right-handed power is slightly more damped than left-handed. Favor gap hitters, speed, outfield range, and contact-heavy profiles over pure HR power.",
+        "key_characteristics": [
+          "Batting average boost (+3.2%)",
+          "Doubles boost (+12.8%)",
+          "Triples boost (+12.6%)",
+          "Home run suppression (-15.1% overall)",
+          "RHB HR 0.841 vs LHB HR 0.864"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.909,
+          "_calculation_Pow": "1.0 + ((0.849 - 1.0) x 0.6) = 0.909 | Power worth 9.1% less",
+          "Gap": 1.102,
+          "_calculation_Gap": "1.0 + ((1.128 - 1.0) x 0.5) + ((1.126 - 1.0) x 0.3) = 1.102 | Gap worth 10.2% more",
+          "Eye": 1.01,
+          "_calculation_Eye": "1.0 + ((1.032 - 1.0) x 0.3) = 1.010 | Eye worth 1.0% more",
+          "Ks": 0.994,
+          "_calculation_Ks": "1.0 + ((1.032 - 1.0) x -0.2) = 0.994 | Avoiding Ks worth 0.6% less"
+        },
+        "defense": {
+          "_comment": "Very high doubles/triples and AVG - strong OF premium, modest IFR bump",
+          "OFR": 1.06,
+          "_rationale_OFR": "Elite extra-base rates demand plus outfield range and routes",
+          "IFR": 1.02,
+          "_rationale_IFR": "Higher batting average increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base heavy environment rewards speed and advancement",
+          "Speed": 1.04,
+          "_rationale_Speed": "High doubles/triples sharply increase speed value on balls in play",
+          "Run": 1.05,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Strong HR suppression lowers marginal HR-avoidance and movement-for-HR value",
+          "Stuff": 1.0,
+          "Movement": 0.95,
+          "_rationale_Movement": "Park already depresses HRs; less premium on movement solely to limit fly-ball homers",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact on BIP keeps walk avoidance modestly relevant",
+          "HR_Avoid": 0.91,
+          "_rationale_HR_Avoid": "With HRs heavily suppressed, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.841 vs LHB HR 0.864 (~2.7% relative to RHB factor)",
+        "_comment_2": "Small split - optional",
+        "enabled": false,
+        "_rationale": "RHB/LHB HR gap is modest; keep disabled unless you want handedness fine-tuning",
+        "RHB": {
+          "Pow": 0.905,
+          "_calculation": "1.0 + ((0.841 - 1.0) x 0.6) = 0.905"
+        },
+        "LHB": {
+          "Pow": 0.918,
+          "_calculation": "1.0 + ((0.864 - 1.0) x 0.6) = 0.918"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Kansas City Kings organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled by default; small RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.955 instead of 0.909"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Optional: RHB/LHB HR 0.841 vs 0.864 - usually keep disabled"
+      }
+    },
+    "Las Vegas Gamblers": {
+      "_comment": "Park factors for Las Vegas Gamblers (NLD) - VOS Evaluation",
+      "_comment_2": "Spiders Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild HR lift with light doubles/triples bump and slightly low AVG; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Las Vegas Gamblers",
+        "team_code": "LVG",
+        "park_name": "Spiders Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.991,
+        "avg_rhb": 0.991,
+        "avg_lhb": 0.989,
+        "doubles": 1.009,
+        "triples": 1.028,
+        "hr_overall": 1.034,
+        "hr_rhb": 1.035,
+        "hr_lhb": 1.033
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "balanced_park",
+        "description": "Spiders Park plays close to league average on batting average (slightly pitcher-friendly) with a modest extra-base bump and a small home run lift for both hands. Favor a slight power lean over pure gap-only profiles; pitcher HR suppression gains a touch of value.",
+        "key_characteristics": [
+          "Slight batting average suppression (-0.9%)",
+          "Mild doubles boost (+0.9%)",
+          "Modest triples boost (+2.8%)",
+          "Mild home run boost (+3.4% overall)",
+          "RHB/LHB HR factors nearly equal (1.035 vs 1.033)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.02,
+          "_calculation_Pow": "1.0 + ((1.034 - 1.0) x 0.6) = 1.020 | Power worth 2.0% more",
+          "Gap": 1.013,
+          "_calculation_Gap": "1.0 + ((1.009 - 1.0) x 0.5) + ((1.028 - 1.0) x 0.3) = 1.013 | Gap worth 1.3% more",
+          "Eye": 0.997,
+          "_calculation_Eye": "1.0 + ((0.991 - 1.0) x 0.3) = 0.997 | Eye worth 0.3% less",
+          "Ks": 1.002,
+          "_calculation_Ks": "1.0 + ((0.991 - 1.0) x -0.2) = 1.002 | Avoiding Ks worth 0.2% more"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly low AVG",
+          "OFR": 1.02,
+          "_rationale_OFR": "Modest doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Modest extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly reward speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR-friendly park nudges movement and HR-avoid value",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Slightly elevated HR factor increases premium on soft aerial contact",
+          "Control": 1.0,
+          "_rationale_Control": "Near-neutral walk environment vs balls in play",
+          "HR_Avoid": 1.02,
+          "_rationale_HR_Avoid": "Park modestly boosts HRs; pitchers who suppress homers gain a bit of value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.035 vs LHB HR 1.033 (~0.2% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 1.021,
+          "_calculation": "1.0 + ((1.035 - 1.0) x 0.6) = 1.021"
+        },
+        "LHB": {
+          "Pow": 1.02,
+          "_calculation": "1.0 + ((1.033 - 1.0) x 0.6) = 1.020"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Las Vegas Gamblers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.010 instead of 1.020"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 1.035 vs 1.033"
+      }
+    },
+    "Louisville Thoroughbreds": {
+      "_comment": "Park factors for Louisville Thoroughbreds (NLD) - VOS Evaluation",
+      "_comment_2": "Churchill Stadium - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild HR lift with suppressed AVG, doubles, and triples - power over gap",
+      "team_info": {
+        "team_name": "Louisville Thoroughbreds",
+        "team_code": "LOU",
+        "park_name": "Churchill Stadium"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.986,
+        "avg_rhb": 0.983,
+        "avg_lhb": 0.99,
+        "doubles": 0.957,
+        "triples": 0.964,
+        "hr_overall": 1.033,
+        "hr_rhb": 1.035,
+        "hr_lhb": 1.029
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "power_park",
+        "description": "Churchill Stadium slightly boosts home runs while depressing batting average and extra-base hits (doubles and triples). Favor fly-ball power and pitchers who limit hard contact in the air; gap and speed profiles lose a bit of value versus league average.",
+        "key_characteristics": [
+          "Mild home run boost (+3.3% overall)",
+          "Batting average suppression (-1.4%)",
+          "Doubles suppressed (-4.3%)",
+          "Triples suppressed (-3.6%)",
+          "RHB/LHB HR factors close (1.035 vs 1.029)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.02,
+          "_calculation_Pow": "1.0 + ((1.033 - 1.0) x 0.6) = 1.020 | Power worth 2.0% more",
+          "Gap": 0.968,
+          "_calculation_Gap": "1.0 + ((0.957 - 1.0) x 0.5) + ((0.964 - 1.0) x 0.3) = 0.968 | Gap worth 3.2% less",
+          "Eye": 0.996,
+          "_calculation_Eye": "1.0 + ((0.986 - 1.0) x 0.3) = 0.996 | Eye worth 0.4% less",
+          "Ks": 1.003,
+          "_calculation_Ks": "1.0 + ((0.986 - 1.0) x -0.2) = 1.003 | Avoiding Ks worth 0.3% more"
+        },
+        "defense": {
+          "_comment": "Lower AVG and fewer doubles/triples reduce range pressure vs gap-heavy parks",
+          "OFR": 0.98,
+          "_rationale_OFR": "Suppressed doubles/triples modestly reduce outfield range premium",
+          "IFR": 0.98,
+          "_rationale_IFR": "Lower batting average reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Fewer doubles/triples slightly depress speed and advancement value",
+          "Speed": 0.98,
+          "_rationale_Speed": "Suppressed extra-base rates reduce speed conversion on balls in play",
+          "Run": 0.97,
+          "_rationale_Run": "Less frequent extra-base opportunities temper aggressive advancement value",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR-friendly park nudges movement and HR-avoid value",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Slightly elevated HR factor increases premium on limiting aerial damage",
+          "Control": 1.0,
+          "_rationale_Control": "Near-neutral emphasis on walks vs balls in play",
+          "HR_Avoid": 1.02,
+          "_rationale_HR_Avoid": "Park modestly boosts HRs; pitchers who suppress homers gain a bit of value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.035 vs LHB HR 1.029 (~0.6% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 1.021,
+          "_calculation": "1.0 + ((1.035 - 1.0) x 0.6) = 1.021"
+        },
+        "LHB": {
+          "Pow": 1.017,
+          "_calculation": "1.0 + ((1.029 - 1.0) x 0.6) = 1.017"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Louisville Thoroughbreds organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.010 instead of 1.020"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 1.035 vs 1.029"
+      }
+    },
+    "Miami Vice": {
+      "_comment": "Park factors for Miami Vice (NLD) - VOS Evaluation",
+      "_comment_2": "Vice Park - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Gap-friendly with mild AVG lift and modest HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Miami Vice",
+        "team_code": "MIA",
+        "park_name": "Vice Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.011,
+        "avg_rhb": 1.012,
+        "avg_lhb": 1.01,
+        "doubles": 1.084,
+        "triples": 1.096,
+        "hr_overall": 0.94,
+        "hr_rhb": 0.938,
+        "hr_lhb": 0.943
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Vice Park boosts batting average and both doubles and triples while modestly suppressing home runs. RHB and LHB HR factors are almost identical. Favor gap hitters, outfield range, and baserunning over pure fly-ball power.",
+        "key_characteristics": [
+          "Batting average boost (+1.1%)",
+          "Doubles boost (+8.4%)",
+          "Triples boost (+9.6%)",
+          "Home run suppression (-6.0% overall)",
+          "RHB/LHB HR factors nearly equal (0.938 vs 0.943)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.964,
+          "_calculation_Pow": "1.0 + ((0.940 - 1.0) x 0.6) = 0.964 | Power worth 3.6% less",
+          "Gap": 1.071,
+          "_calculation_Gap": "1.0 + ((1.084 - 1.0) x 0.5) + ((1.096 - 1.0) x 0.3) = 1.071 | Gap worth 7.1% more",
+          "Eye": 1.003,
+          "_calculation_Eye": "1.0 + ((1.011 - 1.0) x 0.3) = 1.003 | Eye worth 0.3% more",
+          "Ks": 0.998,
+          "_calculation_Ks": "1.0 + ((1.011 - 1.0) x -0.2) = 0.998 | Avoiding Ks worth 0.2% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and AVG increase outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Strong extra-base environment puts a premium on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid tweaks",
+          "Stuff": 1.0,
+          "Movement": 0.98,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.96,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.938 vs LHB HR 0.943 (~0.5% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.963,
+          "_calculation": "1.0 + ((0.938 - 1.0) x 0.6) = 0.963"
+        },
+        "LHB": {
+          "Pow": 0.966,
+          "_calculation": "1.0 + ((0.943 - 1.0) x 0.6) = 0.966"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Miami Vice organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.982 instead of 0.964"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.938 vs 0.943"
+      }
+    },
+    "New England Spitters": {
+      "_comment": "Park factors for New England Spitters (NLD) - VOS Evaluation",
+      "_comment_2": "Jesters Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples with near-neutral AVG and mild HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "New England Spitters",
+        "team_code": "NES",
+        "park_name": "Jesters Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.998,
+        "avg_rhb": 1.002,
+        "avg_lhb": 0.991,
+        "doubles": 1.126,
+        "triples": 1.166,
+        "hr_overall": 0.975,
+        "hr_rhb": 0.974,
+        "hr_lhb": 0.977
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Jesters Park is a pronounced doubles and triples park with batting average near league average and slightly suppressed home runs. RHB and LHB HR factors are almost the same. Favor gap hitters, outfield range, and baserunning.",
+        "key_characteristics": [
+          "Batting average near neutral (-0.2%)",
+          "Major doubles boost (+12.6%)",
+          "Major triples boost (+16.6%)",
+          "Home run suppression (-2.5% overall)",
+          "RHB/LHB HR factors nearly equal (0.974 vs 0.977)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.985,
+          "_calculation_Pow": "1.0 + ((0.975 - 1.0) x 0.6) = 0.985 | Power worth 1.5% less",
+          "Gap": 1.113,
+          "_calculation_Gap": "1.0 + ((1.126 - 1.0) x 0.5) + ((1.166 - 1.0) x 0.3) = 1.113 | Gap worth 11.3% more",
+          "Eye": 0.999,
+          "_calculation_Eye": "1.0 + ((0.998 - 1.0) x 0.3) = 0.999 | Eye worth 0.1% less",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((0.998 - 1.0) x -0.2) = 1.000 | Avoiding Ks neutral at 3dp"
+        },
+        "defense": {
+          "_comment": "Very high doubles/triples with near-neutral overall AVG",
+          "OFR": 1.06,
+          "_rationale_OFR": "Elite extra-base environment demands plus outfield range",
+          "IFR": 1.0,
+          "_rationale_IFR": "Overall AVG factor near league average; infield range baseline",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base heavy environment rewards speed and advancement",
+          "Speed": 1.04,
+          "_rationale_Speed": "High doubles/triples increase speed payoff on balls in play",
+          "Run": 1.05,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid tweaks",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 1.0,
+          "_rationale_Control": "Near-neutral overall AVG on contact",
+          "HR_Avoid": 0.98,
+          "_rationale_HR_Avoid": "Slight HR suppression lowers marginal value of dedicated HR avoidance"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.974 vs LHB HR 0.977 (~0.3% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.984,
+          "_calculation": "1.0 + ((0.974 - 1.0) x 0.6) = 0.984"
+        },
+        "LHB": {
+          "Pow": 0.986,
+          "_calculation": "1.0 + ((0.977 - 1.0) x 0.6) = 0.986"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in New England Spitters organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.993 instead of 0.985"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.974 vs 0.977"
+      }
+    },
+    "North Dakota Bison": {
+      "_comment": "Park factors for North Dakota Bison (NLD) - VOS Evaluation",
+      "_comment_2": "Big Stick Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples and mild AVG lift with modest HR suppression; LHB HR closer to average than RHB",
+      "team_info": {
+        "team_name": "North Dakota Bison",
+        "team_code": "NDK",
+        "park_name": "Big Stick Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.012,
+        "avg_rhb": 1.016,
+        "avg_lhb": 1.004,
+        "doubles": 1.107,
+        "triples": 1.144,
+        "hr_overall": 0.953,
+        "hr_rhb": 0.934,
+        "hr_lhb": 0.99
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Big Stick Park lifts batting average slightly and boosts doubles and triples while modestly suppressing home runs. Right-handed pull power is more depressed than left-handed; favor gap hitters, outfield range, and baserunning over pure fly-ball power from the right side.",
+        "key_characteristics": [
+          "Batting average boost (+1.2%)",
+          "Doubles boost (+10.7%)",
+          "Triples boost (+14.4%)",
+          "Home run suppression (-4.7% overall)",
+          "RHB HR factor below LHB (0.934 vs 0.990)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.972,
+          "_calculation_Pow": "1.0 + ((0.953 - 1.0) x 0.6) = 0.972 | Power worth 2.8% less",
+          "Gap": 1.097,
+          "_calculation_Gap": "1.0 + ((1.107 - 1.0) x 0.5) + ((1.144 - 1.0) x 0.3) = 1.097 | Gap worth 9.7% more",
+          "Eye": 1.004,
+          "_calculation_Eye": "1.0 + ((1.012 - 1.0) x 0.3) = 1.004 | Eye worth 0.4% more",
+          "Ks": 0.998,
+          "_calculation_Ks": "1.0 + ((1.012 - 1.0) x -0.2) = 0.998 | Avoiding Ks worth 0.2% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and AVG increase outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Strong extra-base environment puts a premium on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.985,
+          "_rationale_Movement": "Park slightly depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.96,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.934 vs LHB HR 0.990 (~6.0% relative to RHB factor)",
+        "_comment_2": "Moderate split - LHB power environment closer to league average",
+        "enabled": true,
+        "_rationale": "RHB HR factor materially lower than LHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.96,
+          "_calculation": "1.0 + ((0.934 - 1.0) x 0.6) = 0.960"
+        },
+        "LHB": {
+          "Pow": 0.994,
+          "_calculation": "1.0 + ((0.990 - 1.0) x 0.6) = 0.994"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in North Dakota Bison organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.986 instead of 0.972"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 0.990 vs RHB HR 0.934"
+      }
+    },
+    "Oklahoma City Drifters": {
+      "_comment": "Park factors for Oklahoma City Drifters (NLD) - VOS Evaluation",
+      "_comment_2": "Driftersdome - dome, artificial turf, capacity 42,675 (OOTP)",
+      "_comment_3": "HR-friendly dome with depressed batting average; mild doubles/triples; RHB power plays up vs LHB",
+      "team_info": {
+        "team_name": "Oklahoma City Drifters",
+        "team_code": "OKC",
+        "park_name": "Driftersdome"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.982,
+        "avg_rhb": 0.98,
+        "avg_lhb": 0.985,
+        "doubles": 1.01,
+        "triples": 1.026,
+        "hr_overall": 1.041,
+        "hr_rhb": 1.066,
+        "hr_lhb": 0.994
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "power_park",
+        "description": "Driftersdome boosts home runs overall with a slight doubles/triples tilt and lower batting averages on turf under a dome. Right-handed pull power plays up more than left-handed; favor power bats, HR-suppressing pitchers, and a modest outfield range bump from light extra-base frequency.",
+        "key_characteristics": [
+          "Home run boost (+4.1% overall)",
+          "Batting average suppression (-1.8%)",
+          "Mild doubles boost (+1.0%)",
+          "Modest triples boost (+2.6%)",
+          "RHB HR factor above LHB (1.066 vs 0.994)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.025,
+          "_calculation_Pow": "1.0 + ((1.041 - 1.0) x 0.6) = 1.025 | Power worth 2.5% more",
+          "Gap": 1.013,
+          "_calculation_Gap": "1.0 + ((1.010 - 1.0) x 0.5) + ((1.026 - 1.0) x 0.3) = 1.013 | Gap worth 1.3% more",
+          "Eye": 0.995,
+          "_calculation_Eye": "1.0 + ((0.982 - 1.0) x 0.3) = 0.995 | Eye worth 0.5% less",
+          "Ks": 1.004,
+          "_calculation_Ks": "1.0 + ((0.982 - 1.0) x -0.2) = 1.004 | Avoiding Ks worth 0.4% more"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly lower AVG - modest OF premium, slight IFR dip",
+          "OFR": 1.01,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Mild extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly rewards speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement value bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-friendly park raises value of limiting long balls and quality of contact",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Elevated HR environment increases premium on movement and soft contact",
+          "Control": 1.01,
+          "_rationale_Control": "Slightly more important when balls leave the yard more often",
+          "HR_Avoid": 1.02,
+          "_rationale_HR_Avoid": "Park boosts HRs; pitchers who suppress homers gain extra value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.066 vs LHB HR 0.994 (~7.2% relative to LHB factor)",
+        "_comment_2": "Moderate split - separate RHB/LHB power scaling improves fit",
+        "enabled": true,
+        "_rationale": "RHB HR factor materially higher than LHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 1.04,
+          "_calculation": "1.0 + ((1.066 - 1.0) x 0.6) = 1.040"
+        },
+        "LHB": {
+          "Pow": 0.996,
+          "_calculation": "1.0 + ((0.994 - 1.0) x 0.6) = 0.996"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Oklahoma City Drifters organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.013 instead of 1.025"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: RHB HR 1.066 vs LHB HR 0.994"
+      }
+    },
+    "Philadelphia Cheesesteaks": {
+      "_comment": "Park factors for Philadelphia Cheesesteaks (NLD) - VOS Evaluation",
+      "_comment_2": "Cannons Park - outdoor, artificial turf, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild gap/triples tilt with near-neutral overall HR; left-handed pull power plays up vs right-handed",
+      "team_info": {
+        "team_name": "Philadelphia Cheesesteaks",
+        "team_code": "PHI",
+        "park_name": "Cannons Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.002,
+        "avg_rhb": 1.005,
+        "avg_lhb": 0.996,
+        "doubles": 1.05,
+        "triples": 1.082,
+        "hr_overall": 0.999,
+        "hr_rhb": 0.978,
+        "hr_lhb": 1.038
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Cannons Park on turf lifts doubles and triples slightly with a hair above league-average batting average overall, while home runs aggregate to nearly neutral. Left-handed power sees a real boost versus right-handed; favor gap hitters and outfield range, and use handedness-aware power for evals.",
+        "key_characteristics": [
+          "Batting average slightly above average (+0.2%)",
+          "Doubles boost (+5.0%)",
+          "Triples boost (+8.2%)",
+          "Home runs near league average overall (-0.1%)",
+          "LHB HR factor above RHB (1.038 vs 0.978)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.999,
+          "_calculation_Pow": "1.0 + ((0.999 - 1.0) x 0.6) = 0.999 | Power effectively neutral vs league",
+          "Gap": 1.05,
+          "_calculation_Gap": "1.0 + ((1.050 - 1.0) x 0.5) + ((1.082 - 1.0) x 0.3) = 1.050 | Gap worth 5.0% more",
+          "Eye": 1.001,
+          "_calculation_Eye": "1.0 + ((1.002 - 1.0) x 0.3) = 1.001 | Eye worth 0.1% more",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.002 - 1.0) x -0.2) = 1.000 (0.9996 rounded) | Avoiding Ks effectively neutral"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly higher AVG - modest OF premium, slight IFR lift",
+          "OFR": 1.02,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 1.01,
+          "_rationale_IFR": "Slightly higher AVG modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Mild extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly rewards speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement value bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Overall HR factor ~league average - neutral pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "No meaningful overall HR tilt; movement premium unchanged vs neutral",
+          "Control": 1.0,
+          "_rationale_Control": "Neutral overall run environment for fly-ball outcomes",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "hr_overall 0.999; handedness split handled in batting splits, not aggregate pitching tilt"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.978 vs LHB HR 1.038 (~6.1% relative to RHB factor)",
+        "_comment_2": "Moderate split - LHB power environment clearly friendlier",
+        "enabled": true,
+        "_rationale": "LHB HR factor materially higher than RHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.987,
+          "_calculation": "1.0 + ((0.978 - 1.0) x 0.6) = 0.987"
+        },
+        "LHB": {
+          "Pow": 1.023,
+          "_calculation": "1.0 + ((1.038 - 1.0) x 0.6) = 1.023"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Philadelphia Cheesesteaks organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.000 instead of 0.999"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 1.038 vs RHB HR 0.978"
+      }
+    },
+    "Richmond Greeks": {
+      "_comment": "Park factors for Richmond Greeks (NLD) - VOS Evaluation",
+      "_comment_2": "Gyro Park - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild doubles/triples with slightly low AVG and tiny HR lift; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Richmond Greeks",
+        "team_code": "RIC",
+        "park_name": "Gyro Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.993,
+        "avg_rhb": 0.994,
+        "avg_lhb": 0.991,
+        "doubles": 1.03,
+        "triples": 1.044,
+        "hr_overall": 1.009,
+        "hr_rhb": 1.014,
+        "hr_lhb": 1.001
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Gyro Park slightly favors doubles and triples with batting averages a touch below league average and home runs just above neutral under a retractable roof. RHB and LHB HR factors are effectively tied. Favor gap skills and modest outfield range; power and HR-suppression pitchers tick up slightly.",
+        "key_characteristics": [
+          "Batting average slightly below average (-0.7%)",
+          "Mild doubles boost (+3.0%)",
+          "Modest triples boost (+4.4%)",
+          "Home runs slightly above average (+0.9%)",
+          "RHB/LHB HR factors nearly equal (1.014 vs 1.001)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.005,
+          "_calculation_Pow": "1.0 + ((1.009 - 1.0) x 0.6) = 1.005 | Power worth 0.5% more",
+          "Gap": 1.028,
+          "_calculation_Gap": "1.0 + ((1.030 - 1.0) x 0.5) + ((1.044 - 1.0) x 0.3) = 1.028 | Gap worth 2.8% more",
+          "Eye": 0.998,
+          "_calculation_Eye": "1.0 + ((0.993 - 1.0) x 0.3) = 0.998 | Eye worth 0.2% less",
+          "Ks": 1.001,
+          "_calculation_Ks": "1.0 + ((0.993 - 1.0) x -0.2) = 1.001 | Avoiding Ks worth 0.1% more"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly lower AVG - modest OF premium, slight IFR dip",
+          "OFR": 1.01,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Mild extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly rewards speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement value bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Slightly HR-positive park - mild movement/HR-avoid emphasis",
+          "Stuff": 1.0,
+          "Movement": 1.01,
+          "_rationale_Movement": "Tiny HR lift increases premium on movement and soft contact slightly",
+          "Control": 1.0,
+          "_rationale_Control": "Overall environment close to neutral for sequencing",
+          "HR_Avoid": 1.01,
+          "_rationale_HR_Avoid": "Park nudges HRs up; pitchers who limit homers gain a small extra edge"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.014 vs LHB HR 1.001 (~1.3% relative to LHB factor)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 1.008,
+          "_calculation": "1.0 + ((1.014 - 1.0) x 0.6) = 1.008"
+        },
+        "LHB": {
+          "Pow": 1.001,
+          "_calculation": "1.0 + ((1.001 - 1.0) x 0.6) = 1.001"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Richmond Greeks organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.003 instead of 1.005"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 1.014 vs 1.001"
+      }
+    },
+    "San Diego Hops": {
+      "_comment": "Park factors for San Diego Hops (NLD) - VOS Evaluation",
+      "_comment_2": "The Jake - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Balanced AVG with strong doubles/triples and HR suppression; RHB HR more depressed than LHB",
+      "team_info": {
+        "team_name": "San Diego Hops",
+        "team_code": "SDP",
+        "park_name": "The Jake"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.999,
+        "avg_rhb": 1.0,
+        "avg_lhb": 0.998,
+        "doubles": 1.063,
+        "triples": 1.064,
+        "hr_overall": 0.942,
+        "hr_rhb": 0.931,
+        "hr_lhb": 0.963
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "The Jake plays near league-average for batting average while boosting doubles and triples and holding home runs down. Right-handed power is more suppressed than left-handed. Favor gap hitters, outfield range, and baserunning; HR-avoid and contact management for pitchers stay valuable but slightly less than in deeper HR-suppressing parks.",
+        "key_characteristics": [
+          "Batting average near league average (-0.1%)",
+          "Doubles boost (+6.3%)",
+          "Triples boost (+6.4%)",
+          "Home run suppression (-5.8% overall)",
+          "RHB HR factor below LHB (0.931 vs 0.963)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.965,
+          "_calculation_Pow": "1.0 + ((0.942 - 1.0) x 0.6) = 0.965 | Power worth 3.5% less",
+          "Gap": 1.051,
+          "_calculation_Gap": "1.0 + ((1.063 - 1.0) x 0.5) + ((1.064 - 1.0) x 0.3) = 1.051 | Gap worth 5.1% more",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((0.999 - 1.0) x 0.3) = 1.000 (0.9997 rounded) | Eye effectively neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((0.999 - 1.0) x -0.2) = 1.000 (1.0002 rounded) | Avoiding Ks effectively neutral"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples with league-average AVG - solid OF premium",
+          "OFR": 1.04,
+          "_rationale_OFR": "Meaningful extra-base environment rewards outfield range",
+          "IFR": 1.0,
+          "_rationale_IFR": "AVG near neutral - no material IFR tilt",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.02,
+          "_rationale_Speed": "Boosted doubles/triples increase speed payoff on balls in play",
+          "Run": 1.03,
+          "_rationale_Run": "Extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-suppressing park - mild movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.985,
+          "_rationale_Movement": "Park depresses HRs; small reduction in fly-ball HR prevention premium vs HR-heavy parks",
+          "Control": 0.99,
+          "_rationale_Control": "Contact environment close to neutral; modest control emphasis",
+          "HR_Avoid": 0.96,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has somewhat lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.931 vs LHB HR 0.963 (~3.4 points; ~6.8% relative to RHB factor)",
+        "_comment_2": "Moderate split - RHB power environment tougher than LHB",
+        "enabled": true,
+        "_rationale": "RHB HR factor materially lower than LHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.959,
+          "_calculation": "1.0 + ((0.931 - 1.0) x 0.6) = 0.959"
+        },
+        "LHB": {
+          "Pow": 0.978,
+          "_calculation": "1.0 + ((0.963 - 1.0) x 0.6) = 0.978"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in San Diego Hops organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.983 instead of 0.965"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 0.963 vs RHB HR 0.931"
+      }
+    },
+    "San Francisco Gulls": {
+      "_comment": "Park factors for San Francisco Gulls (NLD) - VOS Evaluation",
+      "_comment_2": "Harbor Point Park - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples with slightly low AVG and modest HR suppression; LHB HR far below RHB",
+      "team_info": {
+        "team_name": "San Francisco Gulls",
+        "team_code": "SFG",
+        "park_name": "Harbor Point Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.992,
+        "avg_rhb": 0.985,
+        "avg_lhb": 1.004,
+        "doubles": 1.102,
+        "triples": 1.108,
+        "hr_overall": 0.973,
+        "hr_rhb": 0.999,
+        "hr_lhb": 0.925
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Harbor Point Park boosts doubles and triples while shaving batting average and home runs in the aggregate. Right-handed home runs track league average while left-handed power is strongly suppressed—use handedness-aware power for evals. Favor gap hitters, outfield range, and baserunning.",
+        "key_characteristics": [
+          "Batting average slightly below average (-0.8%)",
+          "Doubles boost (+10.2%)",
+          "Triples boost (+10.8%)",
+          "Home run suppression (-2.7% overall)",
+          "RHB HR near average; LHB HR much lower (0.999 vs 0.925)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.984,
+          "_calculation_Pow": "1.0 + ((0.973 - 1.0) x 0.6) = 0.984 | Power worth 1.6% less",
+          "Gap": 1.083,
+          "_calculation_Gap": "1.0 + ((1.102 - 1.0) x 0.5) + ((1.108 - 1.0) x 0.3) = 1.083 | Gap worth 8.3% more",
+          "Eye": 0.998,
+          "_calculation_Eye": "1.0 + ((0.992 - 1.0) x 0.3) = 0.998 | Eye worth 0.2% less",
+          "Ks": 1.002,
+          "_calculation_Ks": "1.0 + ((0.992 - 1.0) x -0.2) = 1.002 | Avoiding Ks worth 0.2% more"
+        },
+        "defense": {
+          "_comment": "Strong doubles/triples with slightly lower AVG - OF premium, slight IFR dip",
+          "OFR": 1.05,
+          "_rationale_OFR": "Elevated doubles/triples demand solid outfield range and routes",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly environment rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed payoff on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression lowers marginal HR-avoidance premium slightly",
+          "Stuff": 1.0,
+          "Movement": 0.99,
+          "_rationale_Movement": "Park slightly depresses HRs overall; small reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Slightly lower AVG on balls in play keeps walk avoidance modestly relevant",
+          "HR_Avoid": 0.97,
+          "_rationale_HR_Avoid": "HRs already a bit suppressed by park; incremental HR avoidance somewhat less valuable"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.999 vs LHB HR 0.925 (~8.0% relative to LHB factor)",
+        "_comment_2": "Large split - RHB HR league-average, LHB power strongly depressed",
+        "enabled": true,
+        "_rationale": "LHB HR factor materially lower than RHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.999,
+          "_calculation": "1.0 + ((0.999 - 1.0) x 0.6) = 0.999"
+        },
+        "LHB": {
+          "Pow": 0.955,
+          "_calculation": "1.0 + ((0.925 - 1.0) x 0.6) = 0.955"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in San Francisco Gulls organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.992 instead of 0.984"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: RHB HR 0.999 vs LHB HR 0.925"
+      }
+    },
+    "Seattle Whalers": {
+      "_comment": "Park factors for Seattle Whalers (NLD) - VOS Evaluation",
+      "_comment_2": "Mt. Rainer National Ballpark - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Perfectly league-average OOTP export: every raw factor 1.000 - no park tilt to batting, defense, or pitching tools",
+      "team_info": {
+        "team_name": "Seattle Whalers",
+        "team_code": "SEA",
+        "park_name": "Mt. Rainer National Ballpark"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.0,
+        "avg_rhb": 1.0,
+        "avg_lhb": 1.0,
+        "doubles": 1.0,
+        "triples": 1.0,
+        "hr_overall": 1.0,
+        "hr_rhb": 1.0,
+        "hr_lhb": 1.0
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "neutral",
+        "description": "Mt. Rainer National Ballpark registers as a true neutral venue in OOTP: batting average, extra-base hits, and home runs (overall and by handedness) all sit at league average. Player evaluation needs no park skew here—strengths and weaknesses show up almost exactly as they would in a generic league-average environment.",
+        "key_characteristics": [
+          "Batting average league average (1.000)",
+          "Doubles / triples league average (1.000)",
+          "Home runs league average overall and by hand (1.000)",
+          "No meaningful handedness asymmetry in the export"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "All tools 1.0: SAHL formulas on 1.000 raw factors yield no adjustment",
+        "batting": {
+          "Pow": 1.0,
+          "_calculation_Pow": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000 | Neutral",
+          "Gap": 1.0,
+          "_calculation_Gap": "1.0 + ((1.000 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Eye": 1.0,
+          "_calculation_Eye": "1.0 + ((1.000 - 1.0) x 0.3) = 1.000 | Neutral",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((1.000 - 1.0) x -0.2) = 1.000 | Neutral"
+        },
+        "defense": {
+          "_comment": "Neutral park - baseline defensive tool weights",
+          "OFR": 1.0,
+          "_rationale_OFR": "League-average batted-ball environment per OOTP",
+          "IFR": 1.0,
+          "_rationale_IFR": "League-average batted-ball environment per OOTP",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Neutral park - baseline baserunning weights",
+          "Speed": 1.0,
+          "_rationale_Speed": "No extra-base or run-environment tilt in the export",
+          "Run": 1.0,
+          "_rationale_Run": "No extra-base or run-environment tilt in the export",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Neutral park - baseline pitcher tool weights",
+          "Stuff": 1.0,
+          "Movement": 1.0,
+          "_rationale_Movement": "HR and contact environment neutral",
+          "Control": 1.0,
+          "_rationale_Control": "HR and contact environment neutral",
+          "HR_Avoid": 1.0,
+          "_rationale_HR_Avoid": "HR and contact environment neutral"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB/LHB HR both 1.000 - no split",
+        "_comment_2": "OOTP export is symmetric by handedness for these factors",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors identical at league average",
+        "RHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        },
+        "LHB": {
+          "Pow": 1.0,
+          "_calculation": "1.0 + ((1.000 - 1.0) x 0.6) = 1.000"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Seattle Whalers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no RHB/LHB HR difference in export",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At any strength, multipliers remain 1.0 while raw factors stay 1.000"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR both 1.000"
+      }
+    },
+    "Sheltown Shockers": {
+      "_comment": "Park factors for Sheltown Shockers (NLD) - VOS Evaluation",
+      "_comment_2": "Ottawa Stadium - outdoor, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "HR-friendly with depressed AVG and doubles; triples neutral; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Sheltown Shockers",
+        "team_code": "SHE",
+        "park_name": "Ottawa Stadium"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.982,
+        "avg_rhb": 0.983,
+        "avg_lhb": 0.979,
+        "doubles": 0.984,
+        "triples": 1.0,
+        "hr_overall": 1.057,
+        "hr_rhb": 1.054,
+        "hr_lhb": 1.064
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "power_park",
+        "description": "Ottawa Stadium boosts home runs while shaving batting average and doubles, with triples at league average. The profile favors fly-ball power over gap doubles; outfield and infield range matter slightly less than in extra-base-heavy parks. HR-suppressing pitchers gain extra value.",
+        "key_characteristics": [
+          "Batting average below average (-1.8%)",
+          "Doubles slightly suppressed (-1.6%)",
+          "Triples league average (1.000)",
+          "Home run boost (+5.7% overall)",
+          "RHB/LHB HR factors nearly equal (1.054 vs 1.064)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.034,
+          "_calculation_Pow": "1.0 + ((1.057 - 1.0) x 0.6) = 1.034 | Power worth 3.4% more",
+          "Gap": 0.992,
+          "_calculation_Gap": "1.0 + ((0.984 - 1.0) x 0.5) + ((1.000 - 1.0) x 0.3) = 0.992 | Gap worth 0.8% less",
+          "Eye": 0.995,
+          "_calculation_Eye": "1.0 + ((0.982 - 1.0) x 0.3) = 0.995 | Eye worth 0.5% less",
+          "Ks": 1.004,
+          "_calculation_Ks": "1.0 + ((0.982 - 1.0) x -0.2) = 1.004 | Avoiding Ks worth 0.4% more"
+        },
+        "defense": {
+          "_comment": "Lower AVG and doubles with neutral triples - modest reduction in range premiums",
+          "OFR": 0.99,
+          "_rationale_OFR": "Slightly fewer doubles and no triples bump modestly reduce OF range value",
+          "IFR": 0.99,
+          "_rationale_IFR": "Lower batting average slightly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Fewer doubles on average - small drag on speed/advancement value",
+          "Speed": 0.99,
+          "_rationale_Speed": "Depressed doubles modestly reduce speed payoff on balls in play",
+          "Run": 0.99,
+          "_rationale_Run": "Slightly fewer extra-base chances from doubles",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-friendly park raises value of limiting long balls and quality of contact",
+          "Stuff": 1.0,
+          "Movement": 1.02,
+          "_rationale_Movement": "Elevated HR environment increases premium on movement and soft contact",
+          "Control": 1.01,
+          "_rationale_Control": "Slightly more important when balls leave the yard more often",
+          "HR_Avoid": 1.03,
+          "_rationale_HR_Avoid": "Park boosts HRs; pitchers who suppress homers gain extra value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 1.054 vs LHB HR 1.064 (~0.9% relative to RHB factor)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 1.032,
+          "_calculation": "1.0 + ((1.054 - 1.0) x 0.6) = 1.032"
+        },
+        "LHB": {
+          "Pow": 1.038,
+          "_calculation": "1.0 + ((1.064 - 1.0) x 0.6) = 1.038"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Sheltown Shockers organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.017 instead of 1.034"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 1.054 vs 1.064"
+      }
+    },
+    "Steel City Bulldogs": {
+      "_comment": "Park factors for Steel City Bulldogs (NLD) - VOS Evaluation",
+      "_comment_2": "Denver Grounds - dome, artificial turf, capacity 42,675 (OOTP)",
+      "_comment_3": "Strong doubles/triples and AVG with deep HR suppression; RHB HR much lower than LHB",
+      "team_info": {
+        "team_name": "Steel City Bulldogs",
+        "team_code": "STC",
+        "park_name": "Denver Grounds"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.022,
+        "avg_rhb": 1.027,
+        "avg_lhb": 1.015,
+        "doubles": 1.125,
+        "triples": 1.161,
+        "hr_overall": 0.92,
+        "hr_rhb": 0.9,
+        "hr_lhb": 0.958
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Denver Grounds on turf under a dome lifts batting average, doubles, and triples while strongly suppressing home runs. Right-handed power is especially damped relative to left-handed. Favor gap hitters, outfield range, and baserunning; pure fly-ball power from the right side is discounted most.",
+        "key_characteristics": [
+          "Batting average boost (+2.2%)",
+          "Doubles boost (+12.5%)",
+          "Triples boost (+16.1%)",
+          "Home run suppression (-8.0% overall)",
+          "RHB HR factor well below LHB (0.900 vs 0.958)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.952,
+          "_calculation_Pow": "1.0 + ((0.920 - 1.0) x 0.6) = 0.952 | Power worth 4.8% less",
+          "Gap": 1.111,
+          "_calculation_Gap": "1.0 + ((1.125 - 1.0) x 0.5) + ((1.161 - 1.0) x 0.3) = 1.111 | Gap worth 11.1% more",
+          "Eye": 1.007,
+          "_calculation_Eye": "1.0 + ((1.022 - 1.0) x 0.3) = 1.007 | Eye worth 0.7% more",
+          "Ks": 0.996,
+          "_calculation_Ks": "1.0 + ((1.022 - 1.0) x -0.2) = 0.996 | Avoiding Ks worth 0.4% less"
+        },
+        "defense": {
+          "_comment": "Elevated doubles/triples and AVG increase outfield range value",
+          "OFR": 1.05,
+          "_rationale_OFR": "Strong extra-base environment puts a premium on outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Higher batting average modestly increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.03,
+          "_rationale_Speed": "Boosted doubles/triples increase speed impact on balls in play",
+          "Run": 1.04,
+          "_rationale_Run": "Frequent extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Mild HR suppression - small movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.98,
+          "_rationale_Movement": "Park depresses HRs; marginal reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Higher contact environment modestly shifts emphasis vs neutral",
+          "HR_Avoid": 0.95,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.900 vs LHB HR 0.958 (~6.4% relative to RHB factor)",
+        "_comment_2": "Moderate split - RHB power environment much tougher than LHB",
+        "enabled": true,
+        "_rationale": "RHB HR factor materially lower than LHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.94,
+          "_calculation": "1.0 + ((0.900 - 1.0) x 0.6) = 0.940"
+        },
+        "LHB": {
+          "Pow": 0.975,
+          "_calculation": "1.0 + ((0.958 - 1.0) x 0.6) = 0.975"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Steel City Bulldogs organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.976 instead of 0.952"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 0.958 vs RHB HR 0.900"
+      }
+    },
+    "Sugar Land Space Cowboys": {
+      "_comment": "Park factors for Sugar Land Space Cowboys (NLD) - VOS Evaluation",
+      "_comment_2": "Nake Juice Park - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Moderate doubles/triples with slightly low AVG and HR suppression; RHB HR lower than LHB",
+      "team_info": {
+        "team_name": "Sugar Land Space Cowboys",
+        "team_code": "SUG",
+        "park_name": "Nake Juice Park"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.997,
+        "avg_rhb": 1.001,
+        "avg_lhb": 0.99,
+        "doubles": 1.058,
+        "triples": 1.056,
+        "hr_overall": 0.944,
+        "hr_rhb": 0.925,
+        "hr_lhb": 0.981
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Nake Juice Park boosts doubles and triples while shaving batting average overall and suppressing home runs. Right-handed power is more damped than left-handed under the retractable roof. Favor gap hitters, outfield range, and baserunning over pure pull fly-ball power from the right side.",
+        "key_characteristics": [
+          "Batting average slightly below average (-0.3%)",
+          "Doubles boost (+5.8%)",
+          "Triples boost (+5.6%)",
+          "Home run suppression (-5.6% overall)",
+          "RHB HR factor below LHB (0.925 vs 0.981)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.966,
+          "_calculation_Pow": "1.0 + ((0.944 - 1.0) x 0.6) = 0.966 | Power worth 3.4% less",
+          "Gap": 1.046,
+          "_calculation_Gap": "1.0 + ((1.058 - 1.0) x 0.5) + ((1.056 - 1.0) x 0.3) = 1.046 | Gap worth 4.6% more",
+          "Eye": 0.999,
+          "_calculation_Eye": "1.0 + ((0.997 - 1.0) x 0.3) = 0.999 | Eye worth 0.1% less",
+          "Ks": 1.001,
+          "_calculation_Ks": "1.0 + ((0.997 - 1.0) x -0.2) = 1.001 | Avoiding Ks worth 0.1% more"
+        },
+        "defense": {
+          "_comment": "Moderate extra-base bump with slightly lower AVG - OF premium, slight IFR dip",
+          "OFR": 1.04,
+          "_rationale_OFR": "Meaningful doubles/triples increase rewards outfield range",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Extra-base friendly park rewards speed and advancement",
+          "Speed": 1.02,
+          "_rationale_Speed": "Boosted doubles/triples increase speed payoff on balls in play",
+          "Run": 1.03,
+          "_rationale_Run": "Extra-base opportunities reward efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "HR-suppressing park - mild movement/HR-avoid adjustments",
+          "Stuff": 1.0,
+          "Movement": 0.985,
+          "_rationale_Movement": "Park depresses HRs; small reduction in fly-ball HR prevention premium",
+          "Control": 0.99,
+          "_rationale_Control": "Contact environment close to neutral; modest control emphasis",
+          "HR_Avoid": 0.96,
+          "_rationale_HR_Avoid": "With HRs already suppressed by park, incremental HR avoidance has somewhat lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.925 vs LHB HR 0.981 (~6.1% relative to RHB factor)",
+        "_comment_2": "Moderate split - RHB power environment tougher than LHB",
+        "enabled": true,
+        "_rationale": "RHB HR factor materially lower than LHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.955,
+          "_calculation": "1.0 + ((0.925 - 1.0) x 0.6) = 0.955"
+        },
+        "LHB": {
+          "Pow": 0.989,
+          "_calculation": "1.0 + ((0.981 - 1.0) x 0.6) = 0.989"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Sugar Land Space Cowboys organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.983 instead of 0.966"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 0.981 vs RHB HR 0.925"
+      }
+    },
+    "Tucson Oilmen": {
+      "_comment": "Park factors for Tucson Oilmen (NLD) - VOS Evaluation",
+      "_comment_2": "Tucson Fields - retractable roof, grass, capacity 42,675 (OOTP)",
+      "_comment_3": "Mild doubles/triples with near-neutral AVG and HR overall; LHB HR plays up vs RHB",
+      "team_info": {
+        "team_name": "Tucson Oilmen",
+        "team_code": "TUC",
+        "park_name": "Tucson Fields"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 0.998,
+        "avg_rhb": 1.002,
+        "avg_lhb": 0.99,
+        "doubles": 1.029,
+        "triples": 1.057,
+        "hr_overall": 1.005,
+        "hr_rhb": 0.983,
+        "hr_lhb": 1.046
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "Tucson Fields slightly lifts doubles and triples with batting average and overall home runs hugging league average under a retractable roof. Left-handed pull power plays up versus right-handed; favor gap hitters and a modest outfield bump, with handedness-aware power for evals.",
+        "key_characteristics": [
+          "Batting average slightly below average (-0.2%)",
+          "Mild doubles boost (+2.9%)",
+          "Modest triples boost (+5.7%)",
+          "Home runs barely above average overall (+0.5%)",
+          "LHB HR factor above RHB (1.046 vs 0.983)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 1.003,
+          "_calculation_Pow": "1.0 + ((1.005 - 1.0) x 0.6) = 1.003 | Power worth 0.3% more",
+          "Gap": 1.032,
+          "_calculation_Gap": "1.0 + ((1.029 - 1.0) x 0.5) + ((1.057 - 1.0) x 0.3) = 1.032 | Gap worth 3.2% more",
+          "Eye": 0.999,
+          "_calculation_Eye": "1.0 + ((0.998 - 1.0) x 0.3) = 0.999 | Eye worth 0.1% less",
+          "Ks": 1.0,
+          "_calculation_Ks": "1.0 + ((0.998 - 1.0) x -0.2) = 1.000 (1.0004 rounded) | Avoiding Ks effectively neutral"
+        },
+        "defense": {
+          "_comment": "Light extra-base bump with slightly lower AVG - modest OF premium, slight IFR dip",
+          "OFR": 1.02,
+          "_rationale_OFR": "Mild doubles/triples increase nudges outfield range value up",
+          "IFR": 0.99,
+          "_rationale_IFR": "Slightly suppressed AVG modestly reduces infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Mild extra-base environment - small speed/advancement lift",
+          "Speed": 1.01,
+          "_rationale_Speed": "Slightly elevated doubles/triples modestly rewards speed on contact",
+          "Run": 1.01,
+          "_rationale_Run": "Light extra-base profile offers a small advancement value bump",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Tiny HR lift overall - mild movement/HR-avoid emphasis",
+          "Stuff": 1.0,
+          "Movement": 1.01,
+          "_rationale_Movement": "Slight HR nudge increases premium on movement and soft contact marginally",
+          "Control": 1.0,
+          "_rationale_Control": "Overall environment close to neutral for sequencing",
+          "HR_Avoid": 1.01,
+          "_rationale_HR_Avoid": "Park barely favors HRs; pitchers who limit homers gain a small extra edge"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.983 vs LHB HR 1.046 (~6.4% relative to RHB factor)",
+        "_comment_2": "Moderate split - LHB power environment friendlier than RHB",
+        "enabled": true,
+        "_rationale": "LHB HR factor materially higher than RHB; enable for handedness-aware power valuation",
+        "RHB": {
+          "Pow": 0.99,
+          "_calculation": "1.0 + ((0.983 - 1.0) x 0.6) = 0.990"
+        },
+        "LHB": {
+          "Pow": 1.028,
+          "_calculation": "1.0 + ((1.046 - 1.0) x 0.6) = 1.028"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Tucson Oilmen organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": true,
+        "_comment_handedness": "Enabled due to meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 1.002 instead of 1.003"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Enabled: LHB HR 1.046 vs RHB HR 0.983"
+      }
+    },
+    "Walnut Grove Wildcats": {
+      "_comment": "Park factors for Walnut Grove Wildcats (NLD) - VOS Evaluation",
+      "_comment_2": "The Eagles Nest - outdoor, artificial turf, capacity 42,675 (OOTP)",
+      "_comment_3": "Extreme doubles/triples and AVG with deep HR suppression; RHB/LHB HR nearly equal",
+      "team_info": {
+        "team_name": "Walnut Grove Wildcats",
+        "team_code": "WLG",
+        "park_name": "The Eagles Nest"
+      },
+      "raw_park_factors": {
+        "_comment": "Raw park factors from OOTP - 1.0 = league average",
+        "avg_overall": 1.03,
+        "avg_rhb": 1.033,
+        "avg_lhb": 1.024,
+        "doubles": 1.209,
+        "triples": 1.263,
+        "hr_overall": 0.907,
+        "hr_rhb": 0.908,
+        "hr_lhb": 0.906
+      },
+      "park_profile": {
+        "_comment": "Human-readable summary of park characteristics",
+        "type": "gap_park",
+        "description": "The Eagles Nest on turf massively lifts doubles, triples, and batting average while strongly suppressing home runs for both hands. One of the most gap- and speed-friendly profiles in the league; outfield range and baserunning dominate park value, with raw power discounted.",
+        "key_characteristics": [
+          "Batting average boost (+3.0%)",
+          "Doubles boost (+20.9%)",
+          "Triples boost (+26.3%)",
+          "Home run suppression (-9.3% overall)",
+          "RHB/LHB HR factors nearly equal (0.908 vs 0.906)"
+        ]
+      },
+      "tool_adjustments": {
+        "_comment": "Multipliers applied to tool ratings. 1.0 = no change, >1.0 = more valuable, <1.0 = less valuable",
+        "_comment_2": "Calculated from raw park factors using SAHL conversion formulas",
+        "batting": {
+          "Pow": 0.944,
+          "_calculation_Pow": "1.0 + ((0.907 - 1.0) x 0.6) = 0.944 | Power worth 5.6% less",
+          "Gap": 1.183,
+          "_calculation_Gap": "1.0 + ((1.209 - 1.0) x 0.5) + ((1.263 - 1.0) x 0.3) = 1.183 | Gap worth 18.3% more",
+          "Eye": 1.009,
+          "_calculation_Eye": "1.0 + ((1.030 - 1.0) x 0.3) = 1.009 | Eye worth 0.9% more",
+          "Ks": 0.994,
+          "_calculation_Ks": "1.0 + ((1.030 - 1.0) x -0.2) = 0.994 | Avoiding Ks worth 0.6% less"
+        },
+        "defense": {
+          "_comment": "Very high doubles/triples and AVG - strong OF/IF range premiums",
+          "OFR": 1.06,
+          "_rationale_OFR": "Extreme extra-base environment demands plus outfield range",
+          "IFR": 1.01,
+          "_rationale_IFR": "Elevated batting average increases infield range opportunities",
+          "OFE": 1.0,
+          "OFA": 1.0,
+          "IFE": 1.0,
+          "IFA": 1.0,
+          "TDP": 1.0,
+          "CArm": 1.0,
+          "CBlk": 1.0,
+          "CFrm": 1.0
+        },
+        "baserunning": {
+          "_comment": "Elite extra-base environment for speed and advancement",
+          "Speed": 1.04,
+          "_rationale_Speed": "Very high doubles/triples sharply increase speed impact on balls in play",
+          "Run": 1.05,
+          "_rationale_Run": "Constant extra-base chances reward aggressive, efficient baserunning",
+          "StealAbi": 1.0,
+          "StlRt": 1.0
+        },
+        "pitcher_ability": {
+          "_comment": "Deep HR suppression - movement/HR-avoid de-emphasis vs HR-heavy parks",
+          "Stuff": 1.0,
+          "Movement": 0.98,
+          "_rationale_Movement": "Park strongly depresses HRs; fly-ball HR prevention premium reduced",
+          "Control": 0.99,
+          "_rationale_Control": "High contact on BIP keeps walk avoidance modestly relevant",
+          "HR_Avoid": 0.94,
+          "_rationale_HR_Avoid": "With HRs already heavily suppressed by park, incremental HR avoidance has lower marginal value"
+        }
+      },
+      "handedness_splits": {
+        "_comment": "RHB HR 0.908 vs LHB HR 0.906 (~0.2% relative difference)",
+        "_comment_2": "Negligible split",
+        "enabled": false,
+        "_rationale": "RHB and LHB HR factors are effectively identical",
+        "RHB": {
+          "Pow": 0.945,
+          "_calculation": "1.0 + ((0.908 - 1.0) x 0.6) = 0.945"
+        },
+        "LHB": {
+          "Pow": 0.944,
+          "_calculation": "1.0 + ((0.906 - 1.0) x 0.6) = 0.944"
+        }
+      },
+      "application_rules": {
+        "_comment": "Rules for when and how aggressively to apply these park factors",
+        "apply_to_prospects": true,
+        "_comment_prospects": "Apply to all players in Walnut Grove Wildcats organization, including minors",
+        "apply_to_major_leaguers": true,
+        "_comment_major_leaguers": "Apply to players at ML level with this team",
+        "use_handedness_splits": false,
+        "_comment_handedness": "Disabled: no meaningful RHB/LHB HR difference",
+        "adjustment_strength": 0.75,
+        "_comment_strength": "1.0 = full strength, 0.5 = half strength",
+        "_comment_strength_2": "At 0.5 strength: Pow becomes 0.972 instead of 0.944"
+      },
+      "usage_notes": {
+        "command_line_example": "python vos_v2.py --league nld --park-factors nld-park-factors.json",
+        "creating_files_for_other_teams": "Copy a team entry and adjust raw_park_factors and team_info sections",
+        "tuning_adjustment_strength": "Start at 0.5, increase to 0.7-1.0 if you want more aggressive park effects",
+        "when_to_enable_handedness_splits": "Not needed: RHB/LHB HR 0.908 vs 0.906"
+      }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "_comment": "Per-level depth chart configuration for depth_chart.py.",
+  "_comment_2": "Per-level keys: roster_size, hitter_count, pitcher_count must reconcile.",
+  "_comment_3": "ratings_weight + stats_weight should sum to 1.0.",
+  "_comment_4": "util_count_per_pos / pinch_hitter_count / pinch_runner_count drive the OOTP-style depth table; per-level overrides supported.",
+
+  "year_weights": [0.55, 0.35, 0.10],
+
+  "stat_floors": {
+    "_comment": "Below these, a player's stats z-score is dampened (or ignored if zero).",
+    "min_pa_full": 200,
+    "min_pa_partial": 50,
+    "min_outs_full": 150,
+    "min_outs_partial": 30,
+    "min_field_innings_full": 200,
+    "min_field_innings_partial": 30
+  },
+
+  "woba_weights": {
+    "_comment": "Generic FanGraphs-era linear weights. Tweak if you want league-specific values.",
+    "uBB": 0.69,
+    "HBP": 0.72,
+    "1B": 0.89,
+    "2B": 1.27,
+    "3B": 1.62,
+    "HR": 2.10
+  },
+
+  "promotion": {
+    "_comment": "Tunables for promotion/replacement/demotion flagging.",
+    "min_advantage_for_promote": 2.5,
+    "underperform_threshold": -1.5,
+    "min_pa_for_demote_call": 80,
+    "min_outs_for_demote_call": 60
+  },
+
+  "playoff": {
+    "_comment": "Read by playoff_planner.py only; ignored by depth_chart.py. Tunes the postseason re-optimization over the ML pool.",
+    "sp_for_series": {"3": 2, "5": 3, "7": 4},
+    "ace_double_start": {"3": false, "5": true, "7": false},
+    "leverage_weight": 0.5,
+    "_comment_lev": "oct_score = leverage_weight * lev_score + (1 - leverage_weight) * composite, used to order late-inning bullpen slots.",
+    "alpha": 0.6,
+    "_comment_alpha": "Blend within the leverage model: lev_score = alpha * L1 (role-earned) + (1 - alpha) * L2 (avg LI). Matches bullpen_builder default.",
+    "platoon_swap_margin": 3.0,
+    "_comment_swap": "A bench bat is flagged as a platoon swap only when its same-side split composite beats the in-lineup starter's by this many points (20-80 scale).",
+    "roster_size": 26,
+    "leverage_role_counts": {"CL": 1, "SU": 2, "MR": 4, "LR": 1}
+  },
+
+  "levels": {
+    "ML": {
+      "level_below": "AAA",
+      "roster_size": 26,
+      "hitter_count": 13,
+      "pitcher_count": 13,
+      "ratings_weight": 0.30,
+      "stats_weight": 0.70,
+      "util_count_per_pos": 2,
+      "pinch_hitter_count": 4,
+      "pinch_runner_count": 3,
+      "pinch_hitter_pa_threshold": 100,
+      "hitter_position_min": {
+        "C": 2, "1B": 1, "2B": 1, "SS": 1, "3B": 1,
+        "LF": 1, "CF": 1, "RF": 1, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 1, "SU": 2, "MR": 4, "LR": 1}
+    },
+    "AAA": {
+      "level_below": "AA",
+      "roster_size": 30,
+      "hitter_count": 15,
+      "pitcher_count": 15,
+      "ratings_weight": 0.45,
+      "stats_weight": 0.55,
+      "hitter_position_min": {
+        "C": 3, "1B": 1, "2B": 2, "SS": 2, "3B": 1,
+        "LF": 2, "CF": 2, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 1, "SU": 2, "MR": 6, "LR": 1}
+    },
+    "AA": {
+      "level_below": "A+",
+      "roster_size": 35,
+      "hitter_count": 17,
+      "pitcher_count": 18,
+      "ratings_weight": 0.60,
+      "stats_weight": 0.40,
+      "hitter_position_min": {
+        "C": 3, "1B": 2, "2B": 2, "SS": 2, "3B": 2,
+        "LF": 2, "CF": 2, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 2, "SU": 2, "MR": 6, "LR": 1}
+    },
+    "A+": {
+      "level_below": "A",
+      "roster_size": 35,
+      "hitter_count": 17,
+      "pitcher_count": 18,
+      "ratings_weight": 0.75,
+      "stats_weight": 0.25,
+      "hitter_position_min": {
+        "C": 3, "1B": 2, "2B": 2, "SS": 2, "3B": 2,
+        "LF": 2, "CF": 2, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 2, "SU": 2, "MR": 6, "LR": 1}
+    },
+    "A": {
+      "level_below": "A-",
+      "roster_size": 35,
+      "hitter_count": 17,
+      "pitcher_count": 18,
+      "ratings_weight": 0.80,
+      "stats_weight": 0.20,
+      "hitter_position_min": {
+        "C": 3, "1B": 2, "2B": 2, "SS": 2, "3B": 2,
+        "LF": 2, "CF": 2, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 2, "SU": 2, "MR": 6, "LR": 1}
+    },
+    "A-": {
+      "level_below": "R",
+      "roster_size": 40,
+      "hitter_count": 20,
+      "pitcher_count": 20,
+      "ratings_weight": 0.85,
+      "stats_weight": 0.15,
+      "hitter_position_min": {
+        "C": 3, "1B": 2, "2B": 2, "SS": 2, "3B": 2,
+        "LF": 2, "CF": 3, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 5, "CL": 2, "SU": 2, "MR": 8, "LR": 1}
+    },
+    "R": {
+      "level_below": null,
+      "roster_size": 45,
+      "hitter_count": 22,
+      "pitcher_count": 23,
+      "ratings_weight": 0.90,
+      "stats_weight": 0.10,
+      "split_by_affiliate": true,
+      "_split_comment": "When true, depth_chart emits one report per affiliate (e.g. R-ACL, R-DSL) instead of bundling them. Affiliate label is regex-extracted from the Team field — see DEFAULT_AFFILIATE_PATTERN. Only applies when the org actually has multiple affiliates at this level.",
+      "hitter_position_min": {
+        "C": 3, "1B": 2, "2B": 2, "SS": 3, "3B": 2,
+        "LF": 3, "CF": 3, "RF": 2, "DH": 0
+      },
+      "pitcher_role_count": {"SP": 7, "CL": 2, "SU": 2, "MR": 9, "LR": 1}
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "_comment": "Defaults for contract.py valuation engine. All knobs overridable via CLI.",
+
+  "age_curve": {
+    "_comment": "Per-year projected VOS. Starts at VOS_Current, ramps toward VOS_Potential up to peak window, then declines. Pitchers use pitcher block, hitters use hitter block.",
+    "hitter": {
+      "peak_start_age": 27,
+      "peak_end_age": 29,
+      "ramp_per_year": 0.6,
+      "_ramp_comment": "Fraction of (Potential - Current) gap closed each year pre-peak. 0.6 = closes 60% of remaining gap per year.",
+      "decline_per_year_post_peak": 0.5,
+      "_decline_comment": "VOS points lost per year after peak_end_age.",
+      "accelerating_decline_age": 33,
+      "decline_accel_multiplier": 1.5,
+      "_accel_comment": "After this age, decline_per_year is multiplied by this factor."
+    },
+    "pitcher": {
+      "peak_start_age": 26,
+      "peak_end_age": 28,
+      "ramp_per_year": 0.6,
+      "decline_per_year_post_peak": 0.7,
+      "accelerating_decline_age": 32,
+      "decline_accel_multiplier": 1.6
+    }
+  },
+
+  "type_multipliers": {
+    "_comment": "Applied to projected VOS each year. Arb: player-team cost-controlled years. Extension_fa: FA years bought out as part of extension (discount for early commit). Market: open-market FA.",
+    "arb_per_year": [0.40, 0.55, 0.70],
+    "_arb_comment": "Year 1 arb = 40% of market, Y2 = 55%, Y3 = 70%. Super-2 handled by user setting --arb-years 4.",
+    "extension_fa": 0.85,
+    "_extension_comment": "FA years in a pre-FA extension context (discount for committing early).",
+    "market": 1.00,
+    "pre_arb": 0.10,
+    "_pre_arb_comment": "Pre-arb (league minimum) years if included in a very early extension."
+  },
+
+  "elite_premium": {
+    "_comment": "Non-linear kicker to correct for VOS sigmoid compression at the top. Applied per-year to fair_value AFTER type multipliers and BEFORE risk discount. Tiers are inclusive lower bounds on projected VOS; pick the highest matching tier.",
+    "enabled": true,
+    "tiers": [
+      {"min_vos": 70, "multiplier": 2.15, "label": "Superstar"},
+      {"min_vos": 65, "multiplier": 1.75, "label": "Star"},
+      {"min_vos": 60, "multiplier": 1.45, "label": "All-Star"},
+      {"min_vos": 55, "multiplier": 1.25, "label": "Above-Avg"},
+      {"min_vos": 45, "multiplier": 1.15, "label": "Regular"},
+      {"min_vos": 0,  "multiplier": 1.00, "label": "Below-Avg"}
+    ]
+  },
+
+  "risk_discount": {
+    "_comment": "Applied to total_fair_value when there is a large gap between VOS_Current and VOS_Potential. Protects against projection bust.",
+    "enabled": true,
+    "per_gap_point": 0.005,
+    "_gap_comment": "Discount = per_gap_point * max(0, VOS_Potential - VOS_Current). Example: gap of 10 points = 5% discount.",
+    "max_discount": 0.25,
+    "min_mlb_vos_floor": 45,
+    "_floor_comment": "If VOS_Current >= this, treat player as 'established' and skip risk discount.",
+    "pitcher_extra_discount": 0.03,
+    "_pitcher_comment": "Additional flat discount applied to pitchers (injury risk)."
+  },
+
+  "vpc": {
+    "vos_floor": 25.0,
+    "winsor_lower": 0.025,
+    "winsor_upper": 0.975,
+    "salary_col": "Contract_salary0",
+    "vos_col": "VOS_Score",
+    "pot_col": "VOS_Potential"
+  },
+
+  "contract_defaults": {
+    "_comment": "Passed through to contract_builder.build_contract(). Most can be overridden at CLI.",
+    "incentives": 4,
+    "incentive_cap_pct": 0.10,
+    "use_option": false,
+    "buyout_pct": 0.25,
+    "rounding": 100000,
+    "incentives_per_year": true,
+    "min_annual_value": 0,
+    "apply_2x": true
+  }
+}

@@ -1,0 +1,1265 @@
+{
+  "_meta": {
+    "version": "v10",
+    "status": "v10 PRODUCTION CANDIDATE. v10 = v7 BABIP features (hitter Reach +0.005 AUC) + recalibrated v5 Career personality heuristic (zero out Leadership, bump Work_Ethic to +/-3.0) + v9 rp_model splice (RP Reach +0.004 AUC). hitter_model and sp_model unchanged from v7.",
+    "built_by": "analysis/build_v10_weights.py",
+    "components": {
+      "A_hitter_sp_models": "v7 (BABIP/PBABIP features)",
+      "B_career_personality_heuristic": "v5 recalibrated (Lead=0/0/0, WrkEthic=3/0/-3, others unchanged)",
+      "C_rp_model": "v9 (personality dummies)"
+    }
+  },
+  "war_archetype": {
+    "_meta": {
+      "anchor": "VOS_Ceiling (quality) + VOS_Career (debut timing) + current age",
+      "framing": "Career arc for a player of this profile IF he becomes a real MLBer (career WAR >= 2.0); NOT a per-player forecast. ceiling_to_career.war = MEDIAN non-bust career WAR (typical-if-he-sticks); war_hi = p90 (top-tier outcome). Both binned by VOS_Ceiling among non-bust reachers, isotonic-smoothed. KEY FINDING: ceiling barely moves the typical (median ~8.5 until elite tier) but widens the upside (p90 ~28->42). remaining[_hi] = value * frac_ahead(age) for MLB players, full for prospects. debut_age = current_age + ttd(VOS_Career).",
+      "built_by": "analysis/war_archetype_ballpark.py",
+      "source": "outcomes.db, 10 cohorts, 403 reached-MLB hitters",
+      "caveat": "Ceiling->WAR gradient is gentle (rho~0.15) -> the number is the center of a WIDE cloud. frac_ahead is survivor-conditional -> slightly over-credits older players. Single sim, default settings."
+    },
+    "ceiling_to_career": {
+      "score": [40.31, 45.09, 49.67, 53.74, 56.28, 58.59, 60.47, 62.71, 65.05, 67.65],
+      "war": [8.54, 8.54, 8.54, 8.54, 8.54, 8.54, 8.54, 8.54, 14.21, 14.76],
+      "war_hi": [28.6, 28.6, 28.6, 28.6, 28.6, 28.6, 28.6, 35.58, 35.58, 42.07]
+    },
+    "frac_ahead": {
+      "age": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
+      "frac": [1.0, 1.0, 0.962, 0.92, 0.874, 0.819, 0.759, 0.699, 0.639, 0.571, 0.507, 0.447, 0.391, 0.34, 0.296, 0.258, 0.224, 0.189, 0.154, 0.107]
+    },
+    "career_to_ttd": {
+      "score": [35, 40, 45, 50, 55, 60],
+      "years": [4.0, 4.0, 4.0, 3.6, 2.29, 2.0]
+    },
+    "ceiling_tiers": {
+      "_comment": "Flavor labels for VOS_Ceiling (projected-quality / potential tier). Describe the player's CEILING profile, not a WAR guarantee. Tweakable. First band (top-down) whose 'min' <= ceiling wins.",
+      "bands": [
+        {"min": 68, "label": "Superstar / Franchise"},
+        {"min": 63, "label": "Perennial All-Star"},
+        {"min": 58, "label": "All-Star Caliber"},
+        {"min": 53, "label": "Above-Average Regular"},
+        {"min": 48, "label": "Everyday Regular"},
+        {"min": 43, "label": "Second-Division Starter"},
+        {"min": 38, "label": "Bench / Platoon"},
+        {"min": 0, "label": "Org Depth"}
+      ]
+    }
+  },
+  "scoring_modes": {
+    "_comment": "v5 produces two parallel scores (VOS_Reach + VOS_Career) plus an optional blended composite. Each mode has its own tool weights. Carried-forward blocks (positional_standards, adjustments, normalization) live at the top level since they apply identically across modes.",
+    "vos_reach": {
+      "_comment": "Predicts P(reach MLB). Inputs are Pot* ratings where available (PotGap, PotPow, PotStf, etc.); falls back to current ratings for tools with no Pot* counterpart (Cntct, Speed, defense ratings). Weights derived from Stage-1 AUC findings \u00e2\u20ac\u201d see analysis/output/raw_ratings_stage_split.csv.",
+      "hitters": {
+        "tool_categories": {
+          "_comment": "Per-tool weights within each category, sum to ~1.0",
+          "batting": {
+            "_rationale": "Stage-1 AUC: PotGap 0.720, PotKs 0.635, PotPow 0.598, PotEye 0.568. Cntct (no Pot* version) AUC 0.563 \u00e2\u20ac\u201d given modest weight.",
+            "PotGap": 0.3,
+            "PotKs": 0.25,
+            "PotPow": 0.2,
+            "PotEye": 0.15,
+            "Cntct": 0.1
+          },
+          "defense": {
+            "_comment": "Stage-1 AUC for defensive ratings is modest (\u00e2\u2030\u00a40.65). Defense in Reach gets non-zero but reduced weight relative to batting. Per-position weights mirror v3's shape since the relative ordering of IFR/IFA/etc. within infield is similar at Stage-1.",
+            "C": {
+              "CFrm": 0.45,
+              "CBlk": 0.35,
+              "CArm": 0.2
+            },
+            "1B": {
+              "IFE": 0.8,
+              "IFA": 0.2,
+              "IFR": 0.0,
+              "TDP": 0.0
+            },
+            "2B": {
+              "IFR": 0.5,
+              "TDP": 0.25,
+              "IFA": 0.15,
+              "IFE": 0.1
+            },
+            "3B": {
+              "IFA": 0.4,
+              "IFR": 0.4,
+              "IFE": 0.2,
+              "TDP": 0.0
+            },
+            "SS": {
+              "IFR": 0.55,
+              "TDP": 0.25,
+              "IFE": 0.1,
+              "IFA": 0.1
+            },
+            "LF": {
+              "OFR": 0.65,
+              "OFE": 0.3,
+              "OFA": 0.05
+            },
+            "CF": {
+              "OFR": 0.75,
+              "OFE": 0.2,
+              "OFA": 0.05
+            },
+            "RF": {
+              "OFR": 0.55,
+              "OFE": 0.3,
+              "OFA": 0.15
+            }
+          },
+          "baserunning": {
+            "_rationale": "Stage-1 AUCs for the four baserunning ratings are roughly equal (Run 0.602, StlRt 0.622, Speed 0.621, StealAbi 0.600). Use equal-ish weights.",
+            "Run": 0.27,
+            "StlRt": 0.27,
+            "Speed": 0.24,
+            "StealAbi": 0.22
+          }
+        },
+        "position_category_weights": {
+          "_comment": "How much each position values batting/defense/baserunning in Reach mode. Defense weighted lower than in Career mode because Stage-1 AUC for defense is modest.",
+          "C": {
+            "batting": 0.3,
+            "defense": 0.6,
+            "baserunning": 0.1
+          },
+          "1B": {
+            "batting": 0.8,
+            "defense": 0.1,
+            "baserunning": 0.1
+          },
+          "2B": {
+            "batting": 0.5,
+            "defense": 0.35,
+            "baserunning": 0.15
+          },
+          "3B": {
+            "batting": 0.55,
+            "defense": 0.35,
+            "baserunning": 0.1
+          },
+          "SS": {
+            "batting": 0.45,
+            "defense": 0.4,
+            "baserunning": 0.15
+          },
+          "LF": {
+            "batting": 0.7,
+            "defense": 0.15,
+            "baserunning": 0.15
+          },
+          "CF": {
+            "batting": 0.35,
+            "defense": 0.45,
+            "baserunning": 0.2
+          },
+          "RF": {
+            "batting": 0.7,
+            "defense": 0.2,
+            "baserunning": 0.1
+          },
+          "DH": {
+            "batting": 1.0,
+            "defense": 0.0,
+            "baserunning": 0.0
+          }
+        }
+      },
+      "pitchers": {
+        "ability_weights": {
+          "_comment": "Reach pitcher ability uses Pot* ratings. Stage-1 AUC: PotHRA 0.724, PotMov 0.723, PotCtrl 0.694, PotStf 0.672. Keys are CSV column names directly.",
+          "SP": {
+            "PotStf": 0.2,
+            "PotMov": 0.28,
+            "PotCtrl": 0.24,
+            "PotHRA": 0.28
+          },
+          "RP": {
+            "PotStf": 0.22,
+            "PotMov": 0.26,
+            "PotCtrl": 0.24,
+            "PotHRA": 0.28
+          }
+        },
+        "role_balance": {
+          "_comment": "Ability vs arsenal weighting. Arsenal Pot* AUCs are weaker (mostly 0.50\u00e2\u20ac\u201c0.60 range, only PotCutt at 0.551 stands out) so lean harder on ability composite.",
+          "SP": {
+            "ability_weight": 0.85,
+            "arsenal_weight": 0.15
+          },
+          "RP": {
+            "ability_weight": 0.9,
+            "arsenal_weight": 0.1
+          }
+        }
+      }
+    },
+    "vos_career": {
+      "_comment": "Predicts WAR | MLB. Inputs are current ratings throughout (with age-decay applied \u00e2\u20ac\u201d see age_decay block). Weights essentially v3's, since v3 was tuned for Stage-2 Spearman.",
+      "hitters": {
+        "tool_categories": {
+          "batting": {
+            "_rationale": "v3 weights, unchanged. Stage-2 Spearman: Gap 0.085, Ks 0.084, Pow 0.027, Eye 0.037.",
+            "Gap": 0.4,
+            "Pow": 0.1,
+            "Eye": 0.1,
+            "Ks": 0.4
+          },
+          "defense": {
+            "_comment": "Position-restricted defense ratings \u00e2\u20ac\u201d v3 values, unchanged. OFR (rho 0.311) and CFrm (rho 0.318) dominate Stage-2.",
+            "C": {
+              "CFrm": 0.55,
+              "CBlk": 0.3,
+              "CArm": 0.15
+            },
+            "1B": {
+              "IFE": 0.8,
+              "IFA": 0.2,
+              "IFR": 0.0,
+              "TDP": 0.0
+            },
+            "2B": {
+              "IFR": 0.45,
+              "TDP": 0.3,
+              "IFA": 0.15,
+              "IFE": 0.1
+            },
+            "3B": {
+              "IFA": 0.4,
+              "IFR": 0.4,
+              "IFE": 0.2,
+              "TDP": 0.0
+            },
+            "SS": {
+              "IFR": 0.5,
+              "TDP": 0.3,
+              "IFE": 0.15,
+              "IFA": 0.05
+            },
+            "LF": {
+              "OFR": 0.65,
+              "OFE": 0.3,
+              "OFA": 0.05
+            },
+            "CF": {
+              "OFR": 0.75,
+              "OFE": 0.2,
+              "OFA": 0.05
+            },
+            "RF": {
+              "OFR": 0.55,
+              "OFE": 0.3,
+              "OFA": 0.15
+            }
+          },
+          "baserunning": {
+            "_rationale": "v3 weights, unchanged. Stage-2: Run 0.216, StlRt 0.195, Speed 0.187, StealAbi 0.166.",
+            "Run": 0.28,
+            "StlRt": 0.26,
+            "Speed": 0.25,
+            "StealAbi": 0.21
+          }
+        },
+        "position_category_weights": {
+          "_comment": "v3 values, unchanged.",
+          "C": {
+            "batting": 0.2,
+            "defense": 0.7,
+            "baserunning": 0.1
+          },
+          "1B": {
+            "batting": 0.75,
+            "defense": 0.1,
+            "baserunning": 0.15
+          },
+          "2B": {
+            "batting": 0.4,
+            "defense": 0.4,
+            "baserunning": 0.2
+          },
+          "3B": {
+            "batting": 0.45,
+            "defense": 0.45,
+            "baserunning": 0.1
+          },
+          "SS": {
+            "batting": 0.35,
+            "defense": 0.5,
+            "baserunning": 0.15
+          },
+          "LF": {
+            "batting": 0.65,
+            "defense": 0.15,
+            "baserunning": 0.2
+          },
+          "CF": {
+            "batting": 0.25,
+            "defense": 0.55,
+            "baserunning": 0.2
+          },
+          "RF": {
+            "batting": 0.65,
+            "defense": 0.2,
+            "baserunning": 0.15
+          },
+          "DH": {
+            "batting": 1.0,
+            "defense": 0.0,
+            "baserunning": 0.0
+          }
+        }
+      },
+      "pitchers": {
+        "ability_weights": {
+          "_comment": "v3 values, unchanged. Stage-2: Ctrl 0.264, HRA 0.255, Mov 0.247, Stf 0.181. Keys are CSV column names directly (renamed from v3's Stuff/Movement/Control/HR_Avoid logical names).",
+          "SP": {
+            "Stf": 0.1,
+            "Mov": 0.3,
+            "Ctrl": 0.35,
+            "HRA": 0.25
+          },
+          "RP": {
+            "Stf": 0.15,
+            "Mov": 0.25,
+            "Ctrl": 0.35,
+            "HRA": 0.25
+          }
+        },
+        "role_balance": {
+          "_comment": "v3 values, unchanged.",
+          "SP": {
+            "ability_weight": 0.85,
+            "arsenal_weight": 0.15
+          },
+          "RP": {
+            "ability_weight": 0.9,
+            "arsenal_weight": 0.1
+          }
+        }
+      }
+    },
+    "vos_ceiling": {
+      "_comment": "VOS_Ceiling = Stage-2 (Career) weights applied to POTENTIAL ratings -> projected quality at maturity/ceiling. Only the batting block is defined here; defense, baserunning, and position_category_weights are inherited from vos_career at scoring time (see run_vos._mode_block). No age-decay, no adjustment stack. Added 2026-05-28.",
+      "hitters": {
+        "tool_categories": {
+          "batting": {
+            "_rationale": "Career batting weight VALUES (Gap 0.4 / Pow 0.1 / Eye 0.1 / Ks 0.4) applied to Pot* columns.",
+            "PotGap": 0.4,
+            "PotPow": 0.1,
+            "PotEye": 0.1,
+            "PotKs": 0.4
+          }
+        }
+      }
+    },
+    "blend": {
+      "_comment": "Final VOS_Blended = alpha * VOS_Reach + (1 - alpha) * VOS_Career. Default 0.4 reflects mild Career lean \u00e2\u20ac\u201d once you can identify likely MLBers, 'how good' matters more than 'will they'. Tune empirically once v5 is implemented.",
+      "alpha": 0.4
+    },
+    "vos_reach_v6": {
+      "_comment": "v7 logistic Reach model with BABIP/PBABIP features added vs v6. Block name kept as 'vos_reach_v6' for run_vos.py compatibility \u2014 the schema is unchanged, only the feature list and trained coefficients differ.",
+      "_formula": "z_i = (x_i - means_i) / stds_i; logit = intercept + sum(coefs_i * z_i); p = 1 / (1 + exp(-logit)); VOS_Reach = 20 + 60 * p",
+      "hitter_model": {
+        "features": [
+          "PotGap",
+          "PotPow",
+          "PotEye",
+          "PotKs",
+          "PotBABIP",
+          "Cntct",
+          "Gap",
+          "Pow",
+          "Eye",
+          "Ks",
+          "BABIP",
+          "Speed",
+          "Run",
+          "StealAbi",
+          "StlRt",
+          "CFrm",
+          "CBlk",
+          "CArm",
+          "IFR",
+          "IFE",
+          "IFA",
+          "TDP",
+          "OFR",
+          "OFE",
+          "OFA",
+          "age",
+          "pos_flex",
+          "pos_def_avg",
+          "pos_C",
+          "pos_1B",
+          "pos_2B",
+          "pos_3B",
+          "pos_SS",
+          "pos_LF",
+          "pos_CF",
+          "pos_RF",
+          "pos_DH"
+        ],
+        "means": [
+          47.34765762592462,
+          45.06868615709757,
+          45.47023599859105,
+          48.50827756252202,
+          45.22719267347657,
+          30.801338499471644,
+          29.499823881648467,
+          27.31595632264882,
+          29.06481155336386,
+          31.949630151461783,
+          29.811553363860515,
+          49.49806269813315,
+          44.66713631560408,
+          44.76047904191617,
+          44.887284255019374,
+          27.127509686509335,
+          27.197957027122225,
+          26.713631560408594,
+          40.60408594575555,
+          39.10355759070095,
+          46.651990137372316,
+          34.63543501232829,
+          46.67312433955618,
+          45.05635787249032,
+          47.69284959492779,
+          19.550898203592816,
+          1.7220852412821417,
+          49.92896559821533,
+          0.18598097921803453,
+          0.07291299753434308,
+          0.11518140190207819,
+          0.10179640718562874,
+          0.16167664670658682,
+          0.07150405072208524,
+          0.1983092638252906,
+          0.0926382529059528,
+          0.0
+        ],
+        "stds": [
+          10.710541365632016,
+          9.523919317618038,
+          8.997812636658443,
+          10.89363146883645,
+          6.425898109315886,
+          6.313182362652036,
+          6.985612696990634,
+          6.338118498437919,
+          6.751047162174462,
+          6.928503112196491,
+          6.606863473910845,
+          12.008710871251168,
+          12.84969389742696,
+          12.270968004854165,
+          11.982344810806453,
+          12.622765814170657,
+          12.831511001685993,
+          11.842993396453911,
+          11.48362070159561,
+          11.772224102819028,
+          11.573191840414415,
+          13.418740020581838,
+          9.109769699379548,
+          7.977844071800111,
+          8.580845762526774,
+          1.8406389698671881,
+          1.2877242029586093,
+          6.591945639314768,
+          0.3890913190847819,
+          0.25999363900853417,
+          0.31924073449036877,
+          0.3023803873761101,
+          0.3681539197350754,
+          0.25766494028567155,
+          0.398726346892655,
+          0.28992482992059426,
+          1.0
+        ],
+        "medians": [
+          45.0,
+          45.0,
+          45.0,
+          50.0,
+          45.0,
+          30.0,
+          30.0,
+          25.0,
+          30.0,
+          30.0,
+          30.0,
+          50.0,
+          45.0,
+          45.0,
+          45.0,
+          20.0,
+          20.0,
+          20.0,
+          35.0,
+          35.0,
+          45.0,
+          30.0,
+          45.0,
+          45.0,
+          50.0,
+          19.0,
+          2.0,
+          50.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "coefs": [
+          0.19088786195191498,
+          0.14135915260624507,
+          -0.04830419362552287,
+          0.14573187656358721,
+          0.340028231806952,
+          0.09673684515101466,
+          -0.20846762543901182,
+          0.4517972275686655,
+          0.418703901039237,
+          0.36586428362846385,
+          -0.034485056999504465,
+          0.13609795283245257,
+          0.017664621182219595,
+          -0.037546577533868315,
+          0.10954774540802,
+          0.2822446423951329,
+          -0.11872886907341723,
+          -0.3220132370306713,
+          0.3222228051575019,
+          -0.22197668765620326,
+          0.11235356359867492,
+          -0.07359668794435567,
+          0.029972855543394312,
+          -0.0038785979712306867,
+          -0.04543258746801122,
+          -1.192716406412549,
+          0.19049792934150722,
+          0.24743252474710603,
+          0.16186914475429626,
+          0.08028097154703961,
+          -0.05500344068004548,
+          -0.20718605223377035,
+          0.007750480677023179,
+          0.06263278400317655,
+          -0.003929874222937922,
+          -0.07267670539274963,
+          0.0
+        ],
+        "intercept": -2.2156402421810455,
+        "n_train": 2839,
+        "positive_rate": 0.1419513913349771,
+        "cv_auc": 0.7626891091852159,
+        "in_sample_auc": 0.7857010434874728,
+        "regularization_C": 0.3593813663804626
+      },
+      "sp_model": {
+        "features": [
+          "PotStf",
+          "PotMov",
+          "PotHRA",
+          "PotCtrl",
+          "PotPBABIP",
+          "Stf",
+          "Mov",
+          "HRA",
+          "Ctrl",
+          "PBABIP",
+          "PotFst",
+          "PotSnk",
+          "PotCutt",
+          "PotCrv",
+          "PotSld",
+          "PotChg",
+          "PotSplt",
+          "Stm",
+          "pitch_top3",
+          "plus_pitches",
+          "elite_pitches",
+          "age"
+        ],
+        "means": [
+          41.97564612326044,
+          44.2544731610338,
+          44.05815109343936,
+          43.67296222664016,
+          45.8772365805169,
+          28.215705765407556,
+          32.01540755467197,
+          27.820576540755468,
+          27.57455268389662,
+          45.86729622266402,
+          43.78727634194831,
+          24.654572564612327,
+          16.304671968190856,
+          16.32952286282306,
+          18.513916500994036,
+          39.38121272365805,
+          12.703777335984096,
+          55.60387673956262,
+          48.73177601060305,
+          0.8563618290258449,
+          0.10487077534791253,
+          19.47216699801193
+        ],
+        "stds": [
+          7.238544341572442,
+          6.464527375273568,
+          8.222798288349804,
+          8.573933204138601,
+          2.15879050834957,
+          6.26789223031487,
+          5.80080727079817,
+          7.02056862106113,
+          6.1202259398959695,
+          2.1396995491799964,
+          16.13947278095828,
+          23.562919954570358,
+          23.584165047670755,
+          23.230825120008877,
+          23.007115010845073,
+          19.478853929786766,
+          21.24061541450721,
+          10.020884994067625,
+          7.261410952840926,
+          1.222610171113903,
+          0.44413130659279165,
+          1.8277517928446554
+        ],
+        "medians": [
+          40.0,
+          45.0,
+          45.0,
+          45.0,
+          45.0,
+          25.0,
+          30.0,
+          25.0,
+          25.0,
+          45.0,
+          45.0,
+          35.0,
+          0.0,
+          0.0,
+          0.0,
+          45.0,
+          0.0,
+          55.0,
+          46.666666666666664,
+          0.0,
+          0.0,
+          19.0
+        ],
+        "coefs": [
+          0.19290858052311594,
+          0.15660472892048488,
+          0.0891429993829289,
+          0.10548083381608105,
+          0.04801863087835721,
+          0.1621868719130442,
+          0.09378183840457403,
+          0.20328749301665508,
+          0.3462703338827427,
+          0.012191649964306219,
+          0.11215765121935514,
+          0.11858343469856443,
+          0.12794490174933892,
+          0.08987355099142123,
+          -0.022848833435082684,
+          -0.10662473670707857,
+          0.012797423786439605,
+          0.33345067795199973,
+          0.12649603547712676,
+          0.14030721922634057,
+          -0.056841767390528944,
+          -0.6826407150024973
+        ],
+        "intercept": -1.8070124051565983,
+        "n_train": 2012,
+        "positive_rate": 0.17992047713717693,
+        "cv_auc": 0.7679306880964339,
+        "in_sample_auc": 0.7808371002846141,
+        "regularization_C": 0.046415888336127774
+      },
+      "rp_model": {
+        "features": [
+          "PotStf",
+          "PotMov",
+          "PotHRA",
+          "PotCtrl",
+          "PotPBABIP",
+          "Stf",
+          "Mov",
+          "HRA",
+          "Ctrl",
+          "PBABIP",
+          "PotFst",
+          "PotSnk",
+          "PotCutt",
+          "PotCrv",
+          "PotSld",
+          "PotChg",
+          "PotSplt",
+          "Stm",
+          "pitch_top3",
+          "plus_pitches",
+          "elite_pitches",
+          "age",
+          "Int_H",
+          "Int_L",
+          "WrkEthic_H",
+          "WrkEthic_L",
+          "Greed_H",
+          "Greed_L",
+          "Loy_H",
+          "Loy_L",
+          "Lead_H",
+          "Lead_L"
+        ],
+        "means": [
+          51.02564102564103,
+          46.93061840120664,
+          47.48868778280543,
+          44.98491704374057,
+          46.21417797888386,
+          32.66968325791855,
+          34.67571644042232,
+          31.003016591251885,
+          29.4947209653092,
+          46.21417797888386,
+          46.885369532428356,
+          10.588235294117647,
+          19.60030165912519,
+          15.324283559577678,
+          20.294117647058822,
+          11.493212669683258,
+          4.622926093514328,
+          31.877828054298643,
+          56.354952237305184,
+          1.2865761689291102,
+          0.41478129713423834,
+          19.883861236802414,
+          0.15233785822021115,
+          0.12066365007541478,
+          0.23529411764705882,
+          0.06636500754147813,
+          0.15233785822021115,
+          0.18099547511312217,
+          0.14479638009049775,
+          0.138763197586727,
+          0.10407239819004525,
+          0.1478129713423831
+        ],
+        "stds": [
+          11.366150966209839,
+          7.084792249344599,
+          9.1776225622423,
+          8.749044263290804,
+          2.2968227536505763,
+          7.543204930509071,
+          5.767658181356583,
+          7.425648954360143,
+          6.159730499307613,
+          2.2968227536505763,
+          24.128654916116492,
+          19.754167448328786,
+          26.8836126173545,
+          26.64937068337724,
+          27.37972868885206,
+          22.40352938477417,
+          15.968281698331,
+          5.165015170160804,
+          11.145680595544162,
+          0.957269974341602,
+          0.7022213658016698,
+          1.8216302658306722,
+          0.35934806966656996,
+          0.3257359876125029,
+          0.42418250299576343,
+          0.24891904972399698,
+          0.35934806966656996,
+          0.38501443232909766,
+          0.3518954225379834,
+          0.34569925163678616,
+          0.3053544401593301,
+          0.3549144923010597
+        ],
+        "medians": [
+          50.0,
+          45.0,
+          45.0,
+          45.0,
+          45.0,
+          35.0,
+          35.0,
+          30.0,
+          30.0,
+          45.0,
+          50.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          30.0,
+          57.5,
+          2.0,
+          0.0,
+          21.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "coefs": [
+          0.1782806363240991,
+          -0.0012402547907560833,
+          -0.18079295038731463,
+          0.01966240606905518,
+          0.04197551153852983,
+          0.4740910316382889,
+          0.4689820812427259,
+          0.4974525050618763,
+          0.22277636011313356,
+          0.04197551153852983,
+          0.0008220455417350225,
+          -0.007964204804211495,
+          0.12062911860182907,
+          0.24858885537583159,
+          0.06902100928175219,
+          0.05607738881747085,
+          0.04743277740663541,
+          0.12157161082986218,
+          -0.028590929288084536,
+          0.06570864087513574,
+          -0.05397314002606476,
+          -1.2730106464470148,
+          0.011386288546157924,
+          -0.16704687727407516,
+          0.1964789102884072,
+          -0.2833229721313399,
+          0.1676540467944729,
+          -0.09693870686101422,
+          -0.12600485143641368,
+          -0.10053413918545047,
+          -0.07800112123755035,
+          -0.05139556925188314
+        ],
+        "intercept": -1.392025805556523,
+        "n_train": 663,
+        "positive_rate": 0.2383107088989442,
+        "cv_auc": 0.7162050382253415,
+        "in_sample_auc": 0.7681789697957138,
+        "regularization_C": 0.3593813663804626
+      }
+    }
+  },
+  "age_decay": {
+    "_comment": "Per-tool age-decay applied to CURRENT ratings (not Pot*) before weighting. Source: analysis/output/aging_per_tool_slopes.csv (2026-05-19 run, 80,794 yearly snapshots of 3,057 reached-MLB players).",
+    "_formula": "years_past_peak = max(player_age - peak_age[tool], 0); adjusted_rating = max(raw_rating + decay_per_year[tool] * years_past_peak, normalization.hard_floor)",
+    "_confound_note": "Cohort deflation + survivorship bias mask true decay. These slopes are CONSERVATIVE \u00e2\u20ac\u201d real decay is at least this strong, probably stronger. Sensitivity test: scale slopes by 1.2-1.5x if v5 doesn't predict 33+ year-old decline strongly enough.",
+    "_eye_ctrl_note": "Eye and Ctrl have empirical slope \u00e2\u2030\u02c6 0 (mean keeps creeping up through age 42). Likely small-positive in reality but confounded. Set to 0 explicitly to avoid over-correcting.",
+    "peak_age": {
+      "Cntct": 26,
+      "Gap": 25,
+      "Pow": 28,
+      "Eye": 41,
+      "Ks": 28,
+      "Speed": 27,
+      "Run": 30,
+      "StealAbi": 28,
+      "StlRt": 28,
+      "IFR": 27,
+      "IFA": 25,
+      "IFE": 29,
+      "TDP": 28,
+      "OFR": 27,
+      "OFA": 28,
+      "OFE": 28,
+      "CArm": 26,
+      "CFrm": 29,
+      "CBlk": 29,
+      "Stf": 27,
+      "Mov": 27,
+      "Ctrl": 37,
+      "HRA": 27,
+      "Stm": 18,
+      "Fst": 27,
+      "Snk": 28,
+      "Cutt": 28,
+      "Crv": 28,
+      "Sld": 27,
+      "Chg": 28,
+      "Splt": 27
+    },
+    "decay_per_year": {
+      "_comment": "Linear slope per year past peak_age, in rating points (20-80 scale). Negative = decay.",
+      "Cntct": -0.568,
+      "Gap": -0.535,
+      "Pow": -0.68,
+      "Eye": 0.0,
+      "Ks": -0.558,
+      "Speed": -0.682,
+      "Run": -0.456,
+      "StealAbi": -0.495,
+      "StlRt": -0.318,
+      "IFR": -0.872,
+      "IFA": -0.128,
+      "IFE": -0.123,
+      "TDP": -0.095,
+      "OFR": -1.055,
+      "OFA": -0.134,
+      "OFE": -0.096,
+      "CArm": -0.192,
+      "CFrm": -0.158,
+      "CBlk": -0.147,
+      "Stf": -0.515,
+      "Mov": -0.245,
+      "Ctrl": 0.0,
+      "HRA": -0.386,
+      "Stm": -0.466,
+      "Fst": -0.598,
+      "Snk": -0.444,
+      "Cutt": -0.6,
+      "Crv": -0.549,
+      "Sld": -0.564,
+      "Chg": -0.322,
+      "Splt": -0.487
+    }
+  },
+  "hitters": {
+    "_comment": "Position-eligibility + projection blocks carried forward from v3 unchanged. Tool weights moved to scoring_modes.",
+    "positional_standards": {
+      "_comment": "Minimum ratings for position viability. Unchanged from v3.",
+      "C": {
+        "CArm": 40,
+        "CFrm": 35
+      },
+      "1B": {
+        "IFE": 50
+      },
+      "2B": {
+        "IFR": 45,
+        "TDP": 50,
+        "IFE": 40
+      },
+      "3B": {
+        "IFA": 60,
+        "IFR": 45,
+        "IFE": 45
+      },
+      "SS": {
+        "IFR": 65,
+        "TDP": 45,
+        "IFE": 50,
+        "IFA": 50
+      },
+      "LF": {
+        "OFR": 40,
+        "OFE": 40,
+        "OFA": 45
+      },
+      "CF": {
+        "OFR": 65,
+        "OFE": 45
+      },
+      "RF": {
+        "OFA": 55
+      }
+    },
+    "dh_assignment": {
+      "min_field_quality": 50,
+      "min_dh_margin_over_field": 3
+    },
+    "projection_insights": {
+      "margin_tiers": {
+        "tieish_max": 0.49,
+        "lean_max": 1.49,
+        "clear_max": 2.99
+      },
+      "flexibility": {
+        "relative_band": 2.0,
+        "include_dh": true
+      }
+    }
+  },
+  "pitchers": {
+    "_comment": "Arsenal scoring + stamina blocks carried forward from v3 unchanged. Ability weights moved to scoring_modes.",
+    "arsenal_evaluation": {
+      "_comment": "v3 values, unchanged. Cutter still elevated to 1.10 since it's the only individually predictive arsenal rating.",
+      "pitch_type_values": {
+        "Fastball": 1.0,
+        "Sinker": 0.95,
+        "Cutter": 1.1,
+        "Slider": 0.95,
+        "Curve": 0.9,
+        "Changeup": 0.9,
+        "Splitter": 0.85,
+        "Forkball": 0.75,
+        "Circle_Change": 0.9,
+        "Screwball": 0.65,
+        "Knuckle_Curve": 0.7,
+        "Knuckleball": 0.6
+      },
+      "pitch_slot_weights": {
+        "SP": {
+          "primary": 0.4,
+          "secondary": 0.3,
+          "tertiary": 0.2,
+          "quaternary": 0.1
+        },
+        "RP": {
+          "primary": 0.55,
+          "secondary": 0.3,
+          "tertiary": 0.15
+        }
+      },
+      "diversity_requirements": {
+        "SP": {
+          "min_pitches": 3,
+          "optimal_pitches": 4,
+          "min_velocity_tiers": 2,
+          "min_break_planes": 2
+        },
+        "RP": {
+          "min_pitches": 2,
+          "optimal_pitches": 3,
+          "min_velocity_tiers": 2,
+          "min_break_planes": 1
+        }
+      },
+      "diversity_modifiers": {
+        "velocity_tier_bonus": 1.5,
+        "break_plane_bonus": 1.5,
+        "insufficient_pitches_penalty": -5.0
+      }
+    },
+    "stamina_requirements": {
+      "_comment": "Stm decay is handled by age_decay block (Stm peak_age=18, decay -0.466/yr). This block governs the SP-stamina-floor penalty, unchanged from v3.",
+      "SP": {
+        "minimum_stamina": 50,
+        "penalty_per_point_below": 1.0
+      }
+    }
+  },
+  "adjustments": {
+    "_comment": "All adjustment blocks carried forward from v3 unchanged.",
+    "development_trajectory": {
+      "hitter": {
+        "thresholds": {
+          "exceeding_potential": 0.85,
+          "meeting_potential": 0.7,
+          "developing_normally": 0.5,
+          "underperforming": 0.5
+        },
+        "modifiers": {
+          "exceeding_potential": 2.0,
+          "meeting_potential": 1.0,
+          "developing_normally": 0.0,
+          "underperforming": -2.0
+        },
+        "minimum_potential_for_bonus": 45
+      },
+      "pitcher": {
+        "thresholds": {
+          "exceeding_potential": 0.85,
+          "meeting_potential": 0.7,
+          "developing_normally": 0.5,
+          "underperforming": 0.5
+        },
+        "modifiers": {
+          "exceeding_potential": 2.0,
+          "meeting_potential": 1.0,
+          "developing_normally": 0.0,
+          "underperforming": -2.0
+        },
+        "minimum_potential_for_bonus": 45
+      },
+      "draft_mode_dampener": 0.7
+    },
+    "age_vs_level": {
+      "hitter": {
+        "level_targets": {
+          "ML": {
+            "target_age": 27,
+            "tolerance_band": 2.5
+          },
+          "AAA": {
+            "target_age": 26,
+            "tolerance_band": 2.0
+          },
+          "AA": {
+            "target_age": 24,
+            "tolerance_band": 1.5
+          },
+          "A+": {
+            "target_age": 22,
+            "tolerance_band": 1.5
+          },
+          "A": {
+            "target_age": 21,
+            "tolerance_band": 1.2
+          },
+          "A-": {
+            "target_age": 20,
+            "tolerance_band": 1.0
+          },
+          "Rookie": {
+            "target_age": 19,
+            "tolerance_band": 0.8
+          }
+        },
+        "max_bonus": 3.0,
+        "max_penalty": -3.0
+      },
+      "pitcher": {
+        "level_targets": {
+          "ML": {
+            "target_age": 28,
+            "tolerance_band": 2.5
+          },
+          "AAA": {
+            "target_age": 27,
+            "tolerance_band": 2.0
+          },
+          "AA": {
+            "target_age": 25,
+            "tolerance_band": 1.5
+          },
+          "A+": {
+            "target_age": 23,
+            "tolerance_band": 1.5
+          },
+          "A": {
+            "target_age": 22,
+            "tolerance_band": 1.2
+          },
+          "A-": {
+            "target_age": 21,
+            "tolerance_band": 1.0
+          },
+          "Rookie": {
+            "target_age": 20,
+            "tolerance_band": 0.8
+          }
+        },
+        "max_bonus": 2.5,
+        "max_penalty": -3.0
+      }
+    },
+    "personality_impact": {
+      "trait_modifiers": {
+        "Intelligence": {
+          "high": 1.5,
+          "normal": 0.0,
+          "low": -1.0
+        },
+        "Work_Ethic": {
+          "high": 3.0,
+          "normal": 0.0,
+          "low": -3.0
+        },
+        "Greed": {
+          "high": -0.5,
+          "normal": 0.0,
+          "low": 0.5
+        },
+        "Loyalty": {
+          "high": 0.5,
+          "normal": 0.0,
+          "low": -0.5
+        },
+        "Leadership": {
+          "high": 0.0,
+          "normal": 0.0,
+          "low": 0.0
+        }
+      }
+    },
+    "draft_role_penalties": {
+      "_comment": "v3 removed the -2.0 RP penalty after finding negative rho. Keep at 0 in v5.",
+      "RP": 0.0
+    },
+    "readiness": {
+      "pitcher": {
+        "enabled": true,
+        "min_age": 20,
+        "floor_tiers": [
+          {
+            "min_avg": 55,
+            "min_min": 50,
+            "bonus": 3.0
+          },
+          {
+            "min_avg": 50,
+            "min_min": 45,
+            "bonus": 2.0
+          },
+          {
+            "min_avg": 45,
+            "min_min": 40,
+            "bonus": 1.0
+          }
+        ],
+        "plus_pitch_threshold": 55,
+        "elite_pitch_threshold": 70,
+        "per_plus_pitch": 0.5,
+        "max_plus_pitch_bonus": 2.0,
+        "per_elite_pitch": 1.0,
+        "sp_stamina_floor": 45,
+        "sp_stamina_penalty_mult": 0.5
+      },
+      "hitter": {
+        "enabled": true,
+        "min_age": 20,
+        "floor_tiers": [
+          {
+            "min_avg": 55,
+            "min_min": 50,
+            "bonus": 3.0
+          },
+          {
+            "min_avg": 50,
+            "min_min": 45,
+            "bonus": 2.0
+          },
+          {
+            "min_avg": 45,
+            "min_min": 40,
+            "bonus": 1.0
+          }
+        ],
+        "plus_tool_threshold": 55,
+        "elite_tool_threshold": 70,
+        "per_plus_tool": 0.4,
+        "max_plus_tool_bonus": 2.0,
+        "per_elite_tool": 1.0,
+        "position_ready_bonus": 1.0,
+        "multi_position_bonus": 0.5,
+        "multi_position_threshold": 3
+      }
+    }
+  },
+  "normalization": {
+    "_comment": "Unchanged from v3. Applies independently to both VOS_Reach and VOS_Career.",
+    "method": "sigmoid",
+    "target_center": 50.0,
+    "scale_parameter": 15.0,
+    "hard_floor": 20.0,
+    "hard_ceiling": 80.0
+  }
+}

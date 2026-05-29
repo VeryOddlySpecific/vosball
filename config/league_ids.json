@@ -1,0 +1,79 @@
+{
+  "_comment": "Maps {league_slug} -> {level_label -> [lid, lid, ...]}.",
+  "_comment_2": "Each lid is a 3-digit StatsPlus league ID (the NNN in league_NNN_home.html on the BNN page).",
+  "_comment_3": "Used by depth_chart.py and stats.py to fetch player stats for the right minor league when --level is non-ML.",
+  "_comment_4": "Add new commissioner leagues by copying the sahl block and updating the lids per their BNN page.",
+
+  "sahl": {
+    "ML":  [153],
+    "AAA": [154, 155],
+    "AA":  [156, 157, 158],
+    "A+":  [159, 160, 161],
+    "A":   [162, 163, 165],
+    "R":   [167, 168, 169, 180],
+    "Winter": [263],
+    "_independents": [147, 149, 207],
+    "_international": [225, 226, 228, 229, 263]
+  },
+  "tlg": {
+    "ML":  [153],
+    "AAA": [154, 155],
+    "AA":  [156, 157, 158],
+    "A+":  [159, 160, 161],
+    "A":   [162, 163],
+    "R":   [168, 180],
+    "_independents": [182, 183, 138],
+    "_international": [128, 126, 173, 119, 171, 170]
+  },
+  "wwoba": {
+    "ML":  [200],
+    "AAA": [201, 202],
+    "AA":  [203, 204, 205],
+    "A+":  [206, 207, 208],
+    "A":   [209, 210],
+    "R":   [214, 215, 221, 226],
+    "_international": [217, 218]
+  },
+  "woba": {
+    "ML":  [202],
+    "AAA": [203, 204],
+    "AA":  [205, 206, 207],
+    "A+":  [208, 209, 210],
+    "A":   [211, 212],
+    "R":   [216, 217, 235, 255],
+    "_international": [217, 218]
+  },
+  "uba": {
+    "ML":  [106],
+    "AAA": [112, 107],
+    "AA":  [113, 108],
+    "A+":  [109, 114],
+    "A":   [110, 115],
+    "R":   [111, 116]
+  },
+  "sdmb": {
+    "ML":  [100],
+    "AAA": [101],
+    "AA":  [102],
+    "A":   [103],
+    "A-":  [106],
+    "COL": [104],
+    "HS":  [105]
+  },
+  "ndl": {
+    "ML":  [200],
+    "AAA": [201],
+    "AA":  [202],
+    "A":   [203],
+    "A-":  [204],
+    "R":   [205]
+  },
+  "bwb": {
+    "ML":  [203],
+    "AAA": [204],
+    "AA":  [206],
+    "A+":  [211],
+    "A":   [212],
+    "R":   [217]
+  }
+}

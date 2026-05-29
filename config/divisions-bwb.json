@@ -1,0 +1,16 @@
+{
+  "_comment": "BWB MLB division structure for league projection rollups.",
+  "_comment_2": "Team display names must match the eval CSV's Org column and config/bwb_orgs.json.",
+
+  "Ty Webb League": {
+    "The Links Division":   ["Bushwood Bombers", "Boston Red Sox", "Zach Zach", "Toronto Blue Jays"],
+    "The Meadows Division": ["Tim", "David R", "Detroit Tigers", "Minnesota Twins"],
+    "The Valley Division":  ["Houston Astros", "Vancouver Mounties", "Jose G.", "Texas Rangers"]
+  },
+
+  "Al Czervik League": {
+    "The Bay Division":   ["Traverse City Little Green Men", "Tom L.", "New York Mets", "Philadelphia Phillies"],
+    "The Crest Division": ["Manhattan Mobsters", "Fremont Street Heffalumps", "Pittsburgh Pirates", "St. Louis Cardinals"],
+    "The Oaks Division":  ["Fresno Pharaohs", "Colorado Rockies", "Chihuahua Guerreros", "San Francisco Giants"]
+  }
+}

@@ -1,0 +1,68 @@
+{
+    "_comment": "Per-league overrides for run_vos_all.py. Optional — sensible defaults apply when a league is missing. Copy this to league_settings.json to activate.",
+    "_comment_2": "Currently supported keys: rating_scale ('20-80' or '1-100', defaults to 20-80). Add others as run_vos_all.py grows.",
+    "ndl": {
+        "rating_scale": "1-100",
+        "org": "Seattle Whalers",
+        "year": 2055,
+        "min_comp": 55,
+        "game_version": "OOTP 26",
+        "sim_time": "Early Morning"
+    },
+    "uba": {
+        "rating_scale": "20-80",
+        "org": "Atlanta Bandits",
+        "year": 2041,
+        "min_comp": 55,
+        "game_version": "OOTP 26",
+        "sim_time": "Mid Morning"
+    },
+    "sdmb": {
+        "rating_scale": "20-80",
+        "org": "Chihuahua Guerreros",
+        "year": 2049,
+        "min_comp": 55,
+        "game_version": "OOTP 27",
+        "sim_time": "Afternoon - M,W,F"
+    },
+    "sahl": {
+        "rating_scale": "20-80",
+        "org": "Houston Astros",
+        "year": 2061,
+        "min_comp": 55,
+        "game_version": "OOTP 27",
+        "sim_time": "Late Morning - Early Afternoon"
+    },
+    "tlg": {
+        "rating_scale": "20-80",
+        "org": "Washington Nationals",
+        "year": 2053,
+        "min_comp": 55,
+        "game_version": "OOTP 26",
+        "sim_time": "Late Evening"
+    },
+    "wwoba": {
+        "rating_scale": "20-80",
+        "org": "Arizona Diamondbacks",
+        "year": 2039,
+        "min_comp": 55,
+        "game_version": "OOTP 26",
+        "sim_time": "Late Evening"
+    },
+    "woba": {
+        "rating_scale": "20-80",
+        "org": "St. Louis Cardinals",
+        "year": 2041,
+        "min_comp": 55,
+        "game_version": "OOTP 27",
+        "sim_time": "7:15pm Central"
+    },
+    "bwb": {
+        "rating_scale": "20-80",
+        "org": "Chihuahua Guerreros",
+        "year": 2028,
+        "min_comp": 55,
+        "game_version": "OOTP 27",
+        "sim_time": "Early Morning"
+    }
+}

@@ -1,0 +1,22 @@
+{
+  "_comment": "SAHL division structure for league projection rollups.",
+  "_comment_2": "Team display names must match the eval CSV's Org column and the park-factors teams[] keys.",
+
+  "American League": {
+    "East":    ["Toronto Blue Jays", "Baltimore Orioles", "Montreal Expos",
+                "New York Yankees", "Boston Red Sox"],
+    "Central": ["Ottawa Capitals", "Chicago White Sox", "Detroit Tigers",
+                "Minnesota Twins", "Cleveland Indians"],
+    "West":    ["Seattle Mariners", "Texas Rangers", "Houston Astros",
+                "Oakland Athletics", "Anaheim Angels"]
+  },
+
+  "National League": {
+    "East":    ["Philadelphia Phillies", "Atlanta Braves", "Charlotte Flyers",
+                "Washington Nationals", "New York Mets"],
+    "Central": ["St. Louis Cardinals", "Cincinnati Reds", "Milwaukee Brewers",
+                "Pittsburgh Pirates", "Chicago Cubs"],
+    "West":    ["San Francisco Giants", "Las Vegas Rollers", "Los Angeles Dodgers",
+                "Colorado Rockies", "San Diego Padres"]
+  }
+}

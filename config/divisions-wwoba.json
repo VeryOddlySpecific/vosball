@@ -1,0 +1,22 @@
+{
+  "_comment": "WWOBA MLB division structure for league projection rollups.",
+  "_comment_2": "Team display names must match the eval CSV's Org column and config/wwoba_orgs.json.",
+
+  "American League": {
+    "East":    ["New York Yankees", "Baltimore Orioles", "Tampa Bay Rays",
+                "Boston Red Sox", "Toronto Blue Jays"],
+    "Central": ["Kansas City Royals", "Cleveland Guardians", "Chicago White Sox",
+                "Detroit Tigers", "Minnesota Twins"],
+    "West":    ["Oakland Athletics", "Houston Astros", "Los Angeles Angels",
+                "Texas Rangers", "Seattle Mariners"]
+  },
+
+  "National League": {
+    "East":    ["Miami Marlins", "Philadelphia Phillies", "Washington Nationals",
+                "New York Mets", "Atlanta Braves"],
+    "Central": ["Cincinnati Reds", "St. Louis Cardinals", "Chicago Cubs",
+                "Pittsburgh Pirates", "Milwaukee Brewers"],
+    "West":    ["San Diego Padres", "Colorado Rockies", "Los Angeles Dodgers",
+                "San Francisco Giants", "Arizona Diamondbacks"]
+  }
+}

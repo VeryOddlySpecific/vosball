@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>League News Magazine</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+    @page { 
+        size: {{PAGE_WIDTH}} {{PAGE_HEIGHT}}; 
+    }
+    *::before, 
+    *::after,
+    * { 
+        box-sizing: border-box; 
+        margin: 0; 
+        padding: 0; 
+    }
+    body { 
+        background: #e0d8c4; 
+        font-family: 'Source Serif 4', Georgia, serif; 
+        color: #1a1208; 
+    }
+    .magazine-page {
+        break-after: page; 
+    }
+    .paper {
+        width: 90%; 
+        max-width: 90%; 
+        aspect-ratio: 22/34; 
+        margin: 0 auto 2em; 
+        background: #ebe3d2; 
+        border: none; 
+        box-shadow: none; 
+        padding: 40px 3% 48px; 
+        break-inside: auto; 
+    }
+    .masthead { 
+        text-align: center; 
+        border-bottom: 3px double #1a1208; 
+        padding-bottom: 12px; 
+        margin-bottom: 8px; 
+    }
+    section > .masthead ~ .masthead,
+    section > .section-tag ~ .section-tag,
+    section ~ section > h1 ~ h1,
+    section ~ .deck ~ .deck { 
+        display: none; 
+    }
+    section > .byline ~ .byline { 
+        margin: 15px 0 15px 0; 
+    }
+    .paper-name { 
+        font-family: 'UnifrakturMaguntia', cursive; 
+        font-size: 52px; 
+        line-height: 1; 
+        letter-spacing: 1px; 
+        color: #0f0800; 
+    }
+    .dateline { 
+        font-size: 11px; 
+        letter-spacing: 2px; 
+        text-transform: uppercase; 
+        color: #5a4a2a; 
+        margin-top: 6px; 
+        border-top: 1px solid #1a1208; 
+        border-bottom: 1px solid #1a1208; 
+        padding: 3px 0; 
+    }
+    .section-tag {
+        text-align: center; 
+        font-family: 'Playfair Display', serif; 
+        font-size: 11px; 
+        letter-spacing: 3px; 
+        text-transform: uppercase; 
+        color: #8b3a1a; 
+        margin: 14px 0 10px; 
+    }
+    h1 {
+        font-family: 'Playfair Display', serif; 
+        font-size: 42px; 
+        font-weight: 700; 
+        line-height: 1.1; 
+        text-align: center; 
+        margin-bottom: 6px; 
+        color: #0f0800; 
+        font-family: 'Playfair Display', serif;
+        font-style: italic; 
+        font-size: 17px; 
+        text-align: center; 
+        color: #3d2d10; 
+        margin-bottom: 16px; 
+        line-height: 1.4; 
+    }
+    .byline {
+        text-align: center; 
+        font-size: 11px; 
+        letter-spacing: 2px; 
+        text-transform: uppercase; 
+        color: #5a4a2a; 
+        border-top: 1px solid #c8b98a; 
+        border-bottom: 1px solid #c8b98a; 
+        padding: 5px 0; 
+        margin-bottom: 22px; 
+    }
+    .columns {
+        column-count: 2; 
+        column-gap: 36px; 
+        column-rule: 1px solid #c8b98a; 
+    }
+    p {
+        font-size: 15px; 
+        line-height: 1.75; 
+        margin-bottom: 14px; 
+        text-align: justify; 
+        hyphens: auto; 
+        font-weight: 300; 
+    }
+    p:first-child::first-letter {
+        font-family: 'Playfair Display', serif; 
+        font-size: 62px; 
+        font-weight: 700; 
+        float: left; 
+        line-height: 0.78; 
+        margin-right: 6px; 
+        margin-top: 8px; 
+        color: #0f0800; 
+    }
+    .day-head {
+        font-family: 'Playfair Display', serif; 
+        font-weight: 700; 
+        font-size: 16px; 
+        margin-top: 18px; 
+        margin-bottom: 4px; 
+        color: #8b3a1a; 
+    }
+    .stats-box {
+        border: 1px solid #c8b98a; 
+        background: #f0e8d0; 
+        padding: 14px 18px; 
+        margin: 0 0 14px 0; 
+        break-inside: avoid; 
+    }
+    .stats-box.compact {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    .stats-box table {
+        width: 100%; 
+    }
+    .stats-box td,
+    .stats-box th {
+        padding: 2px 4px;
+    }
+    .linescore-table {
+        font-size: 13px; 
+        margin: 8px 0; 
+        width: 100%; 
+    }
+    .linescore-table td,
+    .linescore-table th {
+        padding: 2px 4px;
+    }
+    .standings-block {
+        break-inside: avoid; 
+        margin-bottom: 18px; 
+    }
+    .standings-block table {
+        width: 100%; 
+        font-size: 13px; 
+    }
+    .standings-block td,
+    .standings-block th {
+        padding: 3px 6px; 
+        text-align: left; 
+    }
+    .standings-block th {
+        text-align: left; 
+    }
+    .standings-block .boxtitle {
+        font-family: 'Playfair Display', serif; 
+        font-size: 14px; 
+        color: #8b3a1a; 
+    }
+</style>
+</head>
+<body>
+{{SECTIONS}}
+</body>
+</html>

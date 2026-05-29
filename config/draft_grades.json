@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "calibrated_against": "OOTP Study 27 outcomes — see draft_grades_calibration.md",
+    "calibration_date": "2026-05-27",
+    "last_updated": "2026-05-27"
+  },
+  "_comment": "Tunable parameters for draft_grades.py. The projection_tiers list is ordered by ascending max_rank; the last tier MUST have max_rank=null (open-ended). To revert to a 2-tier system, drop the Top 25 entry. To change the scale, edit base_points across all tiers proportionally.",
+
+  "projection_tiers": [
+    {
+      "name": "Top 25",
+      "max_rank": 25,
+      "base_points": 7.0,
+      "_calibration_note": "Empirical EV per rank-1-25 player = 8.67 WAR. Compressed to 7.0 to preserve grading depth-sensitivity (full empirical ratio would dominate vDraft+)."
+    },
+    {
+      "name": "Top 100",
+      "max_rank": 100,
+      "base_points": 3.5,
+      "_calibration_note": "Empirical EV per rank-26-100 player = 2.69-3.45 WAR (gradient inside this band)."
+    },
+    {
+      "name": "Later",
+      "max_rank": null,
+      "base_points": 1.5,
+      "_calibration_note": "Empirical EV per rank-101+ player = 0.75-1.88 WAR (depending on rank within band). Open-ended; covers everyone past Top 100."
+    }
+  ],
+
+  "managed_risk": {
+    "base_points": 0.75,
+    "log_scale": 0.25,
+    "_formula": "points = base_points + log_scale * ln(1 + (num_teams - reach_amount))",
+    "_comment": "Partial credit for in-round reaches (player taken before projection but within one round). Applied regardless of which projection tier the player was in."
+  },
+
+  "delta_bonus": {
+    "log_scale": 0.5,
+    "_formula": "log_bonus = log_scale * ln(1 + max(0, overall - projection))",
+    "_comment": "Steal bonus added to the projection tier's base_points when a player is taken at or beyond their projected rank."
+  },
+
+  "grade_bands": [
+    {"position_max": 0.2, "grade": "F"},
+    {"position_max": 0.4, "grade": "D"},
+    {"position_max": 0.6, "grade": "C"},
+    {"position_max": 0.8, "grade": "B"},
+    {"position_max": 1.0, "grade": "A"}
+  ],
+  "_grade_bands_comment": "Per-team letter grades, assigned by position within the league's points range. Top 20% of teams = A, next 20% = B, etc."
+}

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>vContracts — Data Flow</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --fg: #e8eaed;
+    --muted: #8b95a3;
+    --line: #2a3340;
+    --src: #3d4a5c;
+    --reuse: #2c5282;
+    --done: #2d6a4f;
+    --stub: #8a6d3b;
+    --out: #8b3a3a;
+    --accent: #c9a96e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--fg);
+    font-size: 13px; line-height: 1.45;
+  }
+  h1 {
+    margin: 0 0 4px 0; font-size: 20px; font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  h1 .sub { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: 12px; }
+  .legend {
+    display: flex; gap: 16px; margin: 12px 0 28px 0;
+    flex-wrap: wrap; align-items: center;
+    color: var(--muted); font-size: 11px;
+  }
+  .swatch {
+    display: inline-block; width: 11px; height: 11px;
+    border-radius: 2px; margin-right: 6px; vertical-align: -1px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .col h2 {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 12px 0; font-weight: 600;
+    padding-bottom: 6px; border-bottom: 1px solid var(--line);
+  }
+  .node {
+    background: var(--src);
+    border-radius: 5px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--src);
+  }
+  .node.reuse { background: #1e2d3d; border-left-color: var(--reuse); }
+  .node.done  { background: #1e2d22; border-left-color: var(--done); }
+  .node.stub  { background: #2d2a1e; border-left-color: var(--stub); }
+  .node.out   { background: #2d1e1e; border-left-color: var(--out); }
+  .node .title {
+    font-weight: 600; font-size: 12.5px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px;
+  }
+  .node .body {
+    color: var(--muted); font-size: 11.5px; margin-top: 4px;
+  }
+  .node .badge {
+    font-size: 9.5px; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 3px; font-weight: 600;
+    color: var(--bg); background: var(--muted); white-space: nowrap;
+  }
+  .badge.reuse { background: #6ba3e0; }
+  .badge.done  { background: #6bc798; }
+  .badge.stub  { background: #d4b164; }
+  .badge.out   { background: #d47474; }
+  .pipeline {
+    position: relative;
+  }
+  .step {
+    position: relative; padding-left: 28px; margin-bottom: 8px;
+  }
+  .step .n {
+    position: absolute; left: 0; top: 8px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .step:not(:last-child)::before {
+    content: ''; position: absolute;
+    left: 10px; top: 28px; bottom: -4px;
+    width: 1px; background: var(--line);
+  }
+  .arrow-note {
+    color: var(--muted); font-size: 10.5px; font-style: italic;
+    margin: 6px 0 6px 28px;
+  }
+  .footnote {
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 11px; line-height: 1.6;
+  }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px; color: var(--accent);
+    background: rgba(201, 169, 110, 0.08);
+    padding: 1px 4px; border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>vContracts <span class="sub">data flow — extension planner</span></h1>
+
+<div class="legend">
+  <span><span class="swatch" style="background:var(--src)"></span>data source</span>
+  <span><span class="swatch" style="background:var(--reuse)"></span>existing tool (reused)</span>
+  <span><span class="swatch" style="background:var(--done)"></span>vContracts (implemented)</span>
+  <span><span class="swatch" style="background:var(--stub)"></span>vContracts (stub)</span>
+  <span><span class="swatch" style="background:var(--out)"></span>output</span>
+</div>
+
+<div class="grid">
+
+  <!-- LEFT: INPUTS -->
+  <div class="col">
+    <h2>Inputs</h2>
+
+    <div class="node">
+      <div class="title">players_contract.csv <span class="badge">csv</span></div>
+      <div class="body">Existing team obligations. Drives the starting cap-calendar ledger.</div>
+    </div>
+
+    <div class="node">
+      <div class="title">players.csv / roster <span class="badge">csv</span></div>
+      <div class="body">Roster identity, age, position, service time. Used to identify extension candidates and apply age-driven shape locks.</div>
+    </div>
+
+    <div class="node">
+      <div class="title">evaluation_summary_{league}_*.csv <span class="badge">csv</span></div>
+      <div class="body">VOS current + potential per player. Produced upstream by <code>vos_v2.py</code>.</div>
+    </div>
+
+    <div class="node">
+      <div class="title">depth chart outputs <span class="badge">csv/md</span></div>
+      <div class="body">Per-position internal replacement ETAs across the planning horizon. Produced by <code>depth_chart.py</code>.</div>
+    </div>
+
+    <div class="node done">
+      <div class="title">rules_profile.py <span class="badge done">done</span></div>
+      <div class="body"><code>sdmb()</code> / <code>sdmb_post_option_rule()</code>. Swappable config — flip on the day the option-stacking vote lands.</div>
+    </div>
+  </div>
+
+  <!-- MIDDLE: PIPELINE -->
+  <div class="col">
+    <h2>vContracts Pipeline</h2>
+    <div class="pipeline">
+
+      <div class="step">
+        <div class="n">1</div>
+        <div class="node stub">
+          <div class="title">cap_calendar.from_team() <span class="badge stub">stub</span></div>
+          <div class="body">Build forward ledger from <code>players_contract</code>: hard committed $ per future year, existing balloon weights, expiring deals.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">2</div>
+        <div class="node stub">
+          <div class="title">extension_filter (gatekeeper) <span class="badge stub">stub</span></div>
+          <div class="body">Survivors = expiring within horizon AND clear VOS threshold AND no internal replacement ETA before extension would end. "No extension" is a first-class output.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">3</div>
+        <div class="node reuse">
+          <div class="title">AAVContext.suggest_contract() <span class="badge reuse">reuse</span></div>
+          <div class="body">Per candidate → <code>(years, aav, total)</code>. Decline-cutoff heuristic (longest L where year-L value ≥ floor_ratio × year-1). To refactor out of <code>free_agent_market.py</code> into shared <code>market_valuation.py</code>.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">4</div>
+        <div class="node stub">
+          <div class="title">builder.build_min_guaranteed() <span class="badge stub">stub</span></div>
+          <div class="body">Per candidate → <code>ContractOffer</code>. Distribute target AAV using the legal structure that commits least guaranteed money. Applies age-driven shape lock.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">5</div>
+        <div class="node done">
+          <div class="title">validator.validate() <span class="badge done">done</span></div>
+          <div class="body">Reject any offer that violates the active rules profile. Catches stacked options under the post-vote rule, length caps, shape caps, buyout %.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">6</div>
+        <div class="node stub">
+          <div class="title">cap_calendar.feasible() <span class="badge stub">stub</span></div>
+          <div class="body">For each candidate offer at each candidate signing year: does the balloon land on a year already at the ceiling? Reject; retry with different signing year or shape.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="n">7</div>
+        <div class="node stub">
+          <div class="title">planner (joint optimization) <span class="badge stub">stub</span></div>
+          <div class="body">Search over (signing_year × length × shape) across all candidates simultaneously. Maximize headline TCV under: validator clean, calendar feasible, no future year exceeds balloon ceiling.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: OUTPUTS -->
+  <div class="col">
+    <h2>Outputs</h2>
+
+    <div class="node out">
+      <div class="title">multi-year extension schedule <span class="badge out">primary</span></div>
+      <div class="body">Per candidate: <code>signing_year</code>, <code>length</code>, year-by-year structure, options, buyouts, incentives. Or "no extension recommended" with the reason (depth chart gatekeeper, VOS below threshold, no feasible balloon slot).</div>
+    </div>
+
+    <div class="node out">
+      <div class="title">updated cap calendar <span class="badge out">primary</span></div>
+      <div class="body">Forward ledger reflecting the proposed schedule: hard committed $, balloon weight, probable-option $, free space, decline space — per future season.</div>
+    </div>
+
+    <div class="node out">
+      <div class="title">headline TCV vs expected cost <span class="badge out">per offer</span></div>
+      <div class="body">What the agent sees (every dollar at face value) vs. probability-weighted true cost (incentives × P, options × team-side P). Gap = the exploitation surface.</div>
+    </div>
+
+    <div class="node out">
+      <div class="title">contract-state overlay → depth_chart <span class="badge out">feedback</span></div>
+      <div class="body">Guaranteed years remaining, option status, balloon-year flag, forced-roster flag — fed back into depth_chart so future roster construction sees the contract reality.</div>
+    </div>
+
+    <div class="node out">
+      <div class="title">validator report <span class="badge out">diagnostic</span></div>
+      <div class="body">Per offer: rule violations and their severity. Empty list = legal. Surfaces both the active rules profile's hard constraints and any soft warnings.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footnote">
+  <strong>Reading the diagram.</strong> Left column is data flowing in (raw sources + the rules config). Middle column is the seven-step pipeline, in execution order. Right column is what the user sees back. Steps 1, 2, 4, 6, 7 are stubs awaiting implementation; step 3 reuses logic from <code>free_agent_market.AAVContext</code> (to be refactored into a shared module); step 5 is implemented and passing the smoke test. The depth-chart and vos_v2 outputs are inputs here because they're produced by independent tools the user already runs — vContracts consumes their CSVs, it doesn't re-derive them.
+</div>
+
+</body>
+</html>

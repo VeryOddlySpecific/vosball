@@ -1,0 +1,1212 @@
+{
+  "1": {
+    "Name": "Arizona",
+    "Nickname": "Diamondbacks",
+    "Parent": 0
+  },
+  "2": {
+    "Name": "Atlanta",
+    "Nickname": "Braves",
+    "Parent": 0
+  },
+  "3": {
+    "Name": "Baltimore",
+    "Nickname": "Orioles",
+    "Parent": 0
+  },
+  "4": {
+    "Name": "Boston",
+    "Nickname": "Red Sox",
+    "Parent": 0
+  },
+  "5": {
+    "Name": "Chicago",
+    "Nickname": "White Sox",
+    "Parent": 0
+  },
+  "6": {
+    "Name": "Chicago",
+    "Nickname": "Cubs",
+    "Parent": 0
+  },
+  "7": {
+    "Name": "Cincinnati",
+    "Nickname": "Reds",
+    "Parent": 0
+  },
+  "8": {
+    "Name": "Cleveland",
+    "Nickname": "Guardians",
+    "Parent": 0
+  },
+  "9": {
+    "Name": "Colorado",
+    "Nickname": "Rockies",
+    "Parent": 0
+  },
+  "10": {
+    "Name": "Detroit",
+    "Nickname": "Tigers",
+    "Parent": 0
+  },
+  "11": {
+    "Name": "Miami",
+    "Nickname": "Marlins",
+    "Parent": 0
+  },
+  "12": {
+    "Name": "Houston",
+    "Nickname": "Astros",
+    "Parent": 0
+  },
+  "13": {
+    "Name": "Kansas City",
+    "Nickname": "Royals",
+    "Parent": 0
+  },
+  "14": {
+    "Name": "California",
+    "Nickname": "Angels",
+    "Parent": 0
+  },
+  "15": {
+    "Name": "Los Angeles",
+    "Nickname": "Dodgers",
+    "Parent": 0
+  },
+  "16": {
+    "Name": "Milwaukee",
+    "Nickname": "Brewers",
+    "Parent": 0
+  },
+  "17": {
+    "Name": "Minnesota",
+    "Nickname": "Twins",
+    "Parent": 0
+  },
+  "18": {
+    "Name": "New York",
+    "Nickname": "Yankees",
+    "Parent": 0
+  },
+  "19": {
+    "Name": "New York",
+    "Nickname": "Mets",
+    "Parent": 0
+  },
+  "20": {
+    "Name": "Las Vegas",
+    "Nickname": "Athletics",
+    "Parent": 0
+  },
+  "21": {
+    "Name": "Philadelphia",
+    "Nickname": "Phillies",
+    "Parent": 0
+  },
+  "22": {
+    "Name": "Pittsburgh",
+    "Nickname": "Pirates",
+    "Parent": 0
+  },
+  "23": {
+    "Name": "San Diego",
+    "Nickname": "Padres",
+    "Parent": 0
+  },
+  "24": {
+    "Name": "Seattle",
+    "Nickname": "Mariners",
+    "Parent": 0
+  },
+  "25": {
+    "Name": "San Francisco",
+    "Nickname": "Giants",
+    "Parent": 0
+  },
+  "26": {
+    "Name": "St. Louis",
+    "Nickname": "Cardinals",
+    "Parent": 0
+  },
+  "27": {
+    "Name": "Tampa Bay",
+    "Nickname": "Rays",
+    "Parent": 0
+  },
+  "28": {
+    "Name": "Texas",
+    "Nickname": "Rangers",
+    "Parent": 0
+  },
+  "29": {
+    "Name": "Toronto",
+    "Nickname": "Blue Jays",
+    "Parent": 0
+  },
+  "30": {
+    "Name": "Washington",
+    "Nickname": "Nationals",
+    "Parent": 0
+  },
+  "31": {
+    "Name": "American League",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "32": {
+    "Name": "National League",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "33": {
+    "Name": "Columbus",
+    "Nickname": "Clippers",
+    "Parent": 8
+  },
+  "34": {
+    "Name": "Lehigh Valley",
+    "Nickname": "IronPigs",
+    "Parent": 21
+  },
+  "35": {
+    "Name": "Worcester",
+    "Nickname": "Red Sox",
+    "Parent": 4
+  },
+  "36": {
+    "Name": "Rochester",
+    "Nickname": "Red Wings",
+    "Parent": 30
+  },
+  "37": {
+    "Name": "Scranton WB",
+    "Nickname": "RailRiders",
+    "Parent": 18
+  },
+  "38": {
+    "Name": "Las Vegas",
+    "Nickname": "Aviators",
+    "Parent": 20
+  },
+  "39": {
+    "Name": "Charlotte",
+    "Nickname": "Knights",
+    "Parent": 5
+  },
+  "40": {
+    "Name": "Durham",
+    "Nickname": "Bulls",
+    "Parent": 27
+  },
+  "41": {
+    "Name": "Norfolk",
+    "Nickname": "Tides",
+    "Parent": 3
+  },
+  "42": {
+    "Name": "Gwinnett",
+    "Nickname": "Stripers",
+    "Parent": 2
+  },
+  "43": {
+    "Name": "Syracuse",
+    "Nickname": "Mets",
+    "Parent": 19
+  },
+  "44": {
+    "Name": "Indianapolis",
+    "Nickname": "Indians",
+    "Parent": 22
+  },
+  "45": {
+    "Name": "Louisville",
+    "Nickname": "Bats",
+    "Parent": 7
+  },
+  "46": {
+    "Name": "Toledo",
+    "Nickname": "Mud Hens",
+    "Parent": 10
+  },
+  "47": {
+    "Name": "Iowa",
+    "Nickname": "Cubs",
+    "Parent": 6
+  },
+  "48": {
+    "Name": "Memphis",
+    "Nickname": "Redbirds",
+    "Parent": 26
+  },
+  "49": {
+    "Name": "Nashville",
+    "Nickname": "Sounds",
+    "Parent": 16
+  },
+  "50": {
+    "Name": "Omaha",
+    "Nickname": "Storm Chasers",
+    "Parent": 13
+  },
+  "51": {
+    "Name": "Buffalo",
+    "Nickname": "Bisons",
+    "Parent": 29
+  },
+  "52": {
+    "Name": "Oklahoma City",
+    "Nickname": "Dodgers",
+    "Parent": 15
+  },
+  "53": {
+    "Name": "Round Rock",
+    "Nickname": "Express",
+    "Parent": 28
+  },
+  "54": {
+    "Name": "El Paso",
+    "Nickname": "Chihuahuas",
+    "Parent": 23
+  },
+  "55": {
+    "Name": "Salt Lake",
+    "Nickname": "Bees",
+    "Parent": 14
+  },
+  "56": {
+    "Name": "Tacoma",
+    "Nickname": "Rainiers",
+    "Parent": 24
+  },
+  "57": {
+    "Name": "Albuquerque",
+    "Nickname": "Isotopes",
+    "Parent": 9
+  },
+  "58": {
+    "Name": "Sacramento",
+    "Nickname": "River Cats",
+    "Parent": 25
+  },
+  "59": {
+    "Name": "Reno",
+    "Nickname": "Aces",
+    "Parent": 1
+  },
+  "60": {
+    "Name": "Binghamton",
+    "Nickname": "Rumble Ponies",
+    "Parent": 19
+  },
+  "61": {
+    "Name": "Hartford",
+    "Nickname": "Yard Goats",
+    "Parent": 9
+  },
+  "62": {
+    "Name": "New Hampshire",
+    "Nickname": "Fisher Cats",
+    "Parent": 29
+  },
+  "63": {
+    "Name": "Richmond",
+    "Nickname": "Flying Squirrels",
+    "Parent": 25
+  },
+  "64": {
+    "Name": "Portland",
+    "Nickname": "Sea Dogs",
+    "Parent": 4
+  },
+  "65": {
+    "Name": "Akron",
+    "Nickname": "RubberDucks",
+    "Parent": 8
+  },
+  "66": {
+    "Name": "Altoona",
+    "Nickname": "Curve",
+    "Parent": 22
+  },
+  "67": {
+    "Name": "Bowie",
+    "Nickname": "Baysox",
+    "Parent": 3
+  },
+  "68": {
+    "Name": "Erie",
+    "Nickname": "SeaWolves",
+    "Parent": 10
+  },
+  "69": {
+    "Name": "Harrisburg",
+    "Nickname": "Senators",
+    "Parent": 30
+  },
+  "70": {
+    "Name": "Reading",
+    "Nickname": "Fightin Phils",
+    "Parent": 21
+  },
+  "71": {
+    "Name": "Pensacola",
+    "Nickname": "Blue Wahoos",
+    "Parent": 11
+  },
+  "72": {
+    "Name": "Biloxi",
+    "Nickname": "Shuckers",
+    "Parent": 16
+  },
+  "73": {
+    "Name": "Tennessee",
+    "Nickname": "Smokies",
+    "Parent": 6
+  },
+  "74": {
+    "Name": "Birmingham",
+    "Nickname": "Barons",
+    "Parent": 5
+  },
+  "75": {
+    "Name": "Mississippi",
+    "Nickname": "Braves",
+    "Parent": 2
+  },
+  "76": {
+    "Name": "Rocket City",
+    "Nickname": "Trash Pandas",
+    "Parent": 14
+  },
+  "77": {
+    "Name": "Montgomery",
+    "Nickname": "Biscuits",
+    "Parent": 27
+  },
+  "78": {
+    "Name": "Chattanooga",
+    "Nickname": "Lookouts",
+    "Parent": 7
+  },
+  "79": {
+    "Name": "Arkansas",
+    "Nickname": "Travelers",
+    "Parent": 24
+  },
+  "80": {
+    "Name": "Springfield",
+    "Nickname": "Cardinals",
+    "Parent": 26
+  },
+  "81": {
+    "Name": "Tulsa",
+    "Nickname": "Drillers",
+    "Parent": 15
+  },
+  "82": {
+    "Name": "Northwest Arkansas",
+    "Nickname": "Naturals",
+    "Parent": 13
+  },
+  "83": {
+    "Name": "Frisco",
+    "Nickname": "RoughRiders",
+    "Parent": 28
+  },
+  "84": {
+    "Name": "Midland",
+    "Nickname": "RockHounds",
+    "Parent": 20
+  },
+  "85": {
+    "Name": "Amarillo",
+    "Nickname": "Sod Poodles",
+    "Parent": 1
+  },
+  "86": {
+    "Name": "Corpus Christi",
+    "Nickname": "Hooks",
+    "Parent": 12
+  },
+  "87": {
+    "Name": "Wilmington",
+    "Nickname": "Blue Rocks",
+    "Parent": 30
+  },
+  "88": {
+    "Name": "Winston-Salem",
+    "Nickname": "Dash",
+    "Parent": 5
+  },
+  "89": {
+    "Name": "Delmarva",
+    "Nickname": "Shorebirds",
+    "Parent": 3
+  },
+  "90": {
+    "Name": "Augusta",
+    "Nickname": "GreenJackets",
+    "Parent": 2
+  },
+  "91": {
+    "Name": "Charleston",
+    "Nickname": "RiverDogs",
+    "Parent": 27
+  },
+  "92": {
+    "Name": "Kannapolis",
+    "Nickname": "Cannon Ballers",
+    "Parent": 5
+  },
+  "93": {
+    "Name": "Columbia",
+    "Nickname": "Fireflies",
+    "Parent": 13
+  },
+  "94": {
+    "Name": "Milwaukee (ACL)",
+    "Nickname": "Brewers Gold",
+    "Parent": 16
+  },
+  "95": {
+    "Name": "Texas (ACL)",
+    "Nickname": "Rangers",
+    "Parent": 28
+  },
+  "96": {
+    "Name": "Chicago N (ACL)",
+    "Nickname": "Cubs",
+    "Parent": 6
+  },
+  "97": {
+    "Name": "Los Angeles A (ACL)",
+    "Nickname": "Angels",
+    "Parent": 14
+  },
+  "98": {
+    "Name": "Seattle (ACL)",
+    "Nickname": "Mariners",
+    "Parent": 24
+  },
+  "99": {
+    "Name": "Oakland (ACL)",
+    "Nickname": "Athletics",
+    "Parent": 20
+  },
+  "100": {
+    "Name": "San Francisco (ACL)",
+    "Nickname": "Giants Orange",
+    "Parent": 25
+  },
+  "101": {
+    "Name": "Los Angeles N (ACL)",
+    "Nickname": "Dodgers",
+    "Parent": 15
+  },
+  "102": {
+    "Name": "Washington (FCL)",
+    "Nickname": "Nationals",
+    "Parent": 30
+  },
+  "103": {
+    "Name": "Miami (FCL)",
+    "Nickname": "Marlins",
+    "Parent": 11
+  },
+  "104": {
+    "Name": "St. Louis (FCL)",
+    "Nickname": "Cardinals",
+    "Parent": 26
+  },
+  "105": {
+    "Name": "Atlanta (FCL)",
+    "Nickname": "Braves",
+    "Parent": 2
+  },
+  "106": {
+    "Name": "Philadelphia (FCL)",
+    "Nickname": "Phillies",
+    "Parent": 21
+  },
+  "107": {
+    "Name": "Toronto (FCL)",
+    "Nickname": "Blue Jays",
+    "Parent": 29
+  },
+  "108": {
+    "Name": "Detroit (FCL)",
+    "Nickname": "Tigers",
+    "Parent": 10
+  },
+  "109": {
+    "Name": "New York A  (FCL)",
+    "Nickname": "Yankees",
+    "Parent": 18
+  },
+  "110": {
+    "Name": "Cleveland (ACL)",
+    "Nickname": "Guardians",
+    "Parent": 8
+  },
+  "111": {
+    "Name": "Pittsburgh (FCL)",
+    "Nickname": "Pirates",
+    "Parent": 22
+  },
+  "112": {
+    "Name": "Cincinnati (ACL)",
+    "Nickname": "Reds",
+    "Parent": 7
+  },
+  "113": {
+    "Name": "Boston (FCL)",
+    "Nickname": "Red Sox",
+    "Parent": 4
+  },
+  "114": {
+    "Name": "Minnesota (FCL)",
+    "Nickname": "Twins",
+    "Parent": 17
+  },
+  "115": {
+    "Name": "Baltimore (FCL)",
+    "Nickname": "Orioles",
+    "Parent": 3
+  },
+  "116": {
+    "Name": "East Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "117": {
+    "Name": "West Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "118": {
+    "Name": "Northeast Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "119": {
+    "Name": "Southwest Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "120": {
+    "Name": "North Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "121": {
+    "Name": "South Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "122": {
+    "Name": "North Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "123": {
+    "Name": "South Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "124": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "125": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "126": {
+    "Name": "Northern Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "127": {
+    "Name": "Southern Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "128": {
+    "Name": "East",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "129": {
+    "Name": "West",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "130": {
+    "Name": "Northern Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "131": {
+    "Name": "Southern Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "132": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "133": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "134": {
+    "Name": "San Diego (ACL)",
+    "Nickname": "Padres",
+    "Parent": 23
+  },
+  "135": {
+    "Name": "Houston (FCL)",
+    "Nickname": "Astros",
+    "Parent": 12
+  },
+  "136": {
+    "Name": "Tampa Bay (FCL)",
+    "Nickname": "Rays",
+    "Parent": 27
+  },
+  "137": {
+    "Name": "Arizona (ACL)",
+    "Nickname": "Diamondbacks",
+    "Parent": 1
+  },
+  "138": {
+    "Name": "New York N (FCL)",
+    "Nickname": "Mets",
+    "Parent": 19
+  },
+  "140": {
+    "Name": "Texas (DSL)",
+    "Nickname": "Rangers",
+    "Parent": 28
+  },
+  "141": {
+    "Name": "Kansas City (DSL)",
+    "Nickname": "Royals",
+    "Parent": 13
+  },
+  "144": {
+    "Name": "Seattle (DSL)",
+    "Nickname": "Mariners",
+    "Parent": 24
+  },
+  "145": {
+    "Name": "San Francisco (DSL)",
+    "Nickname": "Giants",
+    "Parent": 25
+  },
+  "146": {
+    "Name": "Minnesota (DSL)",
+    "Nickname": "Twins",
+    "Parent": 17
+  },
+  "147": {
+    "Name": "Pittsburgh (DSL)",
+    "Nickname": "Pirates",
+    "Parent": 22
+  },
+  "148": {
+    "Name": "Chicago A (DSL)",
+    "Nickname": "White Sox",
+    "Parent": 5
+  },
+  "149": {
+    "Name": "Cincinnati (DSL)",
+    "Nickname": "Reds",
+    "Parent": 7
+  },
+  "150": {
+    "Name": "Philadelphia (DSL)",
+    "Nickname": "Phillies",
+    "Parent": 21
+  },
+  "151": {
+    "Name": "Los Angeles (DSL)",
+    "Nickname": "Angels",
+    "Parent": 14
+  },
+  "152": {
+    "Name": "Tampa Bay (DSL)",
+    "Nickname": "Rays",
+    "Parent": 27
+  },
+  "153": {
+    "Name": "Baltimore (DSL)",
+    "Nickname": "Orioles",
+    "Parent": 3
+  },
+  "155": {
+    "Name": "San Diego (DSL)",
+    "Nickname": "Padres",
+    "Parent": 23
+  },
+  "157": {
+    "Name": "New York N (DSL)",
+    "Nickname": "Mets",
+    "Parent": 19
+  },
+  "158": {
+    "Name": "Oakland (DSL)",
+    "Nickname": "Athletics",
+    "Parent": 20
+  },
+  "160": {
+    "Name": "Washington (DSL)",
+    "Nickname": "Nationals",
+    "Parent": 30
+  },
+  "161": {
+    "Name": "Miami (DSL)",
+    "Nickname": "Marlins",
+    "Parent": 11
+  },
+  "162": {
+    "Name": "St. Louis (DSL)",
+    "Nickname": "Cardinals",
+    "Parent": 26
+  },
+  "165": {
+    "Name": "Chicago N (DSL)",
+    "Nickname": "Cubs",
+    "Parent": 6
+  },
+  "167": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "168": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "169": {
+    "Name": "Detroit (DSL)",
+    "Nickname": "Tigers",
+    "Parent": 10
+  },
+  "170": {
+    "Name": "Toronto (DSL)",
+    "Nickname": "Blue Jays",
+    "Parent": 29
+  },
+  "171": {
+    "Name": "Atlanta (DSL)",
+    "Nickname": "Braves",
+    "Parent": 2
+  },
+  "172": {
+    "Name": "Milwaukee (DSL)",
+    "Nickname": "Brewers",
+    "Parent": 16
+  },
+  "173": {
+    "Name": "Chicago A (ACL)",
+    "Nickname": "White Sox",
+    "Parent": 5
+  },
+  "174": {
+    "Name": "Kansas City (ACL)",
+    "Nickname": "Royals Blue",
+    "Parent": 13
+  },
+  "176": {
+    "Name": "Los Angeles (DSL)",
+    "Nickname": "Dodgers",
+    "Parent": 15
+  },
+  "177": {
+    "Name": "Arizona (DSL)",
+    "Nickname": "Diamondbacks",
+    "Parent": 1
+  },
+  "180": {
+    "Name": "Colorado (DSL)",
+    "Nickname": "Rockies",
+    "Parent": 9
+  },
+  "186": {
+    "Name": "American League",
+    "Nickname": "Future Stars",
+    "Parent": 0
+  },
+  "187": {
+    "Name": "National League",
+    "Nickname": "Future Stars",
+    "Parent": 0
+  },
+  "189": {
+    "Name": "Cleveland (DSL)",
+    "Nickname": "Guardians",
+    "Parent": 8
+  },
+  "191": {
+    "Name": "Colorado (ACL)",
+    "Nickname": "Rockies",
+    "Parent": 9
+  },
+  "192": {
+    "Name": "St. Paul",
+    "Nickname": "Saints",
+    "Parent": 17
+  },
+  "193": {
+    "Name": "Jacksonville",
+    "Nickname": "Jumbo Shrimp",
+    "Parent": 11
+  },
+  "194": {
+    "Name": "Sugar Land",
+    "Nickname": "Space Cowboys",
+    "Parent": 12
+  },
+  "195": {
+    "Name": "Wichita",
+    "Nickname": "Wind Surge",
+    "Parent": 17
+  },
+  "196": {
+    "Name": "San Antonio",
+    "Nickname": "Missions",
+    "Parent": 23
+  },
+  "197": {
+    "Name": "Somerset",
+    "Nickname": "Patriots",
+    "Parent": 18
+  },
+  "198": {
+    "Name": "Dayton",
+    "Nickname": "Dragons",
+    "Parent": 7
+  },
+  "199": {
+    "Name": "Fort Wayne",
+    "Nickname": "TinCaps",
+    "Parent": 23
+  },
+  "200": {
+    "Name": "Great Lakes",
+    "Nickname": "Loons",
+    "Parent": 15
+  },
+  "201": {
+    "Name": "Lake County",
+    "Nickname": "Captains",
+    "Parent": 8
+  },
+  "202": {
+    "Name": "Lansing",
+    "Nickname": "Lugnuts",
+    "Parent": 20
+  },
+  "203": {
+    "Name": "West Michigan",
+    "Nickname": "Whitecaps",
+    "Parent": 10
+  },
+  "204": {
+    "Name": "Beloit",
+    "Nickname": "Sky Carp",
+    "Parent": 11
+  },
+  "205": {
+    "Name": "Cedar Rapids",
+    "Nickname": "Kernels",
+    "Parent": 17
+  },
+  "206": {
+    "Name": "Peoria",
+    "Nickname": "Chiefs",
+    "Parent": 26
+  },
+  "207": {
+    "Name": "Quad Cities",
+    "Nickname": "River Bandits",
+    "Parent": 13
+  },
+  "208": {
+    "Name": "South Bend",
+    "Nickname": "Cubs",
+    "Parent": 6
+  },
+  "209": {
+    "Name": "Wisconsin",
+    "Nickname": "Timber Rattlers",
+    "Parent": 16
+  },
+  "210": {
+    "Name": "Aberdeen",
+    "Nickname": "Ironbirds",
+    "Parent": 3
+  },
+  "211": {
+    "Name": "Brooklyn",
+    "Nickname": "Cyclones",
+    "Parent": 19
+  },
+  "212": {
+    "Name": "Hudson Valley",
+    "Nickname": "Renegades",
+    "Parent": 18
+  },
+  "213": {
+    "Name": "Jersey Shore",
+    "Nickname": "BlueClaws",
+    "Parent": 21
+  },
+  "214": {
+    "Name": "Asheville",
+    "Nickname": "Tourists",
+    "Parent": 12
+  },
+  "215": {
+    "Name": "Bowling Green",
+    "Nickname": "Hot Rods",
+    "Parent": 27
+  },
+  "216": {
+    "Name": "Greensboro",
+    "Nickname": "Grasshoppers",
+    "Parent": 22
+  },
+  "217": {
+    "Name": "Greenville",
+    "Nickname": "Drive",
+    "Parent": 4
+  },
+  "218": {
+    "Name": "Hickory",
+    "Nickname": "Crawdads",
+    "Parent": 28
+  },
+  "219": {
+    "Name": "Rome",
+    "Nickname": "Braves",
+    "Parent": 2
+  },
+  "220": {
+    "Name": "Eugene",
+    "Nickname": "Emeralds",
+    "Parent": 25
+  },
+  "221": {
+    "Name": "Everett",
+    "Nickname": "AquaSox",
+    "Parent": 24
+  },
+  "222": {
+    "Name": "Spokane",
+    "Nickname": "Indians",
+    "Parent": 9
+  },
+  "223": {
+    "Name": "Tri-City",
+    "Nickname": "Dust Devils",
+    "Parent": 14
+  },
+  "224": {
+    "Name": "Hillsboro",
+    "Nickname": "Hops",
+    "Parent": 1
+  },
+  "225": {
+    "Name": "Vancouver",
+    "Nickname": "Canadians",
+    "Parent": 29
+  },
+  "226": {
+    "Name": "Palm Beach",
+    "Nickname": "Cardinals",
+    "Parent": 26
+  },
+  "227": {
+    "Name": "Jupiter",
+    "Nickname": "Hammerheads",
+    "Parent": 11
+  },
+  "228": {
+    "Name": "East Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "229": {
+    "Name": "West Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "230": {
+    "Name": "St. Lucie",
+    "Nickname": "Mets",
+    "Parent": 19
+  },
+  "231": {
+    "Name": "Daytona",
+    "Nickname": "Tortugas",
+    "Parent": 7
+  },
+  "232": {
+    "Name": "Dunedin",
+    "Nickname": "Blue Jays",
+    "Parent": 29
+  },
+  "233": {
+    "Name": "Fort Myers",
+    "Nickname": "Mighty Mussels",
+    "Parent": 17
+  },
+  "234": {
+    "Name": "Lakeland",
+    "Nickname": "Flying Tigers",
+    "Parent": 10
+  },
+  "235": {
+    "Name": "Tampa",
+    "Nickname": "Tarpons",
+    "Parent": 18
+  },
+  "236": {
+    "Name": "Bradenton",
+    "Nickname": "Marauders",
+    "Parent": 22
+  },
+  "237": {
+    "Name": "Clearwater",
+    "Nickname": "Threshers",
+    "Parent": 21
+  },
+  "238": {
+    "Name": "Salem",
+    "Nickname": "Red Sox",
+    "Parent": 4
+  },
+  "239": {
+    "Name": "Fredericksburg",
+    "Nickname": "Nationals",
+    "Parent": 30
+  },
+  "240": {
+    "Name": "Lynchburg",
+    "Nickname": "Hillcats",
+    "Parent": 8
+  },
+  "241": {
+    "Name": "Down East",
+    "Nickname": "Wood Ducks",
+    "Parent": 28
+  },
+  "242": {
+    "Name": "Fayetteville",
+    "Nickname": "Woodpeckers",
+    "Parent": 12
+  },
+  "243": {
+    "Name": "Carolina",
+    "Nickname": "Mudcats",
+    "Parent": 16
+  },
+  "244": {
+    "Name": "Myrtle Beach",
+    "Nickname": "Pelicans",
+    "Parent": 6
+  },
+  "245": {
+    "Name": "Fresno",
+    "Nickname": "Grizzlies",
+    "Parent": 9
+  },
+  "246": {
+    "Name": "Modesto",
+    "Nickname": "Nuts",
+    "Parent": 24
+  },
+  "247": {
+    "Name": "San Jose",
+    "Nickname": "Giants",
+    "Parent": 25
+  },
+  "248": {
+    "Name": "Stockton",
+    "Nickname": "Ports",
+    "Parent": 20
+  },
+  "249": {
+    "Name": "Visalia",
+    "Nickname": "Rawhide",
+    "Parent": 1
+  },
+  "250": {
+    "Name": "Inland Empire",
+    "Nickname": "66ers",
+    "Parent": 14
+  },
+  "251": {
+    "Name": "Lake Elsinore",
+    "Nickname": "Storm",
+    "Parent": 23
+  },
+  "252": {
+    "Name": "Rancho Cucamonga",
+    "Nickname": "Quakes",
+    "Parent": 15
+  },
+  "253": {
+    "Name": "New York A (DSL)",
+    "Nickname": "Bombers",
+    "Parent": 18
+  },
+  "257": {
+    "Name": "Boston (DSL)",
+    "Nickname": "Red Sox",
+    "Parent": 4
+  },
+  "258": {
+    "Name": "Houston (DSL)",
+    "Nickname": "Astros",
+    "Parent": 12
+  },
+  "259": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "260": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "261": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "262": {
+    "Name": "All-Stars",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "264": {
+    "Name": "East Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  },
+  "265": {
+    "Name": "West Division",
+    "Nickname": "All-Stars",
+    "Parent": 0
+  }
+}
