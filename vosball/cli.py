@@ -14,14 +14,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.error import URLError
 
-from vosball.engine import build_hitter_row, build_pitcher_row, is_pitcher
 from vosball.data import (
     load_id_filter, load_weights, load_id_maps, load_teams,
     load_league_api_base_urls, load_park_factors, load_player_data,
-    get_league_base_url, load_contract_data, attach_contract_fields,
+    get_league_base_url, load_contract_data,
     WEIGHTS_FILENAME, LEAGUE_URLS_FILENAME, RATING_SCALES, DEFAULT_RATING_SCALE,
 )
 from vosball.reporting import write_output_csv, _write_eval_summary_md
+from vosball.services import evaluate_players
 
 logger = logging.getLogger(__name__)
 
@@ -129,29 +129,11 @@ def main(argv: Optional[List[str]] = None, app_root: Optional[Path] = None) -> i
         """Score every player against pass_park_factors and write the CSV/MD.
         Factored out so --per-org-evals can call it once per team-park."""
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        rows: List[Dict[str, Any]] = []
-        for row in players:
-            if is_pitcher(row):
-                pos = (row.get("Pos") or "").strip().upper()
-                role = "RP" if pos in ("RP", "CL") else "SP"
-                out_row = build_pitcher_row(
-                    row, cfg, league_lookup, teams,
-                    role=role, park_factors=pass_park_factors, draft_mode=draft_mode,
-                )
-            else:
-                out_row = build_hitter_row(
-                    row, cfg, league_lookup, teams,
-                    park_factors=pass_park_factors, draft_mode=draft_mode,
-                )
-            if out_row is not None:
-                rows.append(out_row)
-            else:
-                logger.debug("Skipped row ID %s", row.get("ID"))
-            if out_row is not None and include_contracts:
-                pid = str(out_row.get("ID", "")).strip()
-                attach_contract_fields(out_row, contract_lookup.get(pid),
-                                       extension_lookup.get(pid))
-
+        rows = evaluate_players(
+            players, cfg, league_lookup, teams,
+            park_factors=pass_park_factors, draft_mode=draft_mode,
+            contract_lookups=(contract_lookup, extension_lookup) if include_contracts else None,
+        )
         write_output_csv(rows, out_path, draft_mode=draft_mode,
                          include_contracts=include_contracts)
         logger.info("Wrote %d rows to %s", len(rows), out_path)

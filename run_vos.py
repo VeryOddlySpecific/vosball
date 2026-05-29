@@ -40,6 +40,7 @@ for _lib_root in (SCRIPT_DIR, SCRIPT_DIR.parent):
 from vosball.engine import *      # noqa: E402,F401,F403
 from vosball.data import *        # noqa: E402,F401,F403
 from vosball.reporting import write_output_csv, _write_eval_summary_md  # noqa: E402,F401
+from vosball.services import evaluate_players, evaluate_league  # noqa: E402,F401
 from vosball.cli import main      # noqa: E402,F401
 
 # Application paths: the suite's data/ and config/ live beside run_vos.py. The
