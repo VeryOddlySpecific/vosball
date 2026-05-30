@@ -1,6 +1,6 @@
 # VOSBall Layering Refactor — Work Log
 
-> **Status:** Phases 0–4 complete · **Date:** 2026-05-29 · **Sandbox:** `G:\vosball` · **Deployed suite:** `G:\ratings` (untouched)
+> **Status:** Phases 0–4 + Polish complete · **Date:** 2026-05-29 (layering), 2026-05-30 (polish) · **Sandbox:** `F:\vosball` (was `G:\vosball`) · **Deployed suite:** `F:\ratings` (untouched) · **Maintenance playbook:** [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md)
 
 ## Overview
 
@@ -157,22 +157,18 @@ G:\vosball\
 - **Rationale:** The layering work was sequenced precisely so the UI choice could be deferred without blocking anything. The services layer is the stable seam the UI will attach to.
 - **Rough scope:** Pick the platform, then build a presentation/transport layer that calls `evaluate_league` (and renders/serves the resulting rows). No engine changes expected.
 
-### 2. Polish (optional, golden-protected, low risk)
+### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 
-All items below are guarded by the golden harness, so they carry low regression risk. None are required for the suite to function.
+All items below were guarded by the golden harness, so they carried low regression risk. **Completed 2026-05-30** (commits below); the suite-maintenance playbook this established is written up in [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
 
-- **(a) Split the two still-monolithic modules.**
-  - **Status:** Not started.
-  - **Scope:** `vosball/engine/core.py` (~1,300 lines) → finer submodules such as `scoring` / `adjustments` / `park` / `assembly`; and `vosball/data/loaders.py` → `config` / `players` / `contracts` / `parks`.
-  - **Rationale:** Improves navigability and review surface; the AST-extraction precedent makes this mechanical.
-- **(b) Add a permanent in-process golden case that drives `evaluate_league` directly.**
-  - **Status:** Not started (we have already done a one-off byte-for-byte verification of `evaluate_league`).
-  - **Scope:** Add a standing test case that exercises the services entry point end-to-end, not just the engine, so the orchestration layer is permanently pinned.
-  - **Rationale:** Locks in the new public API the UI will depend on.
-- **(c) Migrate suite tools off the `run_vos` back-compat shim.**
-  - **Status:** Not started.
-  - **Scope:** Move `player_card`, `what_if`, `lib/draft_score`, and the **~55 other** suite scripts to import `vosball.*` directly instead of going through `run_vos`.
-  - **Rationale:** Eventually lets the shim shrink/retire; reduces coupling to the legacy entry point. Can be done incrementally, one tool at a time, with the shim staying in place until the last consumer is migrated.
+- **(a) Split the two still-monolithic modules. ✅ DONE** (commits `58d53ff`, `d54b1e5`)
+  - `vosball/engine/core.py` (~1,386 lines) → `context` / `park` / `reach` / `scoring` / `adjustments` / `war`, with `core.py` reduced to the `build_*_row` assemblers + `is_pitcher`.
+  - `vosball/data/loaders.py` → `config` / `players` / `contracts` / `parks`, with `loaders.py` kept as a re-export shim (reporting.py + the package `__init__` import from that path).
+  - Done by verbatim AST source extraction; both package `__init__`s re-aggregate every submodule's `__all__`, so the public import surface is unchanged (all 40 engine + 27 data names still resolve). Golden green throughout.
+- **(b) In-process golden case driving `evaluate_league`. ✅ DONE** (commit `5b760ac`)
+  - `tests/test_golden.py` now runs each case through two modes — `cli` (the `run_vos.py` subprocess) and `service` (`evaluate_league` in-process) — against the same committed snapshot. The orchestration API a UI depends on is permanently pinned, and drift detection was re-confirmed.
+- **(c) Migrate suite tools off the `run_vos` back-compat shim. ✅ DONE** (commit `6abe1c6`)
+  - `player_card.py`, `what_if.py`, and `lib/draft_score.py` — the only real consumers — now import `vosball.*` directly. The shim stays in place for any remaining ad-hoc scripts; retire it once `grep -rnE "import run_vos|from run_vos"` returns only `run_vos.py` and the test harness.
 
 ### 3. Cut-over (sandbox → live)
 
