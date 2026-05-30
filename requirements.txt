@@ -1,0 +1,12 @@
+# VOSBall — runtime dependencies for the local web UI (webapp/app.py).
+#
+# The core evaluation engine (vosball/) runs on the Python standard library;
+# these are what the Streamlit eval browser needs on top of that. Install with:
+#
+#     py -m pip install -r requirements.txt
+#
+# Then launch the UI with:
+#
+#     py -m streamlit run webapp/app.py        (or double-click run_ui.bat on Windows)
+streamlit>=1.30
+pandas>=2.0
