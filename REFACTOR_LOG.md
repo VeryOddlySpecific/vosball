@@ -167,7 +167,9 @@ G:\vosball\
   - **LCARS (DS9) reskin** (`7c8a221`) — dark base theme in `.streamlit/config.toml` + a CSS reskin in `app.py` (Antonio font, pill buttons, color-blocked sidebar, framed table, signature top bar). Two palettes — **Cardassian Ops** and **Starfleet LCARS** — switchable live from a sidebar toggle.
   - **Persisted preferences** (`611d2c3`) — a generic local settings store (`webapp/.ui_settings.json`, gitignored) seeds the palette on startup and saves it on change; `load_ui_settings()` / `save_ui_setting(key, value)` are reusable for future per-module prefs.
   - **Multipage app + Player Card** (`6492ff1`) — the UI became a multipage app (`st.navigation`): the eval table is the **Eval Browser** page and a new **Player Card** page gives a single-player detail view (VOS metrics, component scores, adjustments, projected WAR, all-positions table, contract summary). The card renders entirely from the row `evaluate_league` already returns — still a pure consumer, no new data loading — and an "Open player card →" bridge jumps from the table to the card. Verified live (pitcher + hitter); golden green.
-- **Future iterations:** richer card (raw scouted ratings, pitcher SP/RP dual, VPC fair value), multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
+  - **Card follow-ups** — row-click navigation (`42e2326`); raw scouted-ratings block (`7ad0f39`); pitcher **SP-vs-RP** dual scoring (`839492d`).
+- **Engine: pitcher career-WAR** (`1dd25bf`, card `5155feb`) — `build_pitcher_row` now computes `VOS_Ceiling` + the archetype WAR projection (previously hitters-only), using a new pitcher ceiling-weights block and **separate SP/RP** `war_archetype.pitchers` curves in `weights_v10.json`. Purely additive (existing pitcher VOS scores byte-identical); golden re-blessed for the new pitcher ceiling/WAR columns. The card shows an SP-vs-RP projected-WAR table.
+- **Future iterations:** VPC fair-value card block, multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
 
 ### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 

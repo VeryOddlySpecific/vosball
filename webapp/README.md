@@ -74,9 +74,11 @@ the row the evaluation already produced (no extra scoring run):
   side-by-side SP-vs-RP role comparison** (graded as both a starter and a
   reliever) — and the adjustment stack (development / age / personality, plus
   the draft adjustments when draft mode is on);
-- hitters also get the **projected archetype WAR**, projection insights (ideal
-  position, viable spots, margins), and an **all-positions Current / Potential**
-  table with the current and projected positions flagged;
+- **projected career WAR** (archetype average, not a per-player forecast) —
+  hitters get a single-profile section plus projection insights (ideal position,
+  viable spots, margins) and an **all-positions Current / Potential** table;
+  pitchers get an **SP-vs-RP WAR table** (ceiling + career/remaining WAR for each
+  role), since a starter and a reliever project very differently;
 - a **Scouted ratings** block with the raw underlying ratings (hitters: batting
   / position / defense / baserunning / personality; pitchers: ability / pitches
   / splits / personality), shown at the same rating scale the eval used;
