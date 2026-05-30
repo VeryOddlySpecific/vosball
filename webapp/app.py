@@ -118,12 +118,103 @@ def to_csv_bytes(rows: List[Dict[str, Any]], draft: bool, contracts: bool) -> by
         tmp.unlink(missing_ok=True)
 
 
+# --- LCARS theming ----------------------------------------------------------
+# Two DS9-flavored palettes, switchable live from the sidebar. Each maps the
+# same set of semantic CSS variables, so the stylesheet below just swaps values.
+PALETTES: Dict[str, Dict[str, str]] = {
+    # The Cardassian-built station look: warm ambers/bronze, deep red, teal.
+    "Cardassian Ops": {
+        "bg": "#000000", "panel": "#15110A", "text": "#F4E8D0",
+        "primary": "#E8A33D", "accent": "#CC4422", "accent2": "#3FB6A8",
+        "accent3": "#B5762A", "muted": "#7A6A4F",
+    },
+    # The classic TNG/DS9 Starfleet LCARS palette: orange, peach, lavender, blue.
+    "Starfleet LCARS": {
+        "bg": "#000000", "panel": "#0A0A14", "text": "#F2F2F2",
+        "primary": "#FF9900", "accent": "#CC6666", "accent2": "#9999FF",
+        "accent3": "#CC99CC", "muted": "#6F6F8F",
+    },
+}
+DEFAULT_PALETTE = "Cardassian Ops"
+
+
+def build_theme_css(p: Dict[str, str]) -> str:
+    """LCARS reskin stylesheet for the given palette. Targets stable Streamlit
+    test-ids / baseweb attributes so it survives version bumps."""
+    return f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&display=swap');
+:root {{
+  --lcars-bg: {p['bg']}; --lcars-panel: {p['panel']}; --lcars-text: {p['text']};
+  --lcars-primary: {p['primary']}; --lcars-accent: {p['accent']};
+  --lcars-accent2: {p['accent2']}; --lcars-accent3: {p['accent3']};
+  --lcars-muted: {p['muted']};
+  --lcars-font: 'Antonio','Oswald','Arial Narrow',sans-serif;
+}}
+.stApp {{ background: var(--lcars-bg); color: var(--lcars-text); }}
+h1, h2, h3, h4 {{
+  font-family: var(--lcars-font) !important; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--lcars-primary) !important;
+}}
+/* LCARS top bar (rendered by lcars_header) */
+.lcars-topbar {{ display:flex; align-items:stretch; gap:8px; height:46px; margin:0 0 14px 0; }}
+.lcars-topbar .cap {{ width:46px; background:var(--lcars-primary);
+  border-radius:23px 0 0 23px; }}
+.lcars-topbar .title {{ flex:0 0 auto; display:flex; align-items:center;
+  padding:0 22px; background:var(--lcars-primary); color:#000;
+  font-family:var(--lcars-font); font-weight:700; font-size:1.7rem;
+  letter-spacing:3px; text-transform:uppercase; }}
+.lcars-topbar .b1 {{ flex:1 1 auto; background:var(--lcars-accent3); }}
+.lcars-topbar .b2 {{ width:70px; background:var(--lcars-accent); }}
+.lcars-topbar .b3 {{ width:34px; background:var(--lcars-accent2);
+  border-radius:0 23px 23px 0; }}
+/* Sidebar = LCARS side panel */
+[data-testid="stSidebar"] {{ background: var(--lcars-panel);
+  border-right: 3px solid var(--lcars-primary); }}
+/* Buttons -> LCARS pills */
+.stButton > button, .stDownloadButton > button {{
+  background: var(--lcars-primary); color:#000; border:none;
+  border-radius: 18px; font-family: var(--lcars-font); font-weight:600;
+  text-transform: uppercase; letter-spacing:1px; }}
+.stButton > button:hover, .stDownloadButton > button:hover {{
+  filter: brightness(1.15); color:#000; }}
+.stButton > button:active {{ filter: brightness(0.9); }}
+/* Inputs / selects / radios accent */
+[data-baseweb="select"] > div, .stTextInput input, .stNumberInput input {{
+  border-color: var(--lcars-accent3) !important; }}
+[data-testid="stDataFrame"] {{ border: 2px solid var(--lcars-primary);
+  border-radius: 8px; }}
+/* Palette toggle (segmented control) -> connected LCARS pills */
+[data-testid="stSegmentedControl"] button {{
+  font-family: var(--lcars-font); text-transform: uppercase; letter-spacing:1px; }}
+hr {{ border-color: var(--lcars-accent3); }}
+.stCaption, [data-testid="stCaptionContainer"] {{ color: var(--lcars-muted) !important; }}
+</style>
+"""
+
+
+def lcars_header(title: str) -> None:
+    st.markdown(
+        f'<div class="lcars-topbar"><span class="cap"></span>'
+        f'<span class="title">{title}</span><span class="b1"></span>'
+        f'<span class="b2"></span><span class="b3"></span></div>',
+        unsafe_allow_html=True,
+    )
+
+
 # --- UI ---------------------------------------------------------------------
 
 def main() -> None:
     st.set_page_config(page_title="VOSBall — Eval Browser", page_icon="⚾",
                        layout="wide")
-    st.title("⚾ VOSBall — Eval Browser")
+
+    # Apply the LCARS reskin using the last-selected palette (the toggle below
+    # updates st.session_state['palette'] and reruns, so this reads the new one).
+    st.session_state.setdefault("palette", DEFAULT_PALETTE)
+    st.markdown(build_theme_css(PALETTES[st.session_state["palette"]]),
+                unsafe_allow_html=True)
+
+    lcars_header("⚾ VOSBall · Eval Browser")
     st.caption(
         "Browse VOS player evaluations for any league. Reads the same "
         "`data/` and `config/` the CLI uses; scores with "
@@ -137,6 +228,12 @@ def main() -> None:
 
     # --- Sidebar: run controls ---
     with st.sidebar:
+        # Palette toggle (LCARS reskin). Keyed on session_state so the choice
+        # persists and the theme injection above picks it up on rerun.
+        st.segmented_control(
+            "LCARS palette", list(PALETTES), key="palette",
+            help="Switch the Deep Space 9 color scheme.")
+
         st.header("Evaluate")
         league = st.selectbox("League", leagues, index=0)
 

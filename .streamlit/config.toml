@@ -1,0 +1,12 @@
+# Base theme for the VOSBall web UI. Sets a dark LCARS-friendly base so the
+# data grid + widgets render dark on first paint; webapp/app.py then injects
+# palette-specific LCARS styling (and a Cardassian Ops / Starfleet toggle) on
+# top via CSS. Streamlit's [theme] only supports sans-serif/serif/monospace for
+# `font`, so the LCARS (Antonio) typeface is applied in app.py's CSS.
+[theme]
+base = "dark"
+primaryColor = "#E8A33D"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#15110A"
+textColor = "#F4E8D0"
+font = "sans-serif"
