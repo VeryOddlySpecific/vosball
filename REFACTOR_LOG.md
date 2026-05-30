@@ -145,6 +145,13 @@ G:\vosball\
 | `3ac046d` | 2 | Extract data-access layer into `vosball.data` |
 | `7cc8876` | 3 | Extract CLI + reporting; `run_vos.py` becomes a thin entry point |
 | `489abcb` | 4 | Add UI-agnostic services layer (`vosball.services`) |
+| `6abe979` | docs | Add refactor work log + pipeline user guide |
+| `5b760ac` | polish (b) | Pin services seam — in-process `evaluate_league` golden case |
+| `58d53ff` | polish (a) | Split `engine/core.py` into focused submodules |
+| `d54b1e5` | polish (a) | Split `data/loaders.py` into focused submodules |
+| `6abe1c6` | polish (c) | Migrate suite tools off the `run_vos` shim |
+| `7d009ab` | docs | Add `LOGIC_UPDATE_PROCESS.md`; mark Polish done |
+| `11af276` | docs | Fix stale `run_vos`/`v2` alias comments |
 
 ---
 
@@ -173,7 +180,7 @@ All items below were guarded by the golden harness, so they carried low regressi
 ### 3. Cut-over (sandbox → live)
 
 - **Status:** Not started — to be done **when confident**.
-- **Scope:** Promote `G:\vosball` from sandbox to the live suite, and retire or re-sync the deployed `G:\ratings`.
+- **Scope:** Promote `F:\vosball` from sandbox to the live suite, and retire or re-sync the deployed `F:\ratings`.
 - **Key considerations:**
   - the **`vos_v2.py` rollback path** (must remain available as an escape hatch);
   - the **point-in-time data snapshot** — the sandbox `data/` is a 2026-05-29 copy, so cut-over needs a plan to reconcile/refresh against live data and the ~20 GB of generated output/caches that were excluded from the sandbox.
@@ -182,13 +189,13 @@ All items below were guarded by the golden harness, so they carried low regressi
 
 ## How to pick up where we left off
 
-Everything lives in the **sandbox at `G:\vosball`** (fresh git, no remote; 7 commits, `8098f02` … `489abcb`). The deployed suite at `G:\ratings` is untouched — start from the sandbox.
+Everything lives in the **sandbox at `F:\vosball`** (fresh git, no remote; 14 commits, `8098f02` … `11af276`). The deployed suite at `F:\ratings` is untouched — start from the sandbox. **Phases 0–4 + Polish are done;** for how to make further changes safely, read [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
 
 Before and after any change, confirm zero output drift:
 
 ```bash
-cd G:\vosball
-py tests/test_golden.py            # must stay green
+cd F:\vosball
+py tests/test_golden.py            # must stay green (4 checks: 2 leagues x cli/service)
 py tests/test_golden.py --update   # only after an INTENTIONAL output change
 ```
 
