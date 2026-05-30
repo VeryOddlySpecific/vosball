@@ -166,8 +166,8 @@ G:\vosball\
   - **mtime-aware score cache** (`94eff21`) — the cache key includes each league's `PlayerData` modification time, so a fresh `fetch_*_player_data.py` pull auto-re-scores without a restart; plus a "Data updated: …" caption and a "Clear cache & re-score" button.
   - **LCARS (DS9) reskin** (`7c8a221`) — dark base theme in `.streamlit/config.toml` + a CSS reskin in `app.py` (Antonio font, pill buttons, color-blocked sidebar, framed table, signature top bar). Two palettes — **Cardassian Ops** and **Starfleet LCARS** — switchable live from a sidebar toggle.
   - **Persisted preferences** (`611d2c3`) — a generic local settings store (`webapp/.ui_settings.json`, gitignored) seeds the palette on startup and saves it on change; `load_ui_settings()` / `save_ui_setting(key, value)` are reusable for future per-module prefs.
-- **In progress:** **player-card drill-down** (single-player detail view, reusing `player_card.py`'s logic) — the first additional module on top of the eval table.
-- **Future iterations:** multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
+  - **Multipage app + Player Card** (`6492ff1`) — the UI became a multipage app (`st.navigation`): the eval table is the **Eval Browser** page and a new **Player Card** page gives a single-player detail view (VOS metrics, component scores, adjustments, projected WAR, all-positions table, contract summary). The card renders entirely from the row `evaluate_league` already returns — still a pure consumer, no new data loading — and an "Open player card →" bridge jumps from the table to the card. Verified live (pitcher + hitter); golden green.
+- **Future iterations:** richer card (raw scouted ratings, pitcher SP/RP dual, VPC fair value), multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
 
 ### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 

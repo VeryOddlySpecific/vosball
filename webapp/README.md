@@ -1,8 +1,12 @@
-# VOSBall — Local Web UI (Eval Browser)
+# VOSBall — Local Web UI
 
-A small Streamlit app that lets you browse VOS player evaluations for any league
-in your web browser — pick a league, run the scoring, then sort, filter, and
-search the results, and download the CSV.
+A small Streamlit app for browsing VOS player evaluations in your web browser.
+It's a multipage app with two screens (pick them from the sidebar):
+
+- **Eval Browser** — pick a league, run the scoring, then sort / filter / search
+  the results and download the CSV.
+- **Player Card** — a single-player detail view (scores, adjustments, projected
+  WAR, positional breakdown, contract) for any player from the last evaluation.
 
 It's a thin front end over the existing engine: it calls
 `vosball.services.evaluate_league` (the same code path the `run_vos.py` CLI
@@ -56,6 +60,29 @@ your default browser automatically.
    the full output schema.
 5. **Download** either the full canonical eval CSV (byte-identical to the CLI's
    output) or just the filtered view.
+6. To inspect one player, use **"Open a player in the Player Card"** below the
+   table (jumps straight to the card), or switch to the **Player Card** page in
+   the sidebar.
+
+## Player Card
+
+The **Player Card** page shows a single player in detail, rendered entirely from
+the row the evaluation already produced (no extra scoring run):
+
+- headline VOS metrics — Reach / Career / Blended / Ceiling — plus tiers;
+- component scores (hitters: batting / defense / baserunning; pitchers: ability
+  / arsenal) and the adjustment stack (development / age / personality, plus the
+  draft adjustments when draft mode is on);
+- hitters also get the **projected archetype WAR**, projection insights (ideal
+  position, viable spots, margins), and an **all-positions Current / Potential**
+  table with the current and projected positions flagged;
+- a park / injury line, and a compact **contract** summary when contracts were
+  included in the run.
+
+Pick a player from the searchable selector at the top. (You need to have run an
+evaluation on the Eval Browser page first — the card reads that result.) Raw
+scouted ratings, pitcher SP-vs-RP dual scoring, and full contract / fair-value
+economics are planned follow-ups.
 
 ## Theme (LCARS)
 
@@ -109,6 +136,7 @@ settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
 
 ## Status
 
-**v1 + theming.** Covers the core eval table (filter/sort/search/export), the
-LCARS reskin, and persisted preferences. Next up: a **player card** drill-down;
-multi-league comparison and other views are possible future additions.
+Multipage app: **Eval Browser** (filter/sort/search/export) + **Player Card**
+(single-player detail), with the LCARS reskin and persisted preferences. Future
+additions: raw scouted-ratings + pitcher SP/RP + fair-value on the card, plus
+multi-league comparison and a draft board as their own pages.
