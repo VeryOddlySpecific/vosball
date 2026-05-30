@@ -420,8 +420,34 @@ def eval_browser_page() -> None:
         display_cols = [c for c in DEFAULT_COLUMNS if c in df.columns]
 
     st.caption(f"Showing {len(view)} of {len(df)} players "
-               f"· {len(display_cols)} of {len(df.columns)} columns")
-    st.dataframe(view[display_cols], use_container_width=True, hide_index=True)
+               f"· {len(display_cols)} of {len(df.columns)} columns · "
+               "click a row to open that player's card")
+    # Key the table on the filter signature: changing any filter yields a fresh
+    # table with no carried-over selection, so typing in a filter can never drag
+    # a stale row-selection into a spurious navigation. Within a stable filter
+    # the selection persists, so a click still registers.
+    filt_sig = "|".join([
+        str(result["league"]), name_q.strip(), ",".join(pos_sel), ",".join(lvl_sel),
+        ";".join(f"{k}={v}" for k, v in sorted(score_ranges.items())),
+    ])
+    event = st.dataframe(
+        view[display_cols], use_container_width=True, hide_index=True,
+        on_select="rerun", selection_mode="single-row",
+        key=f"eval_table::{filt_sig}")
+
+    # Row click -> jump to the Player Card. selection.rows are positional indices
+    # into the data as passed (independent of the user's column sort), so map via
+    # view.iloc. Guard with _last_table_sel so returning to this page (selection
+    # still set) doesn't re-trigger navigation.
+    sel = list(event.selection.rows) if (event and event.selection) else []
+    if sel and sel[0] < len(view):
+        pid = str(view.iloc[sel[0]].get("ID", "")).strip()
+        if pid and st.session_state.get("_last_table_sel") != pid:
+            st.session_state["_last_table_sel"] = pid
+            st.session_state["card_pid"] = pid
+            st.switch_page(_PAGES["card"])
+    elif not sel:
+        st.session_state["_last_table_sel"] = None
 
     # --- Downloads ---
     d1, d2 = st.columns(2)
@@ -437,16 +463,6 @@ def eval_browser_page() -> None:
         file_name=f"eval_{result['league']}_filtered.csv",
         mime="text/csv", use_container_width=True,
         help="Just the rows/columns currently shown above.")
-
-    # --- Bridge: open a player in the Player Card page ---
-    st.divider()
-    b1, b2 = st.columns([4, 1])
-    labels = [_player_label(r) for r in rows]
-    id_by_label = {lbl: str(r.get("ID", "")) for lbl, r in zip(labels, rows)}
-    pick = b1.selectbox("Open a player in the Player Card", labels, key="bridge_pick")
-    if b2.button("Open →", use_container_width=True):
-        st.session_state["card_pid"] = id_by_label[pick]
-        st.switch_page(_PAGES["card"])
 
 
 # --- Page: Player Card ------------------------------------------------------
