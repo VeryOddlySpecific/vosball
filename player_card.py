@@ -26,7 +26,13 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import run_vos as v2
+from vosball.engine import (
+    HITTER_POSITIONS, build_pitcher_row, classify_vos_tier, is_pitcher,
+    resolve_int,
+)
+from vosball.data import (
+    PLAYER_DATA_FILENAME_TEMPLATE, load_id_maps, load_teams, load_weights,
+)
 
 # Reuse what_if's display field definitions and helpers — single source of truth.
 import what_if as wi
@@ -49,7 +55,7 @@ DEFAULT_LEAGUE_SETTINGS = SCRIPT_DIR / "config" / "league_settings.json"
 # -----------------------------------------------------------------------------
 
 def load_all_player_rows(league: str) -> Optional[List[Dict[str, str]]]:
-    path = SCRIPT_DIR / "data" / v2.PLAYER_DATA_FILENAME_TEMPLATE.format(league=league)
+    path = SCRIPT_DIR / "data" / PLAYER_DATA_FILENAME_TEMPLATE.format(league=league)
     if not path.exists():
         print(f"ERROR: {path} not found", file=sys.stderr)
         return None
@@ -114,7 +120,7 @@ def league_org(league: str, settings_path: Path) -> Optional[str]:
 # Display
 # -----------------------------------------------------------------------------
 
-ALL_HITTER_POSITIONS = v2.HITTER_POSITIONS  # ["C","1B","2B","3B","SS","LF","CF","RF","DH"]
+ALL_HITTER_POSITIONS = HITTER_POSITIONS  # ["C","1B","2B","3B","SS","LF","CF","RF","DH"]
 
 
 def _fnum(v: Any, prec: int = 2) -> str:
@@ -238,8 +244,8 @@ def print_hitter_positional_scores(eval_row: Dict[str, Any], cfg: Optional[Dict[
     for pos in ALL_HITTER_POSITIONS:
         cur = eval_row.get(f"{pos}_Score", "")
         pot = eval_row.get(f"{pos}_Potential", "")
-        cur_tier = v2.classify_vos_tier(cur, "hitter", cfg)
-        pot_tier = v2.classify_vos_tier(pot, "hitter", cfg)
+        cur_tier = classify_vos_tier(cur, "hitter", cfg)
+        pot_tier = classify_vos_tier(pot, "hitter", cfg)
         marker = ""
         if pos == ideal_cur and pos == ideal_pot:
             marker = "  <- current & projected"
@@ -260,8 +266,8 @@ def print_pitcher_role_scores(
     draft_mode: bool,
 ) -> None:
     """Show both SP and RP evaluation for the pitcher."""
-    sp_eval = v2.build_pitcher_row(row, cfg, league_lookup, teams, role="SP", draft_mode=draft_mode)
-    rp_eval = v2.build_pitcher_row(row, cfg, league_lookup, teams, role="RP", draft_mode=draft_mode)
+    sp_eval = build_pitcher_row(row, cfg, league_lookup, teams, role="SP", draft_mode=draft_mode)
+    rp_eval = build_pitcher_row(row, cfg, league_lookup, teams, role="RP", draft_mode=draft_mode)
     rows_for_table = [
         ("VOS_Reach",                "VOS Reach",         True),
         ("VOS_Career",               "VOS Career",        True),
@@ -279,8 +285,8 @@ def print_pitcher_role_scores(
     for key, label, show_tier in rows_for_table:
         sp_v = (sp_eval or {}).get(key, "")
         rp_v = (rp_eval or {}).get(key, "")
-        sp_tier = v2.classify_vos_tier(sp_v, "pitcher", cfg) if show_tier else ""
-        rp_tier = v2.classify_vos_tier(rp_v, "pitcher", cfg) if show_tier else ""
+        sp_tier = classify_vos_tier(sp_v, "pitcher", cfg) if show_tier else ""
+        rp_tier = classify_vos_tier(rp_v, "pitcher", cfg) if show_tier else ""
         print(
             f"    {label:<22}{_fnum(sp_v):>10}  {sp_tier:<20}{_fnum(rp_v):>10}  {rp_tier:<20}"
         )
@@ -379,8 +385,8 @@ def print_compare_pitcher_role_scores(
     draft_mode: bool,
 ) -> None:
     """Pitchers only — SP/RP eval per player."""
-    sp_evals = [v2.build_pitcher_row(p["row"], cfg, league_lookup, teams, role="SP", draft_mode=draft_mode) for p in players]
-    rp_evals = [v2.build_pitcher_row(p["row"], cfg, league_lookup, teams, role="RP", draft_mode=draft_mode) for p in players]
+    sp_evals = [build_pitcher_row(p["row"], cfg, league_lookup, teams, role="SP", draft_mode=draft_mode) for p in players]
+    rp_evals = [build_pitcher_row(p["row"], cfg, league_lookup, teams, role="RP", draft_mode=draft_mode) for p in players]
     rows = [
         ("VOS_Reach",                "VOS Reach"),
         ("VOS_Career",               "VOS Career"),
@@ -466,7 +472,7 @@ def run_compare(
                     str(saved.get(c, "")).strip() != ""
                     for c in ("Readiness_Adj", "Draft_Age_Adj", "Draft_RP_Penalty")
                 )
-        players.append({"row": row, "saved_eval_row": saved, "is_pit": v2.is_pitcher(row)})
+        players.append({"row": row, "saved_eval_row": saved, "is_pit": is_pitcher(row)})
 
     draft_mode = bool(draft_arg) if draft_arg is not None else eval_has_draft_cols
 
@@ -944,7 +950,7 @@ def main() -> int:
                    help="Specific evaluation_summary CSV (default: latest for the league)")
     p.add_argument("--no-saved", action="store_true",
                    help="Skip loading last-saved eval row (recompute only)")
-    p.add_argument("--config-dir", type=Path, default=v2.DEFAULT_CONFIG_DIR, help="Config directory")
+    p.add_argument("--config-dir", type=Path, default=SCRIPT_DIR / "config", help="Config directory")
     p.add_argument("--draft", dest="draft", action="store_true", default=None,
                    help="Force draft-mode scoring")
     p.add_argument("--no-draft", dest="draft", action="store_false",
@@ -998,12 +1004,12 @@ def main() -> int:
     league = args.league.strip()
     pid = str(args.id).strip()
 
-    cfg = v2.load_weights(args.config_dir)
+    cfg = load_weights(args.config_dir)
     if not cfg:
         print("ERROR: weights config missing/invalid", file=sys.stderr)
         return 1
-    league_lookup = v2.load_id_maps(args.config_dir)
-    teams = v2.load_teams(args.config_dir, league)
+    league_lookup = load_id_maps(args.config_dir)
+    teams = load_teams(args.config_dir, league)
 
     eval_path = args.eval_file if args.eval_file else wi.find_latest_eval_csv(league)
     if eval_path and eval_path.exists() and not args.no_saved:
@@ -1101,7 +1107,7 @@ def main() -> int:
     org_saved_eval_row: Optional[Dict[str, str]] = None
     org_abbrev: Optional[str] = None
     if not args.no_saved and not args.no_org_saved:
-        org_id = v2.resolve_int(row, "Org")
+        org_id = resolve_int(row, "Org")
         org_name = teams.get(org_id, "") if org_id else ""
         if org_name:
             org_abbrev = get_org_abbreviation(org_name)
@@ -1121,7 +1127,7 @@ def main() -> int:
     else:
         draft_mode = bool(args.draft)
 
-    is_pit = v2.is_pitcher(row)
+    is_pit = is_pitcher(row)
     role_override = args.role
     eval_row = wi.score_player(row, cfg, league_lookup, teams, role_override, draft_mode)
     if eval_row is None:

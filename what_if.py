@@ -32,7 +32,10 @@ from typing import Any, Dict, List, Optional, Tuple
 # Reuse all scoring + loading from run_vos (v6 engine; alias kept as `v2`
 # so the rest of this module — and player_card.py which `import what_if as wi`
 # — continues to work unchanged).
-import run_vos as v2
+from vosball.engine import build_hitter_row, build_pitcher_row, is_pitcher
+from vosball.data import (
+    PLAYER_DATA_FILENAME_TEMPLATE, load_id_maps, load_teams, load_weights,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -87,7 +90,7 @@ def load_latest_eval_row(eval_path: Path, player_id: str) -> Optional[Dict[str, 
 
 def load_player_row(league: str, player_id: str) -> Optional[Dict[str, str]]:
     """Return the row for player_id from PlayerData-{league}.csv, or None."""
-    path = SCRIPT_DIR / "data" / v2.PLAYER_DATA_FILENAME_TEMPLATE.format(league=league)
+    path = SCRIPT_DIR / "data" / PLAYER_DATA_FILENAME_TEMPLATE.format(league=league)
     if not path.exists():
         print(f"ERROR: {path} not found", file=sys.stderr)
         return None
@@ -112,11 +115,11 @@ def score_player(
     draft_mode: bool = False,
 ) -> Optional[Dict[str, Any]]:
     """Build the VOS eval output row for one player using vos_v2 logic."""
-    if v2.is_pitcher(row):
+    if is_pitcher(row):
         pos = (row.get("Pos") or "").strip().upper()
         role = role_override or ("RP" if pos in ("RP", "CL") else "SP")
-        return v2.build_pitcher_row(row, cfg, league_lookup, teams, role=role, draft_mode=draft_mode)
-    return v2.build_hitter_row(row, cfg, league_lookup, teams, draft_mode=draft_mode)
+        return build_pitcher_row(row, cfg, league_lookup, teams, role=role, draft_mode=draft_mode)
+    return build_hitter_row(row, cfg, league_lookup, teams, draft_mode=draft_mode)
 
 
 # -----------------------------------------------------------------------------
@@ -406,7 +409,7 @@ def run_repl(
 ) -> int:
     overrides: Dict[str, str] = {}
     role_override: Optional[str] = None
-    is_pit = v2.is_pitcher(base_row)
+    is_pit = is_pitcher(base_row)
 
     # initial recompute (no overrides) — proves consistency vs last saved
     base_eval = score_player(base_row, cfg, league_lookup, teams, role_override, draft_mode)
@@ -489,7 +492,7 @@ def main() -> int:
     p.add_argument("--id", required=True, help="Player ID to load")
     p.add_argument("--eval-file", default=None, type=Path,
                    help="Specific evaluation_summary CSV (default: latest for the league)")
-    p.add_argument("--config-dir", type=Path, default=v2.DEFAULT_CONFIG_DIR, help="Config directory")
+    p.add_argument("--config-dir", type=Path, default=SCRIPT_DIR / "config", help="Config directory")
     p.add_argument("--draft", dest="draft", action="store_true", default=None,
                    help="Force draft-mode scoring (readiness + dampened dev_adj + draft_age modifier)")
     p.add_argument("--no-draft", dest="draft", action="store_false",
@@ -499,12 +502,12 @@ def main() -> int:
     league = args.league.strip()
     pid = str(args.id).strip()
 
-    cfg = v2.load_weights(args.config_dir)
+    cfg = load_weights(args.config_dir)
     if not cfg:
         print("ERROR: weights config missing/invalid", file=sys.stderr)
         return 1
-    league_lookup = v2.load_id_maps(args.config_dir)
-    teams = v2.load_teams(args.config_dir, league)
+    league_lookup = load_id_maps(args.config_dir)
+    teams = load_teams(args.config_dir, league)
 
     row = load_player_row(league, pid)
     if row is None:

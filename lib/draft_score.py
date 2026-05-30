@@ -76,7 +76,7 @@ _ratings_root = SCRIPT_DIR.parent
 if str(_ratings_root) not in sys.path:
     sys.path.insert(0, str(_ratings_root))
 
-import run_vos  # noqa: E402  — needs sys.path fix above
+from vosball import engine as run_vos  # noqa: E402 — engine helpers; needs sys.path fix above
 
 
 # ---------------------------------------------------------------------------
