@@ -70,9 +70,10 @@ The **Player Card** page shows a single player in detail, rendered entirely from
 the row the evaluation already produced (no extra scoring run):
 
 - headline VOS metrics — Reach / Career / Blended / Ceiling — plus tiers;
-- component scores (hitters: batting / defense / baserunning; pitchers: ability
-  / arsenal) and the adjustment stack (development / age / personality, plus the
-  draft adjustments when draft mode is on);
+- component scores — hitters: batting / defense / baserunning; **pitchers get a
+  side-by-side SP-vs-RP role comparison** (graded as both a starter and a
+  reliever) — and the adjustment stack (development / age / personality, plus
+  the draft adjustments when draft mode is on);
 - hitters also get the **projected archetype WAR**, projection insights (ideal
   position, viable spots, margins), and an **all-positions Current / Potential**
   table with the current and projected positions flagged;
@@ -84,8 +85,8 @@ the row the evaluation already produced (no extra scoring run):
 
 Pick a player from the searchable selector at the top (or click a row on the
 Eval Browser). You need to have run an evaluation on the Eval Browser page first
-— the card reads that result. Pitcher SP-vs-RP dual scoring and full contract /
-fair-value economics are planned follow-ups.
+— the card reads that result. Full contract / fair-value (VPC) economics is the
+remaining planned follow-up.
 
 ## Theme (LCARS)
 
