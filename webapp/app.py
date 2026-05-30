@@ -1,10 +1,14 @@
-"""VOSBall — local web UI (Streamlit eval browser).
+"""VOSBall — local web UI (multipage Streamlit app).
 
 A thin browser front end over the VOS evaluation engine. It is a pure *consumer*
 of the layered `vosball` package: it calls vosball.services.evaluate_league()
-(the same UI-agnostic seam the CLI uses), shows the scored players in a
-sortable / filterable table, and offers a CSV download that is byte-identical to
-`run_vos.py` output (written through vosball.reporting.write_output_csv).
+(the same UI-agnostic seam the CLI uses) and renders the returned rows. Two
+pages share one scored result (kept in st.session_state) and the LCARS theme:
+
+  • Eval Browser — sortable/filterable/searchable table + canonical CSV export
+    (byte-identical to run_vos.py via vosball.reporting.write_output_csv).
+  • Player Card — single-player detail view, rendered entirely from the row
+    evaluate_league already returns (no extra data loading).
 
 Run it with:
 
@@ -39,6 +43,7 @@ import pandas as pd  # noqa: E402
 from vosball.services import evaluate_league  # noqa: E402
 from vosball.reporting import write_output_csv  # noqa: E402
 from vosball.data import RATING_SCALES, DEFAULT_RATING_SCALE  # noqa: E402
+from vosball.engine import HITTER_POSITIONS  # noqa: E402  (pure constant)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -236,11 +241,16 @@ def lcars_header(title: str) -> None:
     )
 
 
-# --- UI ---------------------------------------------------------------------
+# --- App shell (multipage) --------------------------------------------------
+
+# Page objects are (re)created each rerun inside main(); stashed here so the
+# Eval Browser's "Open player card" bridge can target the card page via
+# st.switch_page within the same run.
+_PAGES: Dict[str, Any] = {}
+
 
 def main() -> None:
-    st.set_page_config(page_title="VOSBall — Eval Browser", page_icon="⚾",
-                       layout="wide")
+    st.set_page_config(page_title="VOSBall", page_icon="⚾", layout="wide")
 
     # Apply the LCARS reskin using the last-selected palette. Seed from the
     # persisted setting on first load; the toggle below updates
@@ -252,7 +262,26 @@ def main() -> None:
     st.markdown(build_theme_css(PALETTES[st.session_state["palette"]]),
                 unsafe_allow_html=True)
 
-    lcars_header("⚾ VOSBall · Eval Browser")
+    lcars_header("⚾ VOSBall")
+
+    # Global chrome: palette toggle sits above the page nav, on every page.
+    with st.sidebar:
+        st.segmented_control(
+            "LCARS palette", list(PALETTES), key="palette",
+            on_change=_persist_palette,
+            help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
+        st.divider()
+
+    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
+                        default=True)
+    card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
+    _PAGES["card"] = card_page
+    st.navigation([eval_page, card_page]).run()
+
+
+# --- Page: Eval Browser -----------------------------------------------------
+
+def eval_browser_page() -> None:
     st.caption(
         "Browse VOS player evaluations for any league. Reads the same "
         "`data/` and `config/` the CLI uses; scores with "
@@ -266,13 +295,6 @@ def main() -> None:
 
     # --- Sidebar: run controls ---
     with st.sidebar:
-        # Palette toggle (LCARS reskin). Keyed on session_state so the choice
-        # persists and the theme injection above picks it up on rerun.
-        st.segmented_control(
-            "LCARS palette", list(PALETTES), key="palette",
-            on_change=_persist_palette,
-            help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
-
         st.header("Evaluate")
         league = st.selectbox("League", leagues, index=0)
 
@@ -415,6 +437,193 @@ def main() -> None:
         file_name=f"eval_{result['league']}_filtered.csv",
         mime="text/csv", use_container_width=True,
         help="Just the rows/columns currently shown above.")
+
+    # --- Bridge: open a player in the Player Card page ---
+    st.divider()
+    b1, b2 = st.columns([4, 1])
+    labels = [_player_label(r) for r in rows]
+    id_by_label = {lbl: str(r.get("ID", "")) for lbl, r in zip(labels, rows)}
+    pick = b1.selectbox("Open a player in the Player Card", labels, key="bridge_pick")
+    if b2.button("Open →", use_container_width=True):
+        st.session_state["card_pid"] = id_by_label[pick]
+        st.switch_page(_PAGES["card"])
+
+
+# --- Page: Player Card ------------------------------------------------------
+
+def _player_label(r: Dict[str, Any]) -> str:
+    return (f"{r.get('Name', '?')} · {(r.get('Pos') or '').strip()} · "
+            f"{r.get('Team', '')}  (#{r.get('ID', '')})")
+
+
+def _num(v: Any, prec: int = 2) -> str:
+    try:
+        return f"{float(v):.{prec}f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _is_pitcher_row(r: Dict[str, Any]) -> bool:
+    if str(r.get("Pitching_Ability_Score", "")).strip():
+        return True
+    return (r.get("Pos") or "").strip().upper() in {"SP", "RP", "CL", "P"}
+
+
+def player_card_page() -> None:
+    result = st.session_state.get("result")
+    if not result or not result.get("rows"):
+        st.info("Run an evaluation on the **Eval Browser** page first, then pick "
+                "a player here.")
+        return
+    rows = result["rows"]
+    league = result["league"]
+    labels = [_player_label(r) for r in rows]
+    row_by_label = {lbl: r for lbl, r in zip(labels, rows)}
+    id_to_label = {str(r.get("ID", "")): lbl for lbl, r in zip(labels, rows)}
+
+    with st.sidebar:
+        st.header("Player Card")
+        st.caption(f"{league.upper()} · {len(rows)} scored")
+
+    # Preselect the player the bridge sent us (or the last one viewed).
+    pre = st.session_state.get("card_pid")
+    idx = labels.index(id_to_label[pre]) if pre in id_to_label else 0
+    pick = st.selectbox("Player", labels, index=idx)
+    row = row_by_label[pick]
+    st.session_state["card_pid"] = str(row.get("ID", ""))
+
+    _render_card(row, result)
+
+
+def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
+    is_pit = _is_pitcher_row(row)
+
+    st.subheader(f"{row.get('Name', '?')} — {(row.get('Pos') or '').strip()}")
+    bio = [b for b in (
+        f"Age {row.get('Age')}" if str(row.get("Age", "")).strip() else "",
+        str(row.get("Team", "")).strip(),
+        f"Org {row.get('Org')}" if str(row.get("Org", "")).strip() else "",
+        f"Level {row.get('League_Level')}" if str(row.get("League_Level", "")).strip() else "",
+    ) if b]
+    if bio:
+        st.caption(" · ".join(bio))
+    tiers = [f"{lbl}: {row.get(col)}" for lbl, col in (
+        ("Tier", "VOS_Tier"), ("Potential", "VOS_Potential_Tier"),
+        ("Ceiling", "Ceiling_Tier")) if str(row.get(col, "")).strip()]
+    if tiers:
+        st.caption(" · ".join(tiers))
+
+    # Headline VOS metrics
+    m = st.columns(4)
+    m[0].metric("VOS Reach", _num(row.get("VOS_Reach")))
+    m[1].metric("VOS Career", _num(row.get("VOS_Career")))
+    m[2].metric("VOS Blended", _num(row.get("VOS_Blended")))
+    m[3].metric("VOS Ceiling", _num(row.get("VOS_Ceiling")))
+
+    # Component scores
+    st.markdown("**Component scores**")
+    if is_pit:
+        c = st.columns(3)
+        c[0].metric("Ability", _num(row.get("Pitching_Ability_Score")))
+        c[1].metric("Ability (Pot)", _num(row.get("Pitching_Ability_Potential")))
+        c[2].metric("Arsenal", _num(row.get("Pitching_Arsenal_Score")))
+    else:
+        c = st.columns(4)
+        c[0].metric("Batting", _num(row.get("Batting_Score")))
+        c[1].metric("Batting (Pot)", _num(row.get("Batting_Potential")))
+        c[2].metric("Defense", _num(row.get("Defense_Score")))
+        c[3].metric("Baserunning", _num(row.get("Baserunning_Score")))
+
+    # Adjustments
+    adj_specs = [("Development", "Development_Adj"), ("Age", "Age_Adj"),
+                 ("Personality", "Personality_Adj")]
+    if result.get("draft"):
+        adj_specs += [("Readiness", "Readiness_Adj"), ("Draft age", "Draft_Age_Adj"),
+                      ("Draft RP pen.", "Draft_RP_Penalty")]
+    st.markdown("**Adjustments**")
+    ac = st.columns(len(adj_specs))
+    for col, (lbl, key) in zip(ac, adj_specs):
+        col.metric(lbl, _num(row.get(key)))
+
+    # Hitter-only: projected WAR, insights, positional scores
+    if not is_pit:
+        if str(row.get("Arch_Career_WAR", "")).strip():
+            st.markdown("**Projected career WAR** — archetype average for this "
+                        "profile, *not* a per-player forecast")
+            w = st.columns(4)
+            w[0].metric("Career WAR", _num(row.get("Arch_Career_WAR"), 1))
+            w[1].metric("Career WAR (hi)", _num(row.get("Arch_Career_WAR_Hi"), 1))
+            w[2].metric("Remaining WAR", _num(row.get("Remaining_WAR"), 1))
+            debut = str(row.get("Proj_Debut_Age", "")).strip()
+            w[3].metric("Proj. debut age", debut or "—")
+
+        insights = [f"**{lbl}:** {row.get(col)}" for lbl, col in (
+            ("Current pos", "Current_Position"), ("Projected pos", "Projected_Position"),
+            ("Top score", "Projected_Top_Score"), ("2nd score", "Projected_Second_Score"),
+            ("Margin", "Projected_Margin"), ("Margin tier", "Projected_Margin_Tier"),
+            ("Viable positions", "Projected_Viable_Positions"),
+            ("Viable list", "Projected_Viable_Pos_List"),
+            ("Ideal value", "Ideal_Value"),
+        ) if str(row.get(col, "")).strip()]
+        if insights:
+            st.markdown("**Projection insights**")
+            st.markdown("  ·  ".join(insights))
+
+        st.markdown("**Positional scores** (Current / Potential)")
+        ideal_cur = (row.get("Current_Position") or "").strip()
+        ideal_pot = (row.get("Projected_Position") or "").strip()
+        prows = []
+        for pos in HITTER_POSITIONS:
+            if pos == ideal_cur and pos == ideal_pot:
+                marker = "◀ current & projected"
+            elif pos == ideal_cur:
+                marker = "◀ current"
+            elif pos == ideal_pot:
+                marker = "◀ projected"
+            else:
+                marker = ""
+            prows.append({"Pos": pos, "Current": _num(row.get(f"{pos}_Score")),
+                          "Potential": _num(row.get(f"{pos}_Potential")), " ": marker})
+        st.dataframe(pd.DataFrame(prows), hide_index=True, use_container_width=True)
+
+    # Park / injury
+    park_bits = []
+    park_name = str(row.get("Park_Name", "")).strip()
+    if park_name and park_name != "N/A":
+        applied = row.get("Park_Applied") in (True, "True", "true")
+        park_bits.append(f"Park: {park_name} ({'applied' if applied else 'not applied'})")
+    if str(row.get("Prone", "")).strip():
+        park_bits.append(f"Injury prone: {row.get('Prone')}")
+    if park_bits:
+        st.caption(" · ".join(park_bits))
+
+    # Contract (only when contracts were fetched for this run)
+    if result.get("contracts"):
+        _render_contract(row)
+
+
+def _render_contract(row: Dict[str, Any]) -> None:
+    def ci(col: str) -> int:
+        try:
+            return int(float(str(row.get(col, "")).strip() or 0))
+        except (TypeError, ValueError):
+            return 0
+
+    st.markdown("**Contract**")
+    years = ci("Contract_years")
+    if years < 1:
+        st.caption("No active contract (free agent / unsigned).")
+        return
+    salaries = [ci(f"Contract_salary{i}") for i in range(min(years, 15))]
+    total = sum(salaries)
+    aav = total // years if years else 0
+    cur_yr = ci("Contract_current_year")
+    yr_descr = f"Year {cur_yr} of {years}" if cur_yr else f"{years} yr(s)"
+    no_trade = ci("Contract_no_trade") == 1
+    st.write(f"{yr_descr} · total ${total:,} · AAV ${aav:,} · "
+             f"no-trade: {'yes' if no_trade else 'no'}")
+    if any(salaries):
+        st.caption("Salaries: " + " / ".join(f"${s:,}" for s in salaries))
 
 
 if __name__ == "__main__":
