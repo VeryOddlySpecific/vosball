@@ -60,9 +60,9 @@ your default browser automatically.
    the full output schema.
 5. **Download** either the full canonical eval CSV (byte-identical to the CLI's
    output) or just the filtered view.
-6. To inspect one player, use **"Open a player in the Player Card"** below the
-   table (jumps straight to the card), or switch to the **Player Card** page in
-   the sidebar.
+6. To inspect one player, **click their row** in the table to jump straight to
+   their Player Card — or open the **Player Card** page from the sidebar and pick
+   a player there. (Tip: use the name filter to narrow the list first.)
 
 ## Player Card
 
