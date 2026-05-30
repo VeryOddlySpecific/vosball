@@ -42,8 +42,15 @@ import pandas as pd  # noqa: E402
 
 from vosball.services import evaluate_league  # noqa: E402
 from vosball.reporting import write_output_csv  # noqa: E402
-from vosball.data import RATING_SCALES, DEFAULT_RATING_SCALE  # noqa: E402
+from vosball.data import (  # noqa: E402
+    RATING_SCALES, DEFAULT_RATING_SCALE, load_player_data,
+)
 from vosball.engine import HITTER_POSITIONS  # noqa: E402  (pure constant)
+
+# Reuse what_if's rating field-group definitions (display label -> PlayerData
+# columns) so the player card's scouted-ratings block stays in lockstep with the
+# CLI tools. what_if imports cleanly (only vosball.* + stdlib, no side effects).
+import what_if as wi  # noqa: E402
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -122,6 +129,19 @@ def to_csv_bytes(rows: List[Dict[str, Any]], draft: bool, contracts: bool) -> by
         return tmp.read_bytes()
     finally:
         tmp.unlink(missing_ok=True)
+
+
+@st.cache_data(show_spinner=False)
+def raw_player_rows(league: str, rating_scale: str,
+                    data_mtime: float) -> Dict[str, Dict[str, str]]:
+    """Raw PlayerData rows (scouted ratings) for a league, keyed by player ID.
+
+    Loaded at the same rating_scale the eval used, so the displayed ratings match
+    what the engine scored. data_mtime is part of the cache key so a fresh fetch
+    re-reads the file (mirrors the score cache).
+    """
+    rows = load_player_data(DATA_DIR, league, rating_scale=rating_scale)
+    return {str(r.get("ID", "")): r for r in rows}
 
 
 # --- LCARS theming ----------------------------------------------------------
@@ -358,6 +378,7 @@ def eval_browser_page() -> None:
                 return
         st.session_state["result"] = {
             "rows": rows, "league": league, "draft": draft, "contracts": contracts,
+            "rating_scale": rating_scale,
         }
 
     result = st.session_state.get("result")
@@ -485,6 +506,40 @@ def _is_pitcher_row(r: Dict[str, Any]) -> bool:
     return (r.get("Pos") or "").strip().upper() in {"SP", "RP", "CL", "P"}
 
 
+def _ratings_df(raw: Dict[str, str], fields: List, with_pot: bool):
+    """Build a small DataFrame from a what_if field group, dropping blank rows.
+
+    fields are what_if's (label, col[, pot_col]) tuples. Returns None if every
+    value is blank (so the caller can skip the block entirely).
+    """
+    data = []
+    for entry in fields:
+        if with_pot:
+            lbl, cur_col = entry[0], entry[1]
+            pot_col = entry[2] if len(entry) == 3 else None
+            cur = wi._fmt_val(raw.get(cur_col, ""))
+            pot = wi._fmt_val(raw.get(pot_col, "")) if pot_col else "—"
+            if cur == "—" and pot == "—":
+                continue
+            data.append({"Rating": lbl, "Cur": cur, "Pot": pot})
+        else:
+            lbl, col = entry[0], entry[1]
+            v = wi._fmt_val(raw.get(col, ""))
+            if v == "—":
+                continue
+            data.append({"Rating": lbl, "Val": v})
+    return pd.DataFrame(data) if data else None
+
+
+def _ratings_into(container, label: str, raw: Dict[str, str],
+                  fields: List, with_pot: bool) -> None:
+    df = _ratings_df(raw, fields, with_pot)
+    if df is None:
+        return
+    container.caption(label)
+    container.dataframe(df, hide_index=True, use_container_width=True)
+
+
 def player_card_page() -> None:
     result = st.session_state.get("result")
     if not result or not result.get("rows"):
@@ -601,6 +656,26 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
             prows.append({"Pos": pos, "Current": _num(row.get(f"{pos}_Score")),
                           "Potential": _num(row.get(f"{pos}_Potential")), " ": marker})
         st.dataframe(pd.DataFrame(prows), hide_index=True, use_container_width=True)
+
+    # Scouted ratings — raw PlayerData, loaded at the run's rating scale so the
+    # numbers line up with the scores above. Reuses what_if's field groups.
+    raw = raw_player_rows(
+        result["league"], result.get("rating_scale", DEFAULT_RATING_SCALE),
+        player_data_mtime(result["league"])).get(str(row.get("ID", "")))
+    if raw:
+        with st.expander("Scouted ratings", expanded=True):
+            left, right = st.columns(2)
+            if is_pit:
+                _ratings_into(left, "Ability", raw, wi.PITCHER_ABILITY_FIELDS, True)
+                _ratings_into(left, "Splits", raw, wi.PITCHER_SPLIT_FIELDS, False)
+                _ratings_into(right, "Pitches", raw, wi.PITCH_FIELDS, True)
+                _ratings_into(right, "Personality", raw, wi.PERSONALITY_FIELDS, False)
+            else:
+                _ratings_into(left, "Batting", raw, wi.HITTER_RATING_FIELDS, True)
+                _ratings_into(left, "Position ratings", raw, wi.POS_RATING_COLS, True)
+                _ratings_into(right, "Defense", raw, wi.HITTER_DEFENSE_FIELDS, False)
+                _ratings_into(right, "Baserunning", raw, wi.HITTER_BASERUNNING_FIELDS, False)
+                _ratings_into(right, "Personality", raw, wi.PERSONALITY_FIELDS, False)
 
     # Park / injury
     park_bits = []
