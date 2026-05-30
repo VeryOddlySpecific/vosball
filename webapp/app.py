@@ -560,34 +560,54 @@ def _ratings_into(container, label: str, raw: Dict[str, str],
     container.dataframe(df, hide_index=True, use_container_width=True)
 
 
-def _pitcher_role_table(raw: Dict[str, str], result: Dict[str, Any]):
-    """Grade the pitcher as both SP and RP. Returns a (Metric, as SP, as RP)
-    DataFrame, or None if the raw row / scoring context is unavailable.
+def _pitcher_dual(raw: Dict[str, str], result: Dict[str, Any]):
+    """Grade the pitcher as both SP and RP -> (sp_row, rp_row), or (None, None)
+    if the raw row / scoring context is unavailable.
 
-    Re-scores with the same cfg + park context + draft mode the eval used, so
-    the column matching the pitcher's listed position equals the headline VOS.
+    Re-scores with the same cfg + park context + draft mode the eval used, so the
+    column matching the pitcher's listed position equals the headline numbers.
     """
     if not raw:
-        return None
+        return None, None
     ctx = scoring_context(result["league"], bool(result.get("apply_park", True)))
     if ctx is None:
-        return None
+        return None, None
     cfg, league_lookup, teams, park = ctx
     draft = bool(result.get("draft"))
     sp = build_pitcher_row(raw, cfg, league_lookup, teams, role="SP",
                            park_factors=park, draft_mode=draft) or {}
     rp = build_pitcher_row(raw, cfg, league_lookup, teams, role="RP",
                            park_factors=park, draft_mode=draft) or {}
-    metrics = [
-        ("VOS Reach", "VOS_Reach"), ("VOS Career", "VOS_Career"),
-        ("VOS Blended", "VOS_Blended"), ("Ability", "Pitching_Ability_Score"),
-        ("Ability (Pot)", "Pitching_Ability_Potential"),
-        ("Arsenal", "Pitching_Arsenal_Score"), ("Ideal value", "Ideal_Value"),
-    ]
+    return sp, rp
+
+
+def _role_df(sp: Dict[str, Any], rp: Dict[str, Any], metrics):
+    """(Metric, as SP, as RP) DataFrame for the given (label, col, prec) rows."""
     return pd.DataFrame([
-        {"Metric": lbl, "as SP": _num(sp.get(col)), "as RP": _num(rp.get(col))}
-        for lbl, col in metrics
+        {"Metric": lbl, "as SP": _num(sp.get(col), prec), "as RP": _num(rp.get(col), prec)}
+        for lbl, col, prec in metrics
     ])
+
+
+_ROLE_SCORE_METRICS = [
+    ("VOS Reach", "VOS_Reach", 2), ("VOS Career", "VOS_Career", 2),
+    ("VOS Blended", "VOS_Blended", 2), ("Ability", "Pitching_Ability_Score", 2),
+    ("Ability (Pot)", "Pitching_Ability_Potential", 2),
+    ("Arsenal", "Pitching_Arsenal_Score", 2), ("Ideal value", "Ideal_Value", 2),
+]
+_ROLE_WAR_METRICS = [
+    ("VOS Ceiling", "VOS_Ceiling", 2), ("Career WAR", "Arch_Career_WAR", 1),
+    ("Career WAR (hi)", "Arch_Career_WAR_Hi", 1), ("Remaining WAR", "Remaining_WAR", 1),
+    ("Proj. debut age", "Proj_Debut_Age", 0),
+]
+
+
+def _role_war_df(sp: Dict[str, Any], rp: Dict[str, Any]):
+    """Projected-WAR comparison table, or None if neither role has WAR data."""
+    if not (str(sp.get("Arch_Career_WAR", "")).strip()
+            or str(rp.get("Arch_Career_WAR", "")).strip()):
+        return None
+    return _role_df(sp, rp, _ROLE_WAR_METRICS)
 
 
 def player_card_page() -> None:
@@ -623,6 +643,8 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     raw = raw_player_rows(
         result["league"], result.get("rating_scale", DEFAULT_RATING_SCALE),
         player_data_mtime(result["league"])).get(str(row.get("ID", "")))
+    # Pitchers: grade as SP and RP once; shared by the role-score and WAR tables.
+    sp_eval, rp_eval = _pitcher_dual(raw, result) if is_pit else (None, None)
 
     st.subheader(f"{row.get('Name', '?')} — {(row.get('Pos') or '').strip()}")
     bio = [b for b in (
@@ -649,9 +671,9 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     # Component scores
     if is_pit:
         st.markdown("**Role comparison — SP vs RP**")
-        role_df = _pitcher_role_table(raw, result)
-        if role_df is not None:
-            st.dataframe(role_df, hide_index=True, use_container_width=True)
+        if sp_eval is not None:
+            st.dataframe(_role_df(sp_eval, rp_eval, _ROLE_SCORE_METRICS),
+                         hide_index=True, use_container_width=True)
             st.caption("Same arm graded as a starter vs a reliever. The column "
                        "matching his listed position equals the headline VOS above.")
         else:
@@ -679,8 +701,15 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     for col, (lbl, key) in zip(ac, adj_specs):
         col.metric(lbl, _num(row.get(key)))
 
-    # Hitter-only: projected WAR, insights, positional scores
-    if not is_pit:
+    # Projected career WAR — pitchers get an SP vs RP table; hitters get the
+    # single-profile section plus insights and the positional breakdown.
+    if is_pit:
+        war_df = _role_war_df(sp_eval, rp_eval) if sp_eval is not None else None
+        if war_df is not None:
+            st.markdown("**Projected career WAR — SP vs RP** — archetype average "
+                        "for this profile, *not* a per-player forecast")
+            st.dataframe(war_df, hide_index=True, use_container_width=True)
+    else:
         if str(row.get("Arch_Career_WAR", "")).strip():
             st.markdown("**Projected career WAR** — archetype average for this "
                         "profile, *not* a per-player forecast")
