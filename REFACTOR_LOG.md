@@ -157,12 +157,12 @@ G:\vosball\
 
 ## Next phases
 
-### 1. UI (deliberately deferred) — **the next major decision**
+### 1. UI — **v1 DONE 2026-05-30** (local Streamlit eval browser)
 
-- **Status:** Not started. **Intentionally held off** — this is the next big call to make.
-- **Decision pending:** which platform to build on — a **WordPress plugin** vs a **local web app**. Both options sit on top of the same foundation: **`vosball.services.evaluate_league`**. That entry point already returns plain lists of dicts with no argv/file dependencies, so whichever platform is chosen consumes the same API; the choice is about deployment/hosting/UX surface, not engine plumbing.
-- **Rationale:** The layering work was sequenced precisely so the UI choice could be deferred without blocking anything. The services layer is the stable seam the UI will attach to.
-- **Rough scope:** Pick the platform, then build a presentation/transport layer that calls `evaluate_league` (and renders/serves the resulting rows). No engine changes expected.
+- **Status:** ✅ **v1 shipped.** A local web app lives in [`webapp/app.py`](webapp/app.py) (run via `py -m streamlit run webapp/app.py`, or `run_ui.bat` on Windows).
+- **Decision:** **local web app**, not a WordPress plugin. WordPress would be a separate self-contained project — PHP can't call `evaluate_league` directly and would need a subprocess/HTTP bridge. The local app keeps the suite exactly as-is and gives a clean "clone the repo, run one command, opens in your browser" story other GMs could use later. Framework: **Streamlit**; v1 scope: the **core eval table**.
+- **How it attaches:** the app is a pure *consumer* of **`vosball.services.evaluate_league`** — pick a league + options → score → sortable/filterable/searchable table → CSV download. The download is written through `vosball.reporting.write_output_csv`, so it is **byte-identical to `run_vos.py` output** (verified against a real wwoba run). **Zero files in `vosball/` changed**, so the golden harness stayed green by construction. Leagues are auto-discovered from `data/PlayerData-*.csv` (9 today). Deps pinned in root `requirements.txt` (`streamlit`, `pandas`).
+- **Future iterations (not in v1):** player-card drill-down (reuse `player_card.py`), multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
 
 ### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 
@@ -189,7 +189,7 @@ All items below were guarded by the golden harness, so they carried low regressi
 
 ## How to pick up where we left off
 
-Everything lives in the **sandbox at `F:\vosball`** (fresh git, no remote; 14 commits, `8098f02` … `11af276`). The deployed suite at `F:\ratings` is untouched — start from the sandbox. **Phases 0–4 + Polish are done;** for how to make further changes safely, read [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
+Everything lives in the **sandbox at `F:\vosball`** (fresh git, no remote; the refactor + UI v1 history starts at `8098f02`). The deployed suite at `F:\ratings` is untouched — start from the sandbox. **Phases 0–4 + Polish + UI v1 are done;** for how to make further changes safely, read [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
 
 Before and after any change, confirm zero output drift:
 
@@ -205,4 +205,4 @@ Quick smoke test of the full pipeline (writes `{app_root}/{league}/eval/...` by 
 py run_vos.py --league wwoba --output wwoba_test.csv
 ```
 
-The next decision is the **UI platform** (WordPress plugin vs local web app); whatever is chosen attaches to `vosball.services.evaluate_league`.
+The **UI v1** (local Streamlit eval browser, `webapp/app.py`) is done. The remaining major phase is the **cut-over** (sandbox → live `F:\ratings`); the `vos_v2.py` rollback path and the 2026-05-29 data snapshot are the things to reconcile when that day comes.

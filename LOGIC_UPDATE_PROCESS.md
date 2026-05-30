@@ -123,6 +123,14 @@ py tests\test_golden.py --update   # ONLY after an intentional output change
   problems and otherwise just return rows — the caller decides how to surface
   errors. No `argv`, no files written by the service itself.
 
+**Worked example — the web UI.** [webapp/app.py](webapp/app.py) (the local
+Streamlit eval browser) is the canonical consumer to copy: it calls
+`evaluate_league(...)`, drops the returned rows into a table, and writes its CSV
+download through `vosball.reporting.write_output_csv` (so the export is
+byte-identical to the CLI). It never imports from `vosball.engine.*` internals
+and never touches a file the engine owns — it just consumes the seam. New tools
+should follow the same shape.
+
 ---
 
 ## 5. The back-compat shim policy
