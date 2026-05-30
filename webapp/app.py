@@ -14,6 +14,7 @@ Nothing in vosball/ changes for the UI to exist — see LOGIC_UPDATE_PROCESS.md 
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
@@ -138,6 +139,39 @@ PALETTES: Dict[str, Dict[str, str]] = {
 DEFAULT_PALETTE = "Cardassian Ops"
 
 
+# --- Persisted UI preferences -----------------------------------------------
+# A small local settings file so choices (palette, and future per-module prefs)
+# survive a restart. Lives next to the app, gitignored, best-effort — a failed
+# read/write just falls back to defaults rather than breaking the UI.
+SETTINGS_PATH = Path(__file__).resolve().parent / ".ui_settings.json"
+
+
+def load_ui_settings() -> Dict[str, Any]:
+    try:
+        if SETTINGS_PATH.exists():
+            data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return data
+    except (OSError, ValueError):
+        pass
+    return {}
+
+
+def save_ui_setting(key: str, value: Any) -> None:
+    """Merge one preference into the settings file (keeps other keys intact)."""
+    settings = load_ui_settings()
+    settings[key] = value
+    try:
+        SETTINGS_PATH.write_text(json.dumps(settings, indent=2), encoding="utf-8")
+    except OSError:
+        pass  # read-only dir etc. — preference just won't persist this session
+
+
+def _persist_palette() -> None:
+    """on_change callback for the palette toggle (session_state already updated)."""
+    save_ui_setting("palette", st.session_state.get("palette", DEFAULT_PALETTE))
+
+
 def build_theme_css(p: Dict[str, str]) -> str:
     """LCARS reskin stylesheet for the given palette. Targets stable Streamlit
     test-ids / baseweb attributes so it survives version bumps."""
@@ -208,9 +242,13 @@ def main() -> None:
     st.set_page_config(page_title="VOSBall — Eval Browser", page_icon="⚾",
                        layout="wide")
 
-    # Apply the LCARS reskin using the last-selected palette (the toggle below
-    # updates st.session_state['palette'] and reruns, so this reads the new one).
-    st.session_state.setdefault("palette", DEFAULT_PALETTE)
+    # Apply the LCARS reskin using the last-selected palette. Seed from the
+    # persisted setting on first load; the toggle below updates
+    # st.session_state['palette'] (and writes it back) and reruns.
+    saved_palette = load_ui_settings().get("palette", DEFAULT_PALETTE)
+    if saved_palette not in PALETTES:
+        saved_palette = DEFAULT_PALETTE
+    st.session_state.setdefault("palette", saved_palette)
     st.markdown(build_theme_css(PALETTES[st.session_state["palette"]]),
                 unsafe_allow_html=True)
 
@@ -232,7 +270,8 @@ def main() -> None:
         # persists and the theme injection above picks it up on rerun.
         st.segmented_control(
             "LCARS palette", list(PALETTES), key="palette",
-            help="Switch the Deep Space 9 color scheme.")
+            on_change=_persist_palette,
+            help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
 
         st.header("Evaluate")
         league = st.selectbox("League", leagues, index=0)
