@@ -38,7 +38,8 @@ your default browser automatically.
 ## Using it
 
 1. In the left sidebar, pick a **League** (auto-discovered from the
-   `PlayerData-*.csv` files in `data/`).
+   `PlayerData-*.csv` files in `data/`). The sidebar shows **"Data updated: …"**
+   so you can see how fresh that league's snapshot is.
 2. Adjust options as needed:
    - **Rating scale** — `20-80` for most leagues; `1-100` for leagues that
      export component ratings on the 1-100 scale (defaulted per league, but
@@ -56,9 +57,58 @@ your default browser automatically.
 5. **Download** either the full canonical eval CSV (byte-identical to the CLI's
    output) or just the filtered view.
 
-## Notes
+## Theme (LCARS)
 
-- Scoring is cached per (league + options), so filtering and sorting are instant
-  after the first run.
-- This is **v1** — the core eval table. Player cards, multi-league comparisons,
-  and other views are possible future additions.
+The UI is skinned to look like a *Deep Space 9* LCARS console. A **palette
+toggle** at the top of the sidebar switches live between two schemes:
+
+- **Cardassian Ops** — the station's amber / bronze / red / teal.
+- **Starfleet LCARS** — the classic orange / peach / lavender / blue.
+
+Your choice is **remembered between sessions**: it's written to
+`webapp/.ui_settings.json` (a small, gitignored, per-clone preferences file) and
+reloaded on startup. Delete that file to reset to the default (Cardassian Ops).
+The dark base theme lives in `.streamlit/config.toml`; the LCARS styling itself
+is injected as CSS from `app.py`.
+
+## Refreshing data
+
+The app reads `data/PlayerData-<league>.csv` from disk — it does **not** fetch
+from StatsPlus itself. To pull fresh ratings, run the existing fetch scripts,
+then re-score in the UI:
+
+```bash
+py fetch_all_player_data.py          # all leagues (skips ones already current)
+py fetch_player_data.py --league ndl # just one
+```
+
+Scoring is **cached per (league + options + the PlayerData file's modification
+time)**, so:
+
+- filtering/sorting after a run is instant (cache hit), and
+- a freshly fetched CSV is **re-scored automatically** the next time you Run —
+  no restart needed. There's also a **"Clear cache & re-score"** button for a
+  manual force-refresh.
+
+(Reminder: `PlayerData` is the source of truth for the scouted ratings *and* for
+roster state — team / org / league level / age — so a stale snapshot can mean
+stale team/level labels and slightly stale level-sensitive scores. See
+`tickets/0001-playerdata-ratings-only-truth.md` for the planned improvement.)
+
+## Extending the UI
+
+The app is a pure consumer of `vosball.services` — see
+[`LOGIC_UPDATE_PROCESS.md`](../LOGIC_UPDATE_PROCESS.md) §4. To persist a new
+preference (a default league, saved filters, a module's view options, …), reuse
+the generic settings store in `app.py`:
+
+```python
+save_ui_setting("default_league", "wwoba")   # merge one key, keep the rest
+settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
+```
+
+## Status
+
+**v1 + theming.** Covers the core eval table (filter/sort/search/export), the
+LCARS reskin, and persisted preferences. Next up: a **player card** drill-down;
+multi-league comparison and other views are possible future additions.

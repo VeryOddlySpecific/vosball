@@ -162,7 +162,12 @@ G:\vosball\
 - **Status:** ✅ **v1 shipped.** A local web app lives in [`webapp/app.py`](webapp/app.py) (run via `py -m streamlit run webapp/app.py`, or `run_ui.bat` on Windows).
 - **Decision:** **local web app**, not a WordPress plugin. WordPress would be a separate self-contained project — PHP can't call `evaluate_league` directly and would need a subprocess/HTTP bridge. The local app keeps the suite exactly as-is and gives a clean "clone the repo, run one command, opens in your browser" story other GMs could use later. Framework: **Streamlit**; v1 scope: the **core eval table**.
 - **How it attaches:** the app is a pure *consumer* of **`vosball.services.evaluate_league`** — pick a league + options → score → sortable/filterable/searchable table → CSV download. The download is written through `vosball.reporting.write_output_csv`, so it is **byte-identical to `run_vos.py` output** (verified against a real wwoba run). **Zero files in `vosball/` changed**, so the golden harness stayed green by construction. Leagues are auto-discovered from `data/PlayerData-*.csv` (9 today). Deps pinned in root `requirements.txt` (`streamlit`, `pandas`).
-- **Future iterations (not in v1):** player-card drill-down (reuse `player_card.py`), multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
+- **Post-v1 iterations** (all UI-only; engine untouched, golden green throughout):
+  - **mtime-aware score cache** (`94eff21`) — the cache key includes each league's `PlayerData` modification time, so a fresh `fetch_*_player_data.py` pull auto-re-scores without a restart; plus a "Data updated: …" caption and a "Clear cache & re-score" button.
+  - **LCARS (DS9) reskin** (`7c8a221`) — dark base theme in `.streamlit/config.toml` + a CSS reskin in `app.py` (Antonio font, pill buttons, color-blocked sidebar, framed table, signature top bar). Two palettes — **Cardassian Ops** and **Starfleet LCARS** — switchable live from a sidebar toggle.
+  - **Persisted preferences** (`611d2c3`) — a generic local settings store (`webapp/.ui_settings.json`, gitignored) seeds the palette on startup and saves it on change; `load_ui_settings()` / `save_ui_setting(key, value)` are reusable for future per-module prefs.
+- **In progress:** **player-card drill-down** (single-player detail view, reusing `player_card.py`'s logic) — the first additional module on top of the eval table.
+- **Future iterations:** multi-league compare, draft board, wrapping the other ~50 tools, and any hosting beyond a local clone.
 
 ### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 
