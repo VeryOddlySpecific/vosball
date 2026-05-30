@@ -44,8 +44,9 @@ from vosball.services import evaluate_league  # noqa: E402
 from vosball.reporting import write_output_csv  # noqa: E402
 from vosball.data import (  # noqa: E402
     RATING_SCALES, DEFAULT_RATING_SCALE, load_player_data,
+    load_weights, load_id_maps, load_teams, load_park_factors,
 )
-from vosball.engine import HITTER_POSITIONS  # noqa: E402  (pure constant)
+from vosball.engine import HITTER_POSITIONS, build_pitcher_row  # noqa: E402
 
 # Reuse what_if's rating field-group definitions (display label -> PlayerData
 # columns) so the player card's scouted-ratings block stays in lockstep with the
@@ -142,6 +143,25 @@ def raw_player_rows(league: str, rating_scale: str,
     """
     rows = load_player_data(DATA_DIR, league, rating_scale=rating_scale)
     return {str(r.get("ID", "")): r for r in rows}
+
+
+@st.cache_data(show_spinner=False)
+def scoring_context(league: str, apply_park: bool):
+    """(cfg, league_lookup, teams, park_factors) for re-scoring one player —
+    e.g. grading a pitcher as both SP and RP. Built from the same config_dir and
+    park choice the eval used, so a re-score reproduces the headline numbers.
+    Returns None if weights are missing/invalid."""
+    cfg = load_weights(CONFIG_DIR)
+    if not cfg:
+        return None
+    league_lookup = load_id_maps(CONFIG_DIR)
+    teams = load_teams(CONFIG_DIR, league)
+    park = None
+    if apply_park:
+        p = park_factors_path_for(league)
+        if p:
+            park = load_park_factors(str(p))
+    return cfg, league_lookup, teams, park
 
 
 # --- LCARS theming ----------------------------------------------------------
@@ -378,7 +398,7 @@ def eval_browser_page() -> None:
                 return
         st.session_state["result"] = {
             "rows": rows, "league": league, "draft": draft, "contracts": contracts,
-            "rating_scale": rating_scale,
+            "rating_scale": rating_scale, "apply_park": apply_park,
         }
 
     result = st.session_state.get("result")
@@ -540,6 +560,36 @@ def _ratings_into(container, label: str, raw: Dict[str, str],
     container.dataframe(df, hide_index=True, use_container_width=True)
 
 
+def _pitcher_role_table(raw: Dict[str, str], result: Dict[str, Any]):
+    """Grade the pitcher as both SP and RP. Returns a (Metric, as SP, as RP)
+    DataFrame, or None if the raw row / scoring context is unavailable.
+
+    Re-scores with the same cfg + park context + draft mode the eval used, so
+    the column matching the pitcher's listed position equals the headline VOS.
+    """
+    if not raw:
+        return None
+    ctx = scoring_context(result["league"], bool(result.get("apply_park", True)))
+    if ctx is None:
+        return None
+    cfg, league_lookup, teams, park = ctx
+    draft = bool(result.get("draft"))
+    sp = build_pitcher_row(raw, cfg, league_lookup, teams, role="SP",
+                           park_factors=park, draft_mode=draft) or {}
+    rp = build_pitcher_row(raw, cfg, league_lookup, teams, role="RP",
+                           park_factors=park, draft_mode=draft) or {}
+    metrics = [
+        ("VOS Reach", "VOS_Reach"), ("VOS Career", "VOS_Career"),
+        ("VOS Blended", "VOS_Blended"), ("Ability", "Pitching_Ability_Score"),
+        ("Ability (Pot)", "Pitching_Ability_Potential"),
+        ("Arsenal", "Pitching_Arsenal_Score"), ("Ideal value", "Ideal_Value"),
+    ]
+    return pd.DataFrame([
+        {"Metric": lbl, "as SP": _num(sp.get(col)), "as RP": _num(rp.get(col))}
+        for lbl, col in metrics
+    ])
+
+
 def player_card_page() -> None:
     result = st.session_state.get("result")
     if not result or not result.get("rows"):
@@ -568,6 +618,11 @@ def player_card_page() -> None:
 
 def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     is_pit = _is_pitcher_row(row)
+    # Raw PlayerData row (at the run's rating scale) — used for the SP/RP re-score
+    # and the scouted-ratings block below.
+    raw = raw_player_rows(
+        result["league"], result.get("rating_scale", DEFAULT_RATING_SCALE),
+        player_data_mtime(result["league"])).get(str(row.get("ID", "")))
 
     st.subheader(f"{row.get('Name', '?')} — {(row.get('Pos') or '').strip()}")
     bio = [b for b in (
@@ -592,13 +647,21 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     m[3].metric("VOS Ceiling", _num(row.get("VOS_Ceiling")))
 
     # Component scores
-    st.markdown("**Component scores**")
     if is_pit:
-        c = st.columns(3)
-        c[0].metric("Ability", _num(row.get("Pitching_Ability_Score")))
-        c[1].metric("Ability (Pot)", _num(row.get("Pitching_Ability_Potential")))
-        c[2].metric("Arsenal", _num(row.get("Pitching_Arsenal_Score")))
+        st.markdown("**Role comparison — SP vs RP**")
+        role_df = _pitcher_role_table(raw, result)
+        if role_df is not None:
+            st.dataframe(role_df, hide_index=True, use_container_width=True)
+            st.caption("Same arm graded as a starter vs a reliever. The column "
+                       "matching his listed position equals the headline VOS above.")
+        else:
+            # Fallback: the single auto-role scores from the eval row.
+            c = st.columns(3)
+            c[0].metric("Ability", _num(row.get("Pitching_Ability_Score")))
+            c[1].metric("Ability (Pot)", _num(row.get("Pitching_Ability_Potential")))
+            c[2].metric("Arsenal", _num(row.get("Pitching_Arsenal_Score")))
     else:
+        st.markdown("**Component scores**")
         c = st.columns(4)
         c[0].metric("Batting", _num(row.get("Batting_Score")))
         c[1].metric("Batting (Pot)", _num(row.get("Batting_Potential")))
@@ -657,11 +720,8 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
                           "Potential": _num(row.get(f"{pos}_Potential")), " ": marker})
         st.dataframe(pd.DataFrame(prows), hide_index=True, use_container_width=True)
 
-    # Scouted ratings — raw PlayerData, loaded at the run's rating scale so the
-    # numbers line up with the scores above. Reuses what_if's field groups.
-    raw = raw_player_rows(
-        result["league"], result.get("rating_scale", DEFAULT_RATING_SCALE),
-        player_data_mtime(result["league"])).get(str(row.get("ID", "")))
+    # Scouted ratings — raw PlayerData (fetched above), shown at the run's rating
+    # scale so the numbers line up with the scores. Reuses what_if's field groups.
     if raw:
         with st.expander("Scouted ratings", expanded=True):
             left, right = st.columns(2)
