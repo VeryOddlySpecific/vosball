@@ -35,6 +35,7 @@ def project_archetype_war(
     age: Optional[float],
     in_mlb: bool,
     cfg: Dict[str, Any],
+    ceiling_table: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Optional[float]]]:
     """Archetype 'ballpark' career-WAR projection (averages only, not a
     per-player forecast). Reads cfg['war_archetype']:
@@ -52,7 +53,9 @@ def project_archetype_war(
     Returns None if no war_archetype table is present.
     """
     blk = cfg.get("war_archetype") or {}
-    c2c = blk.get("ceiling_to_career") or {}
+    # ceiling_table overrides the ceiling->career curve (e.g. a role-specific
+    # pitcher table) while frac_ahead / career_to_ttd stay shared from blk.
+    c2c = ceiling_table if ceiling_table is not None else (blk.get("ceiling_to_career") or {})
     score, war = c2c.get("score"), c2c.get("war")
     if not (isinstance(score, list) and isinstance(war, list)
             and len(score) == len(war) and len(score) >= 2):

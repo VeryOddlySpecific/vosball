@@ -57,17 +57,27 @@ def _mode_block(cfg: Dict[str, Any], mode: str) -> Dict[str, Any]:
         if not ceil:
             return {}
         career = modes.get("vos_career") or {}
+        merged = dict(career)
+        # Hitter ceiling: swap the batting tool_categories to the Pot*-keyed weights.
         ceil_bat = (((ceil.get("hitters") or {}).get("tool_categories") or {})
                     .get("batting"))
-        if not ceil_bat:
-            return career
-        career_h = career.get("hitters") or {}
-        merged_tc = dict(career_h.get("tool_categories") or {})
-        merged_tc["batting"] = ceil_bat
-        merged_h = dict(career_h)
-        merged_h["tool_categories"] = merged_tc
-        merged = dict(career)
-        merged["hitters"] = merged_h
+        if ceil_bat:
+            career_h = career.get("hitters") or {}
+            merged_tc = dict(career_h.get("tool_categories") or {})
+            merged_tc["batting"] = ceil_bat
+            merged_h = dict(career_h)
+            merged_h["tool_categories"] = merged_tc
+            merged["hitters"] = merged_h
+        # Pitcher ceiling: swap ability_weights to the Pot*-keyed weights (per
+        # role). role_balance / arsenal stay inherited from career. Mirrors the
+        # hitter-batting swap; only populated since the vos_ceiling.pitchers block
+        # was added, so the hitter ceiling path is unchanged.
+        ceil_pit_aw = (ceil.get("pitchers") or {}).get("ability_weights")
+        if ceil_pit_aw:
+            career_p = career.get("pitchers") or {}
+            merged_p = dict(career_p)
+            merged_p["ability_weights"] = ceil_pit_aw
+            merged["pitchers"] = merged_p
         return merged
     return modes.get("vos_career") or {}
 

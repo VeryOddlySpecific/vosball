@@ -297,6 +297,32 @@ def build_pitcher_row(
     alpha = _blend_alpha(cfg)
     vos_blended = alpha * vos_reach + (1.0 - alpha) * vos_career
 
+    # VOS_Ceiling: the Career formula evaluated on POTENTIAL ratings (pitcher
+    # ceiling ability weights), carrying the SAME adjustment stack as Career so
+    # the two differ only by current-vs-potential ratings. Present only when the
+    # weights file carries a vos_ceiling block with pitcher weights. Mirrors
+    # build_hitter_row's ceiling block.
+    vos_ceiling: Optional[float] = None
+    if _has_ceiling(cfg):
+        try:
+            _, _, combined_ceil = pitcher_combined_score(
+                row, role, cfg, "ceiling", age, park_config, park_rules)
+            raw_ceiling = (combined_ceil + dev_adj + age_adj + pers_adj
+                           + draft_age_adj + draft_rp_penalty + readiness_adj)
+            vos_ceiling = normalize_to_20_80(raw_ceiling, center, scale, floor, ceiling)
+        except Exception as e:
+            logger.debug("Pitcher ceiling error for %s: %s", row.get("ID"), e)
+            vos_ceiling = None
+
+    # Role-specific archetype career-WAR projection: uses the SP/RP pitcher curve
+    # from war_archetype.pitchers[role]. Absent table -> no WAR (no hitter-curve
+    # fallback, since that's position-player-scaled).
+    pit_table = (((cfg.get("war_archetype") or {}).get("pitchers") or {})
+                 .get(role) or {}).get("ceiling_to_career")
+    arche = (project_archetype_war(vos_ceiling, vos_career, age,
+                                   league_label == "ML", cfg, ceiling_table=pit_table)
+             if pit_table else None)
+
     out: Dict[str, Any] = {
         "ID": row.get("ID", ""),
         "Name": row.get("Name", ""),
@@ -312,6 +338,14 @@ def build_pitcher_row(
         "VOS_Reach": round(vos_reach, 2),
         "VOS_Career": round(vos_career, 2),
         "VOS_Blended": round(vos_blended, 2),
+        "VOS_Ceiling": round(vos_ceiling, 2) if vos_ceiling is not None else "",
+        "Ceiling_Tier": _classify_ceiling_tier(vos_ceiling, cfg) if vos_ceiling is not None else "",
+        "Arch_Career_WAR": round(arche["arch_career"], 1) if arche else "",
+        "Arch_Career_WAR_Hi": round(arche["arch_upside"], 1) if arche else "",
+        "Remaining_WAR": round(arche["remaining"], 1) if arche else "",
+        "Remaining_WAR_Hi": round(arche["remaining_upside"], 1) if arche else "",
+        "Proj_Debut_Age": (round(arche["debut_age"])
+                           if arche and arche.get("debut_age") is not None else ""),
         "Batting_Score": "",
         "Batting_Potential": "",
         "Defense_Score": "",
