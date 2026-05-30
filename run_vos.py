@@ -9,10 +9,11 @@ file remains for two reasons:
      evaluation. It delegates to vosball.cli.main, anchored at this directory so
      default data/config dirs and the <root>/<league>/eval/ output location are
      unchanged.
-  2. Back-compat — it re-exports the engine + data + reporting surface, so the
-     existing importers (`import run_vos as v2` in player_card.py / what_if.py,
-     `import run_vos` in lib/draft_score.py) resolve every name they used when
-     this file was a single 2,100-line module.
+  2. Back-compat — it re-exports the engine + data + reporting surface so any
+     `import run_vos` consumer resolves every name it used when this file was a
+     single 2,100-line module. The first-party tools (player_card.py, what_if.py,
+     lib/draft_score.py) have since migrated to import vosball.* directly; this
+     shim stays for any remaining ad-hoc scripts.
 
 Output is byte-identical to the pre-refactor engine (guarded by
 tests/test_golden.py).

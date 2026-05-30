@@ -29,9 +29,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Reuse all scoring + loading from run_vos (v6 engine; alias kept as `v2`
-# so the rest of this module — and player_card.py which `import what_if as wi`
-# — continues to work unchanged).
+# Scoring + loading come straight from the vosball package (the v6/v10 engine).
 from vosball.engine import build_hitter_row, build_pitcher_row, is_pitcher
 from vosball.data import (
     PLAYER_DATA_FILENAME_TEMPLATE, load_id_maps, load_teams, load_weights,
