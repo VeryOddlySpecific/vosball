@@ -76,13 +76,16 @@ the row the evaluation already produced (no extra scoring run):
 - hitters also get the **projected archetype WAR**, projection insights (ideal
   position, viable spots, margins), and an **all-positions Current / Potential**
   table with the current and projected positions flagged;
+- a **Scouted ratings** block with the raw underlying ratings (hitters: batting
+  / position / defense / baserunning / personality; pitchers: ability / pitches
+  / splits / personality), shown at the same rating scale the eval used;
 - a park / injury line, and a compact **contract** summary when contracts were
   included in the run.
 
-Pick a player from the searchable selector at the top. (You need to have run an
-evaluation on the Eval Browser page first — the card reads that result.) Raw
-scouted ratings, pitcher SP-vs-RP dual scoring, and full contract / fair-value
-economics are planned follow-ups.
+Pick a player from the searchable selector at the top (or click a row on the
+Eval Browser). You need to have run an evaluation on the Eval Browser page first
+— the card reads that result. Pitcher SP-vs-RP dual scoring and full contract /
+fair-value economics are planned follow-ups.
 
 ## Theme (LCARS)
 
