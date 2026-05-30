@@ -21,7 +21,22 @@ from vosball.engine.tiers import (
     _DEFAULT_PITCHER_TIERS,
 )
 from vosball.engine.rows import resolve_float, resolve_int
+# The scoring core was split out of core.py into focused submodules (Phase-5
+# polish). Re-export every public name from each so `from vosball.engine import X`
+# keeps working no matter which submodule X now lives in.
+from vosball.engine import context as _context
+from vosball.engine import park as _park
+from vosball.engine import reach as _reach
+from vosball.engine import scoring as _scoring
+from vosball.engine import adjustments as _adjustments
+from vosball.engine import war as _war
 from vosball.engine import core as _core
+from vosball.engine.context import *  # noqa: F401,F403
+from vosball.engine.park import *  # noqa: F401,F403
+from vosball.engine.reach import *  # noqa: F401,F403
+from vosball.engine.scoring import *  # noqa: F401,F403
+from vosball.engine.adjustments import *  # noqa: F401,F403
+from vosball.engine.war import *  # noqa: F401,F403
 from vosball.engine.core import *  # noqa: F401,F403
 from vosball.engine.constants import (
     BASERUNNING_STEAL_COLS,
@@ -54,4 +69,6 @@ __all__ = [
     "PRONE_CATEGORY_TO_NUMERIC",
     "HITTER_POSITIONS",
     "LEVEL_LABEL_TO_CONFIG",
-] + list(_core.__all__)
+] + list(_context.__all__) + list(_park.__all__) + list(_reach.__all__) \
+  + list(_scoring.__all__) + list(_adjustments.__all__) + list(_war.__all__) \
+  + list(_core.__all__)
