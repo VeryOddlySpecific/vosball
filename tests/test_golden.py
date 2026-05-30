@@ -26,7 +26,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent                       # sandbox root (G:\vosball)
+ROOT = HERE.parent                       # sandbox root (F:\vosball)
 FIX_DATA = HERE / "fixtures" / "data"
 GOLD = HERE / "golden"
 SAMPLE_ROWS = 200
@@ -36,6 +36,12 @@ CASES = [
     ("engine_wwoba_20-80", "wwoba"),
     ("engine_ndl_1-100", "ndl"),
 ]
+
+# Each case is run through every mode below and compared to the SAME committed
+# golden snapshot. "cli" drives run_vos.py as a subprocess (the public command);
+# "service" calls vosball.services.evaluate_league in-process (the API a UI uses).
+# Pinning both means the orchestration seam can never silently drift from the CLI.
+MODES = ("cli", "service")
 
 TS = re.compile(r"\d{8}_\d{6}")          # a run-timestamp token, if one leaks into content
 
@@ -63,6 +69,7 @@ def ensure_data_fixture(league: str) -> Path:
 
 
 def run_engine(league: str, out_csv: Path) -> None:
+    """CLI mode: drive run_vos.py as a subprocess, exactly as a user would."""
     ensure_data_fixture(league)
     cmd = [sys.executable, str(ROOT / "run_vos.py"),
            "--league", league,
@@ -73,6 +80,29 @@ def run_engine(league: str, out_csv: Path) -> None:
     if res.returncode != 0 or not out_csv.exists():
         sys.stderr.write((res.stdout or "") + "\n" + (res.stderr or "") + "\n")
         raise SystemExit(f"run_vos failed for {league} (exit {res.returncode})")
+
+
+def run_engine_service(league: str, out_csv: Path) -> None:
+    """Service mode: call vosball.services.evaluate_league in-process and write
+    the rows through the same writer the CLI uses. Mirrors run_engine's default
+    invocation (no draft, no contracts, default rating scale) so both modes must
+    reproduce the identical golden CSV. Imports are lazy + ROOT is put on the
+    path here so the CLI-only path doesn't depend on vosball being importable."""
+    ensure_data_fixture(league)
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))   # so `vosball` and `lib` resolve in-process
+    from vosball.services import evaluate_league
+    from vosball.reporting import write_output_csv
+    rows = evaluate_league(
+        league,
+        data_dir=FIX_DATA,
+        config_dir=ROOT / "config",
+    )
+    write_output_csv(rows, out_csv)
+
+
+def produce_output(league: str, mode: str, out_csv: Path) -> None:
+    (run_engine if mode == "cli" else run_engine_service)(league, out_csv)
 
 
 def normalize(text: str) -> str:
@@ -90,24 +120,38 @@ def main(argv=None) -> int:
     GOLD.mkdir(parents=True, exist_ok=True)
 
     failures = []
+    checks = 0
     for case_id, league in CASES:
         gold = GOLD / f"{case_id}.csv"
-        with tempfile.TemporaryDirectory() as td:
-            out = Path(td) / "out.csv"
-            run_engine(league, out)
-            got = normalize(out.read_text(encoding="utf-8", errors="replace"))
-        rows = got.count("\n")           # data rows (header is line 0)
+        outputs = {}
+        for mode in MODES:
+            with tempfile.TemporaryDirectory() as td:
+                out = Path(td) / "out.csv"
+                produce_output(league, mode, out)
+                outputs[mode] = normalize(out.read_text(encoding="utf-8", errors="replace"))
+
         if args.update:
+            # The CLI run is canonical; write it, then assert service mode agrees.
+            got = outputs["cli"]
             gold.write_text(got + "\n", encoding="utf-8")
-            print(f"updated  {case_id:22s} {rows} rows")
-        elif not gold.exists():
-            failures.append(case_id)
+            print(f"updated  {case_id:22s} {got.count(chr(10))} rows")
+            if outputs["service"] != got:
+                print(f"  WARN: service mode differs from cli for {case_id} (investigate)")
+            continue
+
+        if not gold.exists():
+            failures.append(f"{case_id} (missing golden)")
             print(f"MISSING  {case_id:22s} (run --update first)")
-        elif got == normalize(gold.read_text(encoding="utf-8", errors="replace")):
-            print(f"PASS     {case_id:22s} {rows} rows")
-        else:
-            failures.append(case_id)
-            print(f"FAIL     {case_id:22s} output differs from golden")
+            continue
+        gold_norm = normalize(gold.read_text(encoding="utf-8", errors="replace"))
+        for mode in MODES:
+            checks += 1
+            label = f"{case_id} [{mode}]"
+            if outputs[mode] == gold_norm:
+                print(f"PASS     {label:30s} {outputs[mode].count(chr(10))} rows")
+            else:
+                failures.append(label)
+                print(f"FAIL     {label:30s} output differs from golden")
 
     if args.update:
         print("\nFixtures + golden snapshots written. Review & commit tests/.")
@@ -116,7 +160,8 @@ def main(argv=None) -> int:
         print(f"\n{len(failures)} FAILED: {', '.join(failures)} "
               f"(refactor changed output - investigate before committing)")
         return 1
-    print(f"\nAll {len(CASES)} golden cases passed - output is byte-identical to baseline.")
+    print(f"\nAll {checks} golden checks passed ({len(CASES)} cases x {len(MODES)} modes) "
+          f"- output is byte-identical to baseline.")
     return 0
 
 
