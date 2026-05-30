@@ -17,6 +17,7 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -68,6 +69,16 @@ def park_factors_path_for(league: str) -> Path | None:
     """Path to the league's park-factors file if one is shipped in config/."""
     p = CONFIG_DIR / f"{league}-park-factors.json"
     return p if p.exists() else None
+
+
+def player_data_mtime(league: str) -> float:
+    """Modification time of the league's PlayerData CSV (0.0 if absent).
+
+    Folded into the score cache key so a fresh `fetch_*_player_data.py` pull
+    auto-invalidates the cache — same file → instant hit, new file → re-scored.
+    """
+    p = DATA_DIR / f"PlayerData-{league}.csv"
+    return p.stat().st_mtime if p.exists() else 0.0
 
 
 def evaluate(
@@ -129,6 +140,10 @@ def main() -> None:
         st.header("Evaluate")
         league = st.selectbox("League", leagues, index=0)
 
+        mtime = player_data_mtime(league)
+        if mtime:
+            st.caption(f"Data updated: {datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M}")
+
         scales = list(RATING_SCALES)
         default_scale = default_scale_for(league)
         rating_scale = st.radio(
@@ -161,17 +176,25 @@ def main() -> None:
                        "`config/league_url.json`.")
 
         run = st.button("Run evaluation", type="primary", use_container_width=True)
+        if st.button("Clear cache & re-score", use_container_width=True,
+                     help="Force a fresh score, e.g. after re-fetching data."):
+            st.cache_data.clear()
+            st.session_state.pop("result", None)
+            st.rerun()
 
     # Cache scoring so re-renders (sorting/filtering) don't re-score ~12k players.
+    # data_mtime is part of the cache key (not used in the body): when the
+    # PlayerData CSV changes on disk, the key changes and the league is re-scored.
     @st.cache_data(show_spinner=False)
-    def cached_eval(league, rating_scale, draft, contracts, apply_park):
+    def cached_eval(league, rating_scale, draft, contracts, apply_park, data_mtime):
         return evaluate(league, rating_scale, draft, contracts, apply_park)
 
     # Persist the last run across reruns triggered by filter widgets.
     if run:
         with st.spinner(f"Scoring {league}…"):
             try:
-                rows = cached_eval(league, rating_scale, draft, contracts, apply_park)
+                rows = cached_eval(league, rating_scale, draft, contracts, apply_park,
+                                   player_data_mtime(league))
             except (ValueError, FileNotFoundError) as e:
                 st.error(str(e))
                 return
