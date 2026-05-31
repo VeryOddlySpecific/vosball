@@ -11,6 +11,8 @@ click a league chip to open its **League Hub** (see below). The app's screens
   WAR, positional breakdown, contract) for any player from the last evaluation.
 - **Depth Charts** — pick a team and level (ML/AAA/…/R) and see the suggested
   position depth, lineup, and pitching staff.
+- **Prospects** — a ranked prospect board for the league (ceiling × age-for-level
+  × position), defaulting to your farm; row-click opens the player's card.
 - **League Hub** — a per-league landing page (a daily/per-sim checklist + quick
   links to the modules that manage that team); reached by clicking a header chip.
 
@@ -156,6 +158,24 @@ splits** (without stats the two lineups are identical). The roster (which player
 are at which org/level) comes from the eval snapshot, not a live roster pull —
 see `tickets/0001-playerdata-ratings-only-truth.md`.
 
+## Prospect Board
+
+A ranked prospect board for the loaded league (reuses `prospect_rankings.py`).
+Each prospect is scored `ceiling × age-for-level × position/role` and shown with
+both a **league-wide rank** and a **within-org rank**; MLB players are excluded.
+
+- **Ceiling source** — Reach (default; the reach-the-majors model), Career, or
+  Blended.
+- **Pool** — prospects (org-affiliated & rookie-eligible), free agents, or all
+  non-MLB.
+- **Organization** — defaults to your farm (`league_settings.json`); pick
+  *All orgs* to scout the whole league.
+- **Use MLB service time** (opt-in, network) — fetches `/players` to drop players
+  past rookie eligibility (>90 MLB days or ≥7 pro years); off by default (all
+  non-ML included).
+
+Sort by any column; **click a row** to open that player's card.
+
 ## Theme (LCARS)
 
 The UI is skinned to look like a *Deep Space 9* LCARS console. A **palette
@@ -209,9 +229,10 @@ settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
 ## Status
 
 Multipage app — **Eval Browser** (filter/sort/search/export), **Player Card**
-(single-player detail), **Depth Charts** (team → level → depth/lineup/staff), and
-**League Hub** (per-league checklist + module links) — under a persistent,
-clickable **export-status header band**, with the LCARS reskin and persisted
-preferences. Future additions: build out the planned hub modules; fair-value
-(VPC) on the card; live-roster + promotion/cut signals on depth charts; passing
-the hub's league into the module pages.
+(single-player detail), **Depth Charts** (team → level → depth/lineup/staff),
+**Prospects** (ranked prospect board), and **League Hub** (per-league checklist +
+module links) — under a persistent, clickable **export-status header band**, with
+the LCARS reskin and persisted preferences. Future additions: build out the rest
+of the planned hub modules (Farm Value, Trade Targets, Draft Room, Free Agents,
+Finances); fair-value (VPC) on the card; live-roster + promotion/cut signals on
+depth charts; passing the hub's league into the module pages.
