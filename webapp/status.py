@@ -67,55 +67,59 @@ def export_status(leagues: Tuple[str, ...], nonce: int) -> Dict[str, Any]:
 
 # --- render -----------------------------------------------------------------
 
-_BAND_CSS = """
-<style>
-.lcars-band { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:0 0 12px; }
-.lcars-chip { border-radius:11px; padding:3px 11px; color:#000;
-  font-family:var(--lcars-font, sans-serif); font-weight:700; font-size:.82rem;
-  letter-spacing:1.5px; text-transform:uppercase; }
-.lcars-chip.ok { background:#46B36B; }
-.lcars-chip.need { background:#E8A33D; }
-.lcars-band .ck { color:var(--lcars-muted, #888); font-size:.72rem;
-  letter-spacing:.5px; margin-left:4px; }
-</style>
-"""
-
-
-def _band_html(leagues: List[str], results: Dict[str, dict], checked_at: str) -> str:
-    chips = []
+def _chip_color_css(leagues: List[str], results: Dict[str, dict]) -> str:
+    """Per-key CSS so each chip button is colored by status (green/amber). Keyed
+    via Streamlit's `st-key-<key>` class; the 🟢/🟠 label emoji is the fallback."""
+    rules = ["<style>"]
     for lg in leagues:
-        r = results.get(lg) or {}
-        ok = bool(r.get("skip"))
-        word = "Current" if ok else "Needs export"
-        reason = (r.get("reason") or "").replace('"', "'")
-        chips.append(
-            f'<span class="lcars-chip {"ok" if ok else "need"}" '
-            f'title="{word}: {reason}">{lg}</span>')
-    n_need = sum(1 for lg in leagues if not (results.get(lg) or {}).get("skip"))
-    note = f"{n_need} need export"
-    if checked_at:
-        note += f" · checked {checked_at[11:16]}"
-    chips.append(f'<span class="ck">{note} — hover a chip for why</span>')
-    return f'<div class="lcars-band">{"".join(chips)}</div>'
+        ok = bool((results.get(lg) or {}).get("skip"))
+        rules.append(
+            f'.st-key-chip_{lg} button {{ background:{"#46B36B" if ok else "#E8A33D"} '
+            f'!important; color:#000 !important; border:none !important; '
+            f'font-family:var(--lcars-font, sans-serif); font-weight:700; '
+            f'letter-spacing:1px; }}')
+    rules.append("</style>")
+    return "".join(rules)
 
 
 def render_band() -> None:
-    """Compact export-status strip for the global header (call from app.main)."""
+    """Clickable export-status strip for the global header (call from app.main).
+
+    Each league is a chip-button that navigates to its League Hub; the trailing
+    ⟳ re-checks. Cached per session, so only the first load hits the network.
+    """
     leagues = configured_leagues()
     if not leagues:
         return
-    st.markdown(_BAND_CSS, unsafe_allow_html=True)
     st.session_state.setdefault("exports_nonce", 0)
-
-    band_col, btn_col = st.columns([13, 1])
-    with btn_col:
-        if st.button("⟳", key="recheck_exports",
-                     help="Re-check league export status now (one API call per league)."):
-            st.session_state["exports_nonce"] += 1
-            st.rerun()
 
     with st.spinner("Checking exports…"):
         data = export_status(tuple(leagues), st.session_state["exports_nonce"])
-    band_col.markdown(
-        _band_html(leagues, data.get("results", {}), data.get("checked_at", "")),
-        unsafe_allow_html=True)
+    results = data.get("results", {})
+
+    st.markdown(_chip_color_css(leagues, results), unsafe_allow_html=True)
+    cols = st.columns(len(leagues) + 1)
+    for col, lg in zip(cols, leagues):
+        r = results.get(lg) or {}
+        ok = bool(r.get("skip"))
+        clicked = col.button(
+            f"{'🟢' if ok else '🟠'} {lg.upper()}", key=f"chip_{lg}",
+            use_container_width=True,
+            help=f"{'Current' if ok else 'Needs export'}: {r.get('reason', '')}"
+                 "\n\nClick to open this league's hub.")
+        if clicked:
+            # Defer the actual navigation to app.main (after st.navigation is
+            # built) — switch_page from the pre-nav chrome isn't reliable. The
+            # click already triggered this rerun, so the flag flows downstream
+            # in the same run.
+            st.session_state["selected_league"] = lg
+            st.session_state["_pending_page"] = "league"
+    if cols[-1].button("⟳", key="recheck_exports", use_container_width=True,
+                       help="Re-check league export status now (one API call per league)."):
+        st.session_state["exports_nonce"] += 1
+        st.rerun()
+
+    n_need = sum(1 for lg in leagues if not (results.get(lg) or {}).get("skip"))
+    checked = (data.get("checked_at") or "")[11:16]
+    st.caption(f"{n_need} need export · checked {checked or '—'} — click a league "
+               "to open its hub; ⟳ to re-check.")

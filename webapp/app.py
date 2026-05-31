@@ -59,7 +59,8 @@ import what_if as wi  # noqa: E402
 # depth_chart.py's slotting). It reads st.session_state directly — no import back
 # into app.py, so no circular dependency.
 import depth  # noqa: E402
-import status  # noqa: E402  (Ops Status landing page)
+import status  # noqa: E402  (persistent export-status header band)
+import league  # noqa: E402  (per-league hub: checklist + module links)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -310,10 +311,25 @@ def main() -> None:
     st.markdown(build_theme_css(PALETTES[st.session_state["palette"]]),
                 unsafe_allow_html=True)
 
+    # Build the pages up front and stash them so the header band's chip buttons
+    # and the League Hub's quick-links can target them via st.switch_page /
+    # st.page_link. (depth.page and league.page are both named `page`, so give
+    # them explicit unique url_paths — st.Page otherwise infers from the name.)
+    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
+                        default=True)
+    card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
+    depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
+    league_page = st.Page(league.page, title="League Hub", icon="🏟️", url_path="league")
+    st.session_state["_pages"] = {
+        "eval": eval_page, "card": card_page, "depth": depth_page, "league": league_page,
+    }
+    _PAGES["card"] = card_page  # existing eval→card bridge
+
     lcars_header("⚾ VOSBall")
 
-    # Persistent export-status band under the header, on every page. Cached per
-    # session (only the first load hits the network); its ⟳ button re-checks.
+    # Persistent, clickable export-status band under the header, on every page.
+    # Cached per session (only the first load hits the network); chips open the
+    # League Hub, ⟳ re-checks.
     status.render_band()
 
     # Global chrome: palette toggle sits above the page nav, on every page.
@@ -324,14 +340,13 @@ def main() -> None:
             help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
         st.divider()
 
-    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
-                        default=True)
-    card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
-    # depth.page's function is named `page`; give it an explicit url_path so the
-    # inferred path is stable/unique.
-    depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
-    _PAGES["card"] = card_page
-    st.navigation([eval_page, card_page, depth_page]).run()
+    nav = st.navigation([eval_page, card_page, depth_page, league_page])
+    # A header chip sets _pending_page; navigate now that the pages are
+    # registered (switch_page from the pre-nav chrome isn't reliable).
+    goto = st.session_state.pop("_pending_page", None)
+    if goto and goto in st.session_state["_pages"]:
+        st.switch_page(st.session_state["_pages"][goto])
+    nav.run()
 
 
 # --- Page: Eval Browser -----------------------------------------------------
