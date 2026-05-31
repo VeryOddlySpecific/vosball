@@ -120,7 +120,10 @@ the row the evaluation already produced (no extra scoring run):
     archetype estimate with **actual accumulated WAR + projected remaining** —
     much better for veterans. It fetches the player's real ML career WAR from
     StatsPlus (reusing `hof_grade.py`), so it needs a token + network like
-    contracts; off by default;
+    contracts; off by default. It also reads the player's **tier pace** (where
+    his actual accumulated WAR sits between his tier's median and p90 career
+    curves) and blends the remaining toward p90 accordingly — so an
+    over-performer projects off a higher percentile, capped at p90;
 - a **Scouted ratings** block with the raw underlying ratings (hitters: batting
   / position / defense / baserunning / personality; pitchers: ability / pitches
   / splits / personality), shown at the same rating scale the eval used;
