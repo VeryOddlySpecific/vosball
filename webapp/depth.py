@@ -15,7 +15,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 # Make the repo root importable (depth_chart.py + config live there). Mirrors
 # app.py's path setup so this page works under `streamlit run webapp/app.py`.
@@ -50,6 +50,23 @@ def orgs_for_league(league: str, rows: List[Dict[str, Any]]) -> List[str]:
             pass
     return sorted({str(r.get("Org", "")).strip()
                    for r in rows if str(r.get("Org", "")).strip()})
+
+
+def user_org_for_league(league: str) -> Optional[str]:
+    """The org the user plays as for this league, from config/league_settings.json
+    (the same `org` key run_depth_chart_all.py / player_card.py read). None if
+    the file/entry/org is absent."""
+    p = CONFIG_DIR / "league_settings.json"
+    if not p.exists():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    entry = data.get(league) if isinstance(data, dict) else None
+    if isinstance(entry, dict) and isinstance(entry.get("org"), str) and entry["org"].strip():
+        return entry["org"].strip()
+    return None
 
 
 def depth_levels() -> List[str]:
@@ -177,6 +194,18 @@ def page() -> None:
     if not orgs:
         st.warning(f"No organizations found for {league.upper()}.")
         return
+
+    # Default the org selector to the team the user plays as (from
+    # league_settings.json). Re-seed only when the loaded league changes, so a
+    # manual pick sticks within a league and a stale org from another league
+    # never lands in the selectbox's options (which would error).
+    if st.session_state.get("_depth_org_league") != league:
+        st.session_state["_depth_org_league"] = league
+        default_org = user_org_for_league(league)
+        if default_org in orgs:
+            st.session_state["depth_org"] = default_org
+        elif st.session_state.get("depth_org") not in orgs:
+            st.session_state.pop("depth_org", None)
 
     with st.sidebar:
         st.header("Depth Charts")
