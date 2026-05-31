@@ -61,7 +61,7 @@ MODULES = [
     {"label": "Evaluations", "icon": "📊", "page": "eval", "blurb": "Browse & score the league"},
     {"label": "Player Card", "icon": "🪪", "page": "card", "blurb": "Single-player detail"},
     {"label": "Depth Charts", "icon": "📋", "page": "depth", "blurb": "Lineups & staff by level"},
-    {"label": "Prospects", "icon": "🌱", "page": None, "blurb": "Prospect board"},
+    {"label": "Prospects", "icon": "🌱", "page": "prospects", "blurb": "Prospect board"},
     {"label": "Farm Value", "icon": "💲", "page": None, "blurb": "Farm system $ values"},
     {"label": "Trade Targets", "icon": "🔄", "page": None, "blurb": "Shopping list vs trade blocks"},
     {"label": "Draft Room", "icon": "🎯", "page": None, "blurb": "Pool tiers · board · values"},

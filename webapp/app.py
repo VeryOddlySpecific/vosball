@@ -62,6 +62,7 @@ import depth  # noqa: E402
 import status  # noqa: E402  (persistent export-status header band)
 import league as league_hub  # noqa: E402  (aliased: `league` is a local var in
 # eval_browser_page (the selected slug), which would otherwise shadow the module)
+import prospects  # noqa: E402  (Prospect Board page)
 import career_war  # noqa: E402  (opt-in accumulated-WAR fetch for the player card)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
@@ -321,9 +322,12 @@ def main() -> None:
                         default=True)
     card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
     depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
+    prospects_page = st.Page(prospects.page, title="Prospects", icon="🌱",
+                             url_path="prospects")
     league_page = st.Page(league_hub.page, title="League Hub", icon="🏟️", url_path="league")
     st.session_state["_pages"] = {
-        "eval": eval_page, "card": card_page, "depth": depth_page, "league": league_page,
+        "eval": eval_page, "card": card_page, "depth": depth_page,
+        "prospects": prospects_page, "league": league_page,
     }
     _PAGES["card"] = card_page  # existing eval→card bridge
 
@@ -342,7 +346,7 @@ def main() -> None:
             help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
         st.divider()
 
-    nav = st.navigation([eval_page, card_page, depth_page, league_page])
+    nav = st.navigation([eval_page, card_page, depth_page, prospects_page, league_page])
     # A header chip sets _pending_page; navigate now that the pages are
     # registered (switch_page from the pre-nav chrome isn't reliable).
     goto = st.session_state.pop("_pending_page", None)
