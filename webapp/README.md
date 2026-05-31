@@ -1,8 +1,9 @@
 # VOSBall — Local Web UI
 
 A small Streamlit app for browsing VOS player evaluations in your web browser.
-A persistent **export-status band** sits in the header on every page (see below).
-The app has three screens (pick them from the sidebar):
+A persistent, **clickable export-status band** sits in the header on every page —
+click a league chip to open its **League Hub** (see below). The app's screens
+(pick them from the sidebar):
 
 - **Eval Browser** — pick a league, run the scoring, then sort / filter / search
   the results and download the CSV.
@@ -10,6 +11,8 @@ The app has three screens (pick them from the sidebar):
   WAR, positional breakdown, contract) for any player from the last evaluation.
 - **Depth Charts** — pick a team and level (ML/AAA/…/R) and see the suggested
   position depth, lineup, and pitching staff.
+- **League Hub** — a per-league landing page (a daily/per-sim checklist + quick
+  links to the modules that manage that team); reached by clicking a header chip.
 
 It's a thin front end over the existing engine: it calls
 `vosball.services.evaluate_league` (the same code path the `run_vos.py` CLI
@@ -54,6 +57,23 @@ It is **not live**: the check runs once per session and is cached (so it doesn't
 re-hit the network as you move between pages); click the **⟳** button beside the
 band to re-check (one API call per league). If the API isn't reachable, chips
 fail open to "needs export" with the reason in the hover tooltip.
+
+**Each chip is clickable** — it opens that league's **League Hub** (below).
+
+## League Hub
+
+Clicking a header chip (or the **League Hub** nav entry) opens a per-league
+landing page:
+
+- a **per-sim checklist** (transcribed from `DAILY_CHECKLIST.md` — download data,
+  post-sim VOS, analyze org, roster decisions, news). The checkboxes are
+  **interactive and persisted per league** (saved in `webapp/.ui_settings.json`),
+  with a **Reset** button for the next sim;
+- a **module quick-link grid** — built modules (Evaluations, Player Card, Depth
+  Charts) link straight to their page; planned ones (Prospects, Farm Value, Trade
+  Targets, Draft Room, Free Agents, Finances) show a "coming soon" tile. The grid
+  is a registry in `league.py` — adding a module is one entry (or flipping a
+  planned tile's `page` to the new page key).
 
 ## Using it
 
@@ -180,8 +200,9 @@ settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
 ## Status
 
 Multipage app — **Eval Browser** (filter/sort/search/export), **Player Card**
-(single-player detail), and **Depth Charts** (team → level → depth/lineup/staff)
-— under a persistent **export-status header band**, with the LCARS reskin and
-persisted preferences. Future additions: fair-value (VPC) on the card;
-live-roster + promotion/cut signals on depth charts; multi-league comparison and
-a draft board as their own pages.
+(single-player detail), **Depth Charts** (team → level → depth/lineup/staff), and
+**League Hub** (per-league checklist + module links) — under a persistent,
+clickable **export-status header band**, with the LCARS reskin and persisted
+preferences. Future additions: build out the planned hub modules; fair-value
+(VPC) on the card; live-roster + promotion/cut signals on depth charts; passing
+the hub's league into the module pages.
