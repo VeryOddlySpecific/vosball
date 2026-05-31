@@ -1,8 +1,10 @@
 # VOSBall — Local Web UI
 
 A small Streamlit app for browsing VOS player evaluations in your web browser.
-It's a multipage app with three screens (pick them from the sidebar):
+It's a multipage app with four screens (pick them from the sidebar):
 
+- **Ops Status** (home) — a block-band of your leagues with each one's StatsPlus
+  export status (current / needs export), plus a details table; manual re-check.
 - **Eval Browser** — pick a league, run the scoring, then sort / filter / search
   the results and download the CSV.
 - **Player Card** — a single-player detail view (scores, adjustments, projected
@@ -40,6 +42,20 @@ On Windows you can also just **double-click `run_ui.bat`** in the repo root.
 
 Streamlit prints a local URL (usually <http://localhost:8501>) and opens it in
 your default browser automatically.
+
+## Ops Status (home page)
+
+The landing screen shows a **block-band of league tiles** — one per league in
+`config/league_url.json` — color-coded by StatsPlus export status (green =
+current, amber = needs export), over a details table (game version, status,
+PlayerData freshness, sim time, and the reason). Status comes from the same
+`/exports` preflight the bulk runners use (`check_exports.py` /
+`preflight.check_leagues`).
+
+It is **not live**: the check runs once when you open the page and is cached;
+click **⟳ Re-check exports** to re-run it (one API call per league). If the API
+isn't reachable, tiles fail open to "needs export" with the reason shown in the
+table.
 
 ## Using it
 
@@ -165,8 +181,9 @@ settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
 
 ## Status
 
-Multipage app: **Eval Browser** (filter/sort/search/export), **Player Card**
-(single-player detail), and **Depth Charts** (team → level → depth/lineup/staff),
-with the LCARS reskin and persisted preferences. Future additions: fair-value
-(VPC) on the card; live-roster + promotion/cut signals on depth charts;
-multi-league comparison and a draft board as their own pages.
+Multipage app: **Ops Status** (home — league export-status dashboard), **Eval
+Browser** (filter/sort/search/export), **Player Card** (single-player detail),
+and **Depth Charts** (team → level → depth/lineup/staff), with the LCARS reskin
+and persisted preferences. Future additions: fair-value (VPC) on the card;
+live-roster + promotion/cut signals on depth charts; multi-league comparison and
+a draft board as their own pages.
