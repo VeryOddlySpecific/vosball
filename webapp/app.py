@@ -60,7 +60,8 @@ import what_if as wi  # noqa: E402
 # into app.py, so no circular dependency.
 import depth  # noqa: E402
 import status  # noqa: E402  (persistent export-status header band)
-import league  # noqa: E402  (per-league hub: checklist + module links)
+import league as league_hub  # noqa: E402  (aliased: `league` is a local var in
+# eval_browser_page (the selected slug), which would otherwise shadow the module)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -319,7 +320,7 @@ def main() -> None:
                         default=True)
     card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
     depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
-    league_page = st.Page(league.page, title="League Hub", icon="🏟️", url_path="league")
+    league_page = st.Page(league_hub.page, title="League Hub", icon="🏟️", url_path="league")
     st.session_state["_pages"] = {
         "eval": eval_page, "card": card_page, "depth": depth_page, "league": league_page,
     }
@@ -452,7 +453,7 @@ def eval_browser_page() -> None:
     # Default the Org filter to the team you play as (league_settings.json),
     # keyed per league so switching leagues re-defaults rather than carrying a
     # stale org into the new league's options.
-    my_org = league.league_entry(result["league"]).get("org")
+    my_org = league_hub.league_entry(result["league"]).get("org")
     with st.expander("Filters", expanded=True):
         c1, c2, c3, c4 = st.columns(4)
         name_q = c1.text_input("Search name", "")
