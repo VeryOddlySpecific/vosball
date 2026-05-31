@@ -50,3 +50,36 @@ def accumulated_war(league: str, player_id: str) -> Dict[str, Any]:
         return {"ok": False, "error": str(e)}
     except Exception as e:  # noqa: BLE001 — surface, don't crash the card
         return {"ok": False, "error": f"{type(e).__name__}: {e}"}
+
+
+def tier_percentile_projection(actual: float, arch: float, arch_hi: float,
+                               rem: float, rem_hi: float) -> Dict[str, float]:
+    """Where is the player tracking within his tier, and the percentile-adjusted
+    remaining + projected career WAR. Pure (no I/O) so it's unit-testable.
+
+    Inputs (from the eval row + fetched accumulated WAR):
+      actual            actual accumulated career WAR
+      arch / arch_hi    tier career WAR at median (p50) / upside (~p90)
+      rem / rem_hi      tier remaining WAR at median / ~p90
+
+    The aging frac cancels, so "expected so far" at each percentile is just the
+    tier total minus its remaining: exp = arch - rem (resp. arch_hi - rem_hi).
+    t = where actual sits between them (0 = median pace, 1 = p90 pace). The
+    remaining used blends median->p90 by clamp(t,0,1) — capped at p90, floored at
+    median (no p10 anchor to blend below). Returns t, pct (~percentile, p50<->p90
+    linear), remaining_adj, projected, exp_med, exp_hi.
+    """
+    exp_med = arch - rem
+    exp_hi = arch_hi - rem_hi
+    spread = exp_hi - exp_med
+    t = (actual - exp_med) / spread if spread > 1e-9 else 0.0
+    t_clamped = max(0.0, min(1.0, t))
+    remaining_adj = rem + t_clamped * (rem_hi - rem)
+    return {
+        "t": t,
+        "pct": 50.0 + 40.0 * t,  # p50 <-> p90 over t in [0,1]
+        "remaining_adj": remaining_adj,
+        "projected": actual + remaining_adj,
+        "exp_med": exp_med,
+        "exp_hi": exp_hi,
+    }

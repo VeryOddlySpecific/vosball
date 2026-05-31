@@ -760,19 +760,36 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
             st.warning(f"Couldn't fetch career WAR: {data.get('error', 'unknown error')}")
         else:
             actual = float(data["total"])
-            try:
-                remaining = float(row.get("Remaining_WAR") or 0)
-            except (TypeError, ValueError):
-                remaining = 0.0
-            st.markdown("**Projected career WAR** — actual accumulated + projected remaining")
+
+            def _wf(col):
+                try:
+                    return float(row.get(col) or 0)
+                except (TypeError, ValueError):
+                    return 0.0
+
+            proj = career_war.tier_percentile_projection(
+                actual, _wf("Arch_Career_WAR"), _wf("Arch_Career_WAR_Hi"),
+                _wf("Remaining_WAR"), _wf("Remaining_WAR_Hi"))
+            pct = proj["pct"]
+            pace = ">p90" if pct > 90 else "<p50" if pct < 50 else f"~p{round(pct)}"
+
+            st.markdown("**Projected career WAR** — actual accumulated + "
+                        "percentile-adjusted remaining")
             w = st.columns(3)
             w[0].metric("Career WAR (actual)", f"{actual:.1f}")
-            w[1].metric("+ projected remaining", f"{remaining:.1f}")
-            w[2].metric("= projected career WAR", f"{actual + remaining:.1f}")
+            w[1].metric("Tier pace", pace)
+            w[2].metric("= projected career WAR", f"{proj['projected']:.1f}")
+            r = st.columns(3)
+            r[0].metric("Remaining (median)", f"{_wf('Remaining_WAR'):.1f}")
+            r[1].metric("Remaining (p90)", f"{_wf('Remaining_WAR_Hi'):.1f}")
+            r[2].metric("Remaining (used)", f"{proj['remaining_adj']:.1f}")
             st.caption(
                 f"Actual = {data['hit']:.1f} batting + {data['pit']:.1f} pitching WAR "
-                f"over {data['seasons']} ML season(s); remaining is the VOS/age-based "
-                "projection. The archetype line below is the prospect-style estimate.")
+                f"over {data['seasons']} ML season(s). **Tier pace** = where his actual "
+                "accumulated WAR sits between his tier's median and p90 career curves "
+                "(interpolated; >p90 = exceeding tier upside). Remaining-used blends "
+                "median→p90 by that pace (capped at p90). The archetype line below is "
+                "the prospect-style estimate.")
 
     # Projected career WAR — pitchers get an SP vs RP table; hitters get the
     # single-profile section plus insights and the positional breakdown.
