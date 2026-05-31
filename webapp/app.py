@@ -62,6 +62,7 @@ import depth  # noqa: E402
 import status  # noqa: E402  (persistent export-status header band)
 import league as league_hub  # noqa: E402  (aliased: `league` is a local var in
 # eval_browser_page (the selected slug), which would otherwise shadow the module)
+import career_war  # noqa: E402  (opt-in accumulated-WAR fetch for the player card)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -744,6 +745,34 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     ac = st.columns(len(adj_specs))
     for col, (lbl, key) in zip(ac, adj_specs):
         col.metric(lbl, _num(row.get(key)))
+
+    # Career WAR (actual + remaining) — opt-in, fetches this player's accumulated
+    # MLB WAR and adds the projected remaining. For a player with no MLB WAR this
+    # reduces to the archetype projection below (actual 0 + remaining == arch).
+    want_war = st.toggle(
+        "Project career WAR (fetches stats)", value=False, key="career_war_toggle",
+        help="Fetch this player's actual accumulated MLB WAR from StatsPlus and "
+             "add the projected remaining WAR. Needs a StatsPlus token + network "
+             "(config/statsplus_tokens.json), like contracts.")
+    if want_war:
+        data = career_war.accumulated_war(result["league"], row.get("ID", ""))
+        if not data.get("ok"):
+            st.warning(f"Couldn't fetch career WAR: {data.get('error', 'unknown error')}")
+        else:
+            actual = float(data["total"])
+            try:
+                remaining = float(row.get("Remaining_WAR") or 0)
+            except (TypeError, ValueError):
+                remaining = 0.0
+            st.markdown("**Projected career WAR** — actual accumulated + projected remaining")
+            w = st.columns(3)
+            w[0].metric("Career WAR (actual)", f"{actual:.1f}")
+            w[1].metric("+ projected remaining", f"{remaining:.1f}")
+            w[2].metric("= projected career WAR", f"{actual + remaining:.1f}")
+            st.caption(
+                f"Actual = {data['hit']:.1f} batting + {data['pit']:.1f} pitching WAR "
+                f"over {data['seasons']} ML season(s); remaining is the VOS/age-based "
+                "projection. The archetype line below is the prospect-style estimate.")
 
     # Projected career WAR — pitchers get an SP vs RP table; hitters get the
     # single-profile section plus insights and the positional breakdown.
