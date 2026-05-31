@@ -59,6 +59,7 @@ import what_if as wi  # noqa: E402
 # depth_chart.py's slotting). It reads st.session_state directly — no import back
 # into app.py, so no circular dependency.
 import depth  # noqa: E402
+import status  # noqa: E402  (Ops Status landing page)
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -319,12 +320,15 @@ def main() -> None:
             help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
         st.divider()
 
-    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
-                        default=True)
+    # status.page and depth.page are both named `page`, so give explicit unique
+    # url_paths (st.Page otherwise infers the path from the function name → clash).
+    status_page = st.Page(status.page, title="Ops Status", icon="🛰️",
+                          url_path="ops", default=True)
+    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊")
     card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
-    depth_page = st.Page(depth.page, title="Depth Charts", icon="📋")
+    depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
     _PAGES["card"] = card_page
-    st.navigation([eval_page, card_page, depth_page]).run()
+    st.navigation([status_page, eval_page, card_page, depth_page]).run()
 
 
 # --- Page: Eval Browser -----------------------------------------------------
