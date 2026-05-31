@@ -1,12 +1,14 @@
 # VOSBall — Local Web UI
 
 A small Streamlit app for browsing VOS player evaluations in your web browser.
-It's a multipage app with two screens (pick them from the sidebar):
+It's a multipage app with three screens (pick them from the sidebar):
 
 - **Eval Browser** — pick a league, run the scoring, then sort / filter / search
   the results and download the CSV.
 - **Player Card** — a single-player detail view (scores, adjustments, projected
   WAR, positional breakdown, contract) for any player from the last evaluation.
+- **Depth Charts** — pick a team and level (ML/AAA/…/R) and see the suggested
+  position depth, lineup, and pitching staff.
 
 It's a thin front end over the existing engine: it calls
 `vosball.services.evaluate_league` (the same code path the `run_vos.py` CLI
@@ -90,6 +92,27 @@ Eval Browser). You need to have run an evaluation on the Eval Browser page first
 — the card reads that result. Full contract / fair-value (VPC) economics is the
 remaining planned follow-up.
 
+## Depth Charts
+
+The **Depth Charts** page builds a team's suggested roster usage from the loaded
+league's eval, reusing the suite's `depth_chart.py` slotting in-process (no files
+written):
+
+1. Pick an **Organization** in the sidebar.
+2. Choose a **level** from the preview cards (ML / AAA / AA / A+ / A / A- / R) —
+   each card shows how many of the org's players are at that level; empty levels
+   are disabled.
+3. See the **Lineup** (sabermetric batting order), **Position depth** (starter /
+   utility / defensive sub per position), and **Pitching staff** (rotation +
+   bullpen by role).
+
+By default the slotting is **VOS-ratings-only** (fully offline). Flip **"Blend
+in-season stats"** in the sidebar to fetch StatsPlus in-season stats and blend
+them into the composite — this also unlocks **true vs-LHP / vs-RHP lineup
+splits** (without stats the two lineups are identical). The roster (which players
+are at which org/level) comes from the eval snapshot, not a live roster pull —
+see `tickets/0001-playerdata-ratings-only-truth.md`.
+
 ## Theme (LCARS)
 
 The UI is skinned to look like a *Deep Space 9* LCARS console. A **palette
@@ -142,7 +165,8 @@ settings = load_ui_settings()                  # -> dict (｛｝ if missing/bad)
 
 ## Status
 
-Multipage app: **Eval Browser** (filter/sort/search/export) + **Player Card**
-(single-player detail), with the LCARS reskin and persisted preferences. Future
-additions: raw scouted-ratings + pitcher SP/RP + fair-value on the card, plus
+Multipage app: **Eval Browser** (filter/sort/search/export), **Player Card**
+(single-player detail), and **Depth Charts** (team → level → depth/lineup/staff),
+with the LCARS reskin and persisted preferences. Future additions: fair-value
+(VPC) on the card; live-roster + promotion/cut signals on depth charts;
 multi-league comparison and a draft board as their own pages.
