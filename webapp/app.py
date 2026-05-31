@@ -312,6 +312,10 @@ def main() -> None:
 
     lcars_header("⚾ VOSBall")
 
+    # Persistent export-status band under the header, on every page. Cached per
+    # session (only the first load hits the network); its ⟳ button re-checks.
+    status.render_band()
+
     # Global chrome: palette toggle sits above the page nav, on every page.
     with st.sidebar:
         st.segmented_control(
@@ -320,15 +324,14 @@ def main() -> None:
             help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
         st.divider()
 
-    # status.page and depth.page are both named `page`, so give explicit unique
-    # url_paths (st.Page otherwise infers the path from the function name → clash).
-    status_page = st.Page(status.page, title="Ops Status", icon="🛰️",
-                          url_path="ops", default=True)
-    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊")
+    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
+                        default=True)
     card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
+    # depth.page's function is named `page`; give it an explicit url_path so the
+    # inferred path is stable/unique.
     depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
     _PAGES["card"] = card_page
-    st.navigation([status_page, eval_page, card_page, depth_page]).run()
+    st.navigation([eval_page, card_page, depth_page]).run()
 
 
 # --- Page: Eval Browser -----------------------------------------------------
