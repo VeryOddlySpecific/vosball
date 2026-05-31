@@ -116,6 +116,11 @@ the row the evaluation already produced (no extra scoring run):
   viable spots, margins) and an **all-positions Current / Potential** table;
   pitchers get an **SP-vs-RP WAR table** (ceiling + career/remaining WAR for each
   role), since a starter and a reliever project very differently;
+  - an opt-in **"Project career WAR (fetches stats)"** toggle replaces the
+    archetype estimate with **actual accumulated WAR + projected remaining** —
+    much better for veterans. It fetches the player's real ML career WAR from
+    StatsPlus (reusing `hof_grade.py`), so it needs a token + network like
+    contracts; off by default;
 - a **Scouted ratings** block with the raw underlying ratings (hitters: batting
   / position / defense / baserunning / personality; pitchers: ability / pitches
   / splits / personality), shown at the same rating scale the eval used;
