@@ -449,15 +449,26 @@ def eval_browser_page() -> None:
     st.subheader(f"{result['league'].upper()} — {len(df)} players scored")
 
     # --- Filters ---
+    # Default the Org filter to the team you play as (league_settings.json),
+    # keyed per league so switching leagues re-defaults rather than carrying a
+    # stale org into the new league's options.
+    my_org = league.league_entry(result["league"]).get("org")
     with st.expander("Filters", expanded=True):
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
         name_q = c1.text_input("Search name", "")
+        org_opts = sorted(x for x in df.get("Org", pd.Series(dtype=str))
+                          .dropna().astype(str).unique() if x)
+        org_sel = c2.multiselect(
+            "Organization", org_opts,
+            default=[my_org] if my_org in org_opts else [],
+            key=f"org_filter_{result['league']}",
+            help="Defaults to your org (config/league_settings.json). Clear to see all orgs.")
         pos_opts = sorted(x for x in df.get("Pos", pd.Series(dtype=str))
                           .dropna().astype(str).unique() if x)
-        pos_sel = c2.multiselect("Position", pos_opts)
+        pos_sel = c3.multiselect("Position", pos_opts)
         lvl_opts = sorted(x for x in df.get("League_Level", pd.Series(dtype=str))
                           .dropna().astype(str).unique() if x)
-        lvl_sel = c3.multiselect("League level", lvl_opts)
+        lvl_sel = c4.multiselect("League level", lvl_opts)
 
         score_ranges = {}
         score_cols_present = [c for c in VOS_SCORE_COLUMNS if c in df.columns
@@ -476,6 +487,8 @@ def eval_browser_page() -> None:
     view = df
     if name_q.strip():
         view = view[view["Name"].astype(str).str.contains(name_q.strip(), case=False, na=False)]
+    if org_sel:
+        view = view[view["Org"].astype(str).isin(org_sel)]
     if pos_sel:
         view = view[view["Pos"].astype(str).isin(pos_sel)]
     if lvl_sel:
