@@ -25,32 +25,34 @@ from status import configured_leagues  # noqa: E402  (reuse the league list)
 CONFIG_DIR = ROOT / "config"
 SETTINGS_PATH = Path(__file__).resolve().parent / ".ui_settings.json"
 
-# Per-sim checklist (single-league focus) from DAILY_CHECKLIST.md. {lg} is filled
-# with the league slug. Item ids are index-based so editing labels never orphans
-# saved state.
+# Per-sim checklist, rewritten for the app era. The app now scores, builds depth
+# charts, ranks prospects, and renders cards IN-PROCESS from the fetched
+# PlayerData, so the old per-sim CLI runs (vos_v2 / prospect_rankings /
+# depth_chart / player_card just to view) are folded into "review in the app".
+# What survives: fetching fresh data (the app can't), the roster moves + upload
+# (the app can't), and the few tools not yet in the app.
+# {lg} is filled with the league slug. Item ids are index-based.
 CHECKLIST = [
-    ("Download data", [
-        "Pull latest league save from StatsPlus",
-        "py fetch_player_data.py --league {lg}",
-        "current_standings.py --league {lg}  (optional)",
+    ("Get fresh data (required — the app reads it, can't fetch it)", [
+        "Confirm the sim ran & export is up (the header band shows each league)",
+        "py fetch_player_data.py --league {lg}   → data/PlayerData-{lg}.csv",
     ]),
-    ("Post-sim VOS", [
-        "py vos_v2.py --league {lg} --contracts --per-org-evals  (refresh eval first)",
-        "py prospect_rankings.py --league {lg}",
-        "py farm_value.py --league {lg}",
+    ("Review in the app (replaces the old vos / prospect / depth / card CLI runs)", [
+        "Eval Browser — Run evaluation for {lg} (scored in-process; no vos_v2 needed)",
+        "Depth Charts — lineup / rotation / bullpen by level",
+        "Prospects — farm board",
+        "Player Card — check any notables (slumping starter, hot prospect)",
     ]),
-    ("Analyze your org", [
-        "py depth_chart.py --league {lg} … --all-level-charts  (--min-comp flags open slots)",
-        "py project_season.py --league {lg} …",
-        "Check player_card.py / what_if.py for any notables",
-    ]),
-    ("Roster decisions + upload", [
-        "Set lineups / rotation / bullpen roles",
+    ("Make roster moves + upload (the app can't do this part)", [
+        "Set lineups / rotation / bullpen per the depth chart",
         "Process trade offers + waiver claims",
-        "Save and upload changes back to StatsPlus",
+        "Save & upload changes back to StatsPlus",
     ]),
-    ("News (optional)", [
-        "py statsplus_paper_news.py --league {lg}",
+    ("Still command-line (not in the app yet)", [
+        "py farm_value.py --league {lg}   — farm $ values",
+        "py project_season.py --league {lg} …   — season projection vs standings",
+        "py current_standings.py --league {lg}   (optional)",
+        "py statsplus_paper_news.py --league {lg}   (optional)",
     ]),
 ]
 
@@ -131,6 +133,10 @@ def _render_checklist(lg: str) -> None:
 
     done = sum(1 for iid in ids if st.session_state.get(f"chk_{lg}_{iid}"))
     st.subheader(f"Per-sim checklist — {done}/{len(ids)} done")
+    st.caption("Scoring, depth charts, prospects, and cards now run in-process in "
+               "the app — the old per-sim CLI runs for those are gone. The "
+               "command-line tools below read the eval CSV, so run `run_vos_all.py` "
+               "first if you use them (the app doesn't write that file).")
     for s, (section, items) in enumerate(CHECKLIST):
         st.markdown(f"**{section}**")
         for i, item in enumerate(items):
