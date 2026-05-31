@@ -92,8 +92,9 @@ landing page:
      access).
 3. Click **Run evaluation**.
 4. Sort by clicking column headers; narrow with the **Filters** (name search,
-   position, league level, VOS score ranges); toggle **Show all columns** for
-   the full output schema.
+   **organization** — defaults to your org from `league_settings.json`, clear to
+   see all — position, league level, VOS score ranges); toggle **Show all
+   columns** for the full output schema.
 5. **Download** either the full canonical eval CSV (byte-identical to the CLI's
    output) or just the filtered view.
 6. To inspect one player, **click their row** in the table to jump straight to
