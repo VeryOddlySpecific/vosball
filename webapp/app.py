@@ -31,8 +31,10 @@ from typing import Any, Dict, List
 # make the repo root importable: it holds both the `vosball` package and `lib`
 # (the engine imports lib.vos_decay). Mirrors run_vos.py's sys.path handling.
 ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+APP_DIR = Path(__file__).resolve().parent
+for _p in (ROOT, APP_DIR):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))  # ROOT: vosball pkg + sibling tools; APP_DIR: sibling pages (depth.py)
 
 DATA_DIR = ROOT / "data"
 CONFIG_DIR = ROOT / "config"
@@ -52,6 +54,11 @@ from vosball.engine import HITTER_POSITIONS, build_pitcher_row  # noqa: E402
 # columns) so the player card's scouted-ratings block stays in lockstep with the
 # CLI tools. what_if imports cleanly (only vosball.* + stdlib, no side effects).
 import what_if as wi  # noqa: E402
+
+# Depth Charts page lives in its own module (it's the largest module and reuses
+# depth_chart.py's slotting). It reads st.session_state directly — no import back
+# into app.py, so no circular dependency.
+import depth  # noqa: E402
 
 # Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
 # else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
@@ -315,8 +322,9 @@ def main() -> None:
     eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
                         default=True)
     card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
+    depth_page = st.Page(depth.page, title="Depth Charts", icon="📋")
     _PAGES["card"] = card_page
-    st.navigation([eval_page, card_page]).run()
+    st.navigation([eval_page, card_page, depth_page]).run()
 
 
 # --- Page: Eval Browser -----------------------------------------------------
