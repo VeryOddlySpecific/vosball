@@ -1,5 +1,7 @@
 # VOSBall — Local Web UI
 
+> Architecture + progress snapshot: [UI_STATUS.md](UI_STATUS.md).
+
 A small Streamlit app for browsing VOS player evaluations in your web browser.
 A persistent, **clickable export-status band** sits in the header on every page —
 click a league chip to open its **League Hub** (see below). The app's screens
