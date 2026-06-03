@@ -6,7 +6,7 @@
         "org": "Seattle Whalers",
         "year": 2055,
         "min_comp": 55,
-        "game_version": "OOTP 26",
+        "game_version": "OOTP 27",
         "sim_time": "Early Morning"
     },
     "uba": {
@@ -28,7 +28,7 @@
     "sahl": {
         "rating_scale": "20-80",
         "org": "Houston Astros",
-        "year": 2061,
+        "year": 2062,
         "min_comp": 55,
         "game_version": "OOTP 27",
         "sim_time": "Late Morning - Early Afternoon"
