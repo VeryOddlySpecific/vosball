@@ -40,6 +40,14 @@ drop a file at config/hof_thresholds-{league}.json with any of the same keys.
 """
 
 from __future__ import annotations
+# --- repo-root + core/ path bootstrap ---
+import os as _os, sys as _sys
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+# --- end bootstrap ---
+
 
 import argparse
 import csv
@@ -61,7 +69,7 @@ from fetch_player_data import (
 
 logger = logging.getLogger("hof_grade")
 
-REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = REPO_ROOT / "cache" / "hof"
 REPORTS_DIR = REPO_ROOT / "reports" / "hof_review"
 PLAYER_DATA_DIR = REPO_ROOT / "data"

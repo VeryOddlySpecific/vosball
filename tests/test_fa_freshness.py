@@ -19,6 +19,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "core"))  # app-consumed modules live under core/
 
 import free_agent_market as fam  # noqa: E402
 import depth_chart as dc  # noqa: E402

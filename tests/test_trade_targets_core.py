@@ -23,6 +23,7 @@ from typing import Any, Dict, List
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "core"))  # app-consumed modules live under core/
 
 import depth_chart as dc  # noqa: E402
 import trade_targets as tt  # noqa: E402

@@ -21,6 +21,14 @@ Interactive commands (after loading a player):
 """
 
 from __future__ import annotations
+# --- repo-root + core/ path bootstrap ---
+import os as _os, sys as _sys
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+# --- end bootstrap ---
+
 
 import argparse
 import csv
@@ -36,7 +44,7 @@ from vosball.data import (
 )
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPT_DIR = Path(__file__).resolve().parent.parent
 
 
 # -----------------------------------------------------------------------------

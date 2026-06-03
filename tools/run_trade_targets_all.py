@@ -43,11 +43,12 @@ unauthenticated).
 """
 
 from __future__ import annotations
-# --- tools/ -> repo-root bootstrap (added during tools/ move) ---
+# --- repo-root + core/ path bootstrap ---
 import os as _os, sys as _sys
 _ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
-if _ROOT not in _sys.path:
-    _sys.path.insert(0, _ROOT)
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
 # --- end bootstrap ---
 
 
@@ -66,7 +67,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = REPO_ROOT / "config"
 LEAGUE_URL_PATH = CONFIG_DIR / "league_url.json"
 LEAGUE_SETTINGS_PATH = CONFIG_DIR / "league_settings.json"
-TARGETS_SCRIPT = REPO_ROOT / "trade_targets.py"
+TARGETS_SCRIPT = REPO_ROOT / "core" / "trade_targets.py"
 
 
 def load_league_settings() -> dict:

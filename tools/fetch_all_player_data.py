@@ -30,11 +30,12 @@ Usage::
 """
 
 from __future__ import annotations
-# --- tools/ -> repo-root bootstrap (added during tools/ move) ---
+# --- repo-root + core/ path bootstrap ---
 import os as _os, sys as _sys
 _ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
-if _ROOT not in _sys.path:
-    _sys.path.insert(0, _ROOT)
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
 # --- end bootstrap ---
 
 
@@ -64,7 +65,7 @@ logger = logging.getLogger("fetch_all_player_data")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LEAGUE_URL_PATH = REPO_ROOT / "config" / "league_url.json"
-FETCH_SCRIPT = REPO_ROOT / "fetch_player_data.py"
+FETCH_SCRIPT = REPO_ROOT / "core" / "fetch_player_data.py"
 
 
 # -----------------------------------------------------------------------------

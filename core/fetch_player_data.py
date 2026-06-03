@@ -34,6 +34,14 @@ Exit codes: 0 ok, 1 config error, 2 auth likely expired, 3 timed out,
 """
 
 from __future__ import annotations
+# --- repo-root + core/ path bootstrap ---
+import os as _os, sys as _sys
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+# --- end bootstrap ---
+
 
 import argparse
 import json
@@ -49,7 +57,7 @@ from urllib.request import Request, urlopen
 
 logger = logging.getLogger("fetch_player_data")
 
-REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 LEAGUE_URL_PATH = REPO_ROOT / "config" / "league_url.json"
 TOKENS_PATH = REPO_ROOT / "config" / "statsplus_tokens.json"
 SESSION_PATH = REPO_ROOT / "config" / "statsplus_session.json"

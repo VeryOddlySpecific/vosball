@@ -28,9 +28,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 WEBAPP = HERE.parent
 ROOT = WEBAPP.parent
-for _p in (ROOT, WEBAPP):
+for _p in (ROOT, ROOT / "core", WEBAPP):
     if str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))  # ROOT: vosball pkg; WEBAPP: app + sibling pages
+        sys.path.insert(0, str(_p))  # ROOT: vosball pkg; core/: app-consumed modules; WEBAPP: app + sibling pages
 
 # Stub the network-touching export-status check before any AppTest boot, so the
 # smoke test never hits the league API. status.py did `from preflight import
@@ -141,7 +141,7 @@ def _silo_script(body: str) -> str:
     Lets us exercise the silo helpers without scoring real data."""
     setup = (
         "import sys\n"
-        f"for _p in ({str(ROOT)!r}, {str(WEBAPP)!r}):\n"
+        f"for _p in ({str(ROOT)!r}, {str(ROOT / 'core')!r}, {str(WEBAPP)!r}):\n"
         "    if _p not in sys.path:\n"
         "        sys.path.insert(0, _p)\n"
         "import app\n"

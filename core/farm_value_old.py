@@ -4,6 +4,14 @@ Farm system valuation from VOS evaluation summaries (stdlib-only version).
 """
 
 from __future__ import annotations
+# --- repo-root + core/ path bootstrap ---
+import os as _os, sys as _sys
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+for _p in (_ROOT, _os.path.join(_ROOT, "core")):
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+# --- end bootstrap ---
+
 
 import argparse
 import csv
@@ -18,7 +26,7 @@ from urllib.error import URLError
 from urllib.request import urlopen
 
 logger = logging.getLogger(__name__)
-SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPT_DIR = Path(__file__).resolve().parent.parent
 
 LEVEL_MULT = {"AAA": 0.955, "AA": 0.92, "A+": 0.89, "A": 0.87, "R": 0.8375, "Rookie": 0.8375}
 PROX_MULT = {"AAA": 1.00, "AA": 0.93, "A+": 0.86, "A": 0.80, "R": 0.72, "Rookie": 0.72}

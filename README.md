@@ -39,8 +39,8 @@ python run_vos.py --league <slug> --weights-override config/weights_v10.json
 
 **`depth_chart.py`** — Builds ideal depth charts and lineups for an org at a given level, surfaces promotion/demotion candidates and slot assignments.
 ```bash
-python depth_chart.py --league <slug> --org <org> --level MLB
-python depth_chart.py --league <slug> --all-orgs
+python core/depth_chart.py --league <slug> --org <org> --level MLB
+python core/depth_chart.py --league <slug> --all-orgs
 ```
 
 **`org_strength_report.py`** — Rolls up per-level depth charts into a positional strength report. Composites are z-scored within level; surfaces holes, surpluses, and essential players.
@@ -60,12 +60,12 @@ python tools/project_season.py --league <slug> --org <org> --level MLB
 
 **`free_agent_market.py`** — Ranks free agents by fit against your depth chart slots, blending VOS scores with live stat context.
 ```bash
-python free_agent_market.py --league <slug> --org <org> --level MLB
+python core/free_agent_market.py --league <slug> --org <org> --level MLB
 ```
 
 **`trade_targets.py`** — League-wide trade block analysis; matches available players to your roster needs and ranks by fit. Batch runner: `run_trade_targets_all.py`.
 ```bash
-python trade_targets.py --league <slug> --org <org>
+python core/trade_targets.py --league <slug> --org <org>
 ```
 
 **`waiver_wire.py`** — Grades the current waiver wire against your depth needs. Uses lower composite thresholds than trade targets (cost is a roster spot, not a trade asset); includes a "Stash" tier for high-upside fliers.
@@ -111,12 +111,12 @@ python tools/player_card.py --league <slug> --id <player_id> --compare
 
 **`farm_value.py`** — Farm system dollar valuation from prospect rankings using VPC calibration. Supports reach/career/blended as the score source.
 ```bash
-python farm_value.py --league <slug> --score-source blended
+python core/farm_value.py --league <slug> --score-source blended
 ```
 
 **`hof_grade.py`** — Hall of Fame candidacy grader: WAR, JAWS, 7-year peak, Bill James Monitor/Standards, counting milestones, postseason boost.
 ```bash
-python hof_grade.py --league <slug> --id <player_id>
+python core/hof_grade.py --league <slug> --id <player_id>
 ```
 
 **`awards_rank.py`** — Season-end awards rankings (MVP, Cy Young, ROTY, Gold Glove, Silver Slugger) using a transparent WAR + context blend. Supports AL/NL splits when division configs are present.
@@ -138,25 +138,24 @@ python tools/awards_rank.py --league <slug> --year <year>
 
 ```
 ratings/
-├── run_vos.py                  # Core VOS v10 evaluation engine (entry point)
+├── run_vos.py                  # Core VOS v10 evaluation engine (entry point; only .py at root)
 │
-│   # Root keeps the engine entry point plus the modules the web UI imports
-│   # in-process; everything else lives under tools/ (see below).
-├── depth_chart.py              # Depth charts and lineup construction
-├── free_agent_market.py        # Free agent ranking by roster fit
-├── trade_targets.py            # Trade block analysis
-├── trade_block.py              # Trade-block fetch/parse helpers
-├── prospect_rankings.py        # Prospect board
-├── farm_value.py               # Farm system dollar valuation
-├── farm_value_old.py           # Legacy farm core (still imported by farm_value et al.)
-├── contract.py                 # Contract modelling
-├── contract_builder.py         # Contract construction helpers
-├── hof_grade.py                # Hall of Fame candidacy grader
-├── stats.py                    # StatsPlus stat fetcher / aggregator
-├── fetch_player_data.py        # Pull a league's player-data export
-├── preflight.py                # Export-status / freshness checks
-├── org_summary_pdf.py          # Org summary PDF rendering
-├── what_if.py                  # Rating field groups for scenarios
+├── core/                       # Modules the web UI imports in-process (run as `python core/<x>.py`)
+│   ├── depth_chart.py          #   Depth charts and lineup construction
+│   ├── free_agent_market.py    #   Free agent ranking by roster fit
+│   ├── trade_targets.py        #   Trade block analysis
+│   ├── trade_block.py          #   Trade-block fetch/parse helpers
+│   ├── prospect_rankings.py    #   Prospect board
+│   ├── farm_value.py           #   Farm system dollar valuation
+│   ├── farm_value_old.py       #   Legacy farm core (still imported by farm_value et al.)
+│   ├── contract.py             #   Contract modelling
+│   ├── contract_builder.py     #   Contract construction helpers
+│   ├── hof_grade.py            #   Hall of Fame candidacy grader
+│   ├── stats.py                #   StatsPlus stat fetcher / aggregator
+│   ├── fetch_player_data.py    #   Pull a league's player-data export
+│   ├── preflight.py            #   Export-status / freshness checks
+│   ├── org_summary_pdf.py      #   Org summary PDF rendering
+│   └── what_if.py              #   Rating field groups for scenarios
 │
 ├── tools/                      # Standalone CLI tools (run as `python tools/<x>.py`)
 │   ├── project_season.py       #   Pythagorean win projections

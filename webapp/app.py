@@ -26,13 +26,14 @@ from typing import Any, Dict, List
 
 # --- Path setup -------------------------------------------------------------
 # Streamlit sets sys.path[0] to this file's dir (webapp/), not the repo root, so
-# make the repo root importable: it holds both the `vosball` package and `lib`
-# (the engine imports lib.vos_decay). Mirrors run_vos.py's sys.path handling.
+# make the repo root importable: it holds the `vosball` package and `lib`
+# (the engine imports lib.vos_decay), and `core/` holds the in-process modules
+# the pages consume (depth_chart, stats, trade_targets, ...). Mirrors run_vos.py.
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = Path(__file__).resolve().parent
-for _p in (ROOT, APP_DIR):
+for _p in (ROOT, ROOT / "core", APP_DIR):
     if str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))  # ROOT: vosball pkg + sibling tools; APP_DIR: sibling pages (depth.py)
+        sys.path.insert(0, str(_p))  # ROOT: vosball pkg + lib; core/: app-consumed modules; APP_DIR: sibling pages
 
 import streamlit as st  # noqa: E402
 import pandas as pd  # noqa: E402
