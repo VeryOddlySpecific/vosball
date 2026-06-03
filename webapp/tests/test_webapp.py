@@ -306,14 +306,39 @@ def test_provision_parsers_map_api_to_files():
     assert (raw["avg_overall"], raw["avg_rhb"], raw["avg_lhb"]) == (1.021, 1.0, 1.06)
     assert (raw["doubles"], raw["triples"], raw["hr_overall"]) == (1.09, 1.67, 0.9905)
     assert (raw["hr_rhb"], raw["hr_lhb"]) == (0.98, 1.01)
-    # neutral adjustments across all tool groups
-    assert ari["tool_adjustments"]["batting"]["Pow"] == 1.0
+    # batting computed from the raw factors; defense/pitcher stay neutral
+    assert ari["tool_adjustments"]["batting"]["Pow"] == 0.994   # 1+(0.9905-1)*0.6
     assert ari["tool_adjustments"]["defense"]["OFR"] == 1.0
     assert ari["tool_adjustments"]["pitcher_ability"]["Stuff"] == 1.0
+    assert ari["handedness_splits"]["RHB"]["Pow"] == 0.988      # 1+(0.98-1)*0.6
     assert ari["park_profile"]["capacity"] == 48633
+    assert ari["park_profile"]["type"]                          # classified
 
     assert lp.build_orgs(_BALLPARKS) == ["Arizona Diamondbacks", "Boston Beans"]
     assert lp.ml_lid_from_ballparks(_BALLPARKS) == 153
+
+
+def test_park_factor_formulas_match_handauthored():
+    """The ported batting + handedness formulas reproduce the hand-authored
+    Alabama Bears values exactly (config/ndl-park-factors.json)."""
+    import league_provision as lp
+    raw = {"avg_overall": 1.017, "avg_rhb": 1.019, "avg_lhb": 1.014,
+           "doubles": 1.107, "triples": 1.117,
+           "hr_overall": 0.916, "hr_rhb": 0.927, "hr_lhb": 0.897}
+    assert lp.compute_batting_adjustments(raw) == {
+        "Pow": 0.95, "Gap": 1.089, "Eye": 1.005, "Ks": 0.997}
+    h = lp.compute_handedness_pow(raw)
+    assert h["RHB"]["Pow"] == 0.956 and h["LHB"]["Pow"] == 0.938
+
+
+def test_token_age_note_levels():
+    """token_age_note classifies by age against the ~90-day TTL."""
+    import league_admin as la
+    assert la.token_age_note(None, "2026-06-03")[1] == "unknown"
+    assert la.token_age_note("bad-date", "2026-06-03")[1] == "unknown"
+    assert la.token_age_note("2026-06-01", "2026-06-03")[1] == "ok"
+    assert la.token_age_note("2026-03-15", "2026-06-03")[1] == "warn"     # ~80d
+    assert la.token_age_note("2026-02-01", "2026-06-03")[1] == "expired"  # >90d
 
 
 def test_provision_league_orchestration():

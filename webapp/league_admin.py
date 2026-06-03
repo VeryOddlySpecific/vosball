@@ -17,9 +17,11 @@ is unit-testable without Streamlit. Tokens are never displayed in full.
 """
 from __future__ import annotations
 
+import json
 import sys
+from datetime import date
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
 for _p in (ROOT, ROOT / "core"):
@@ -51,6 +53,65 @@ def _flash(msg: str) -> None:
     """Stash a success banner and rerun so the whole page reflects the write."""
     st.session_state[_FLASH_KEY] = msg
     st.rerun()
+
+
+# --- token-age tracking ------------------------------------------------------
+# Tokens are bare UUIDs with no embedded date, so we record the day a token is
+# set *through this app* in the (gitignored) ui-settings file and reason about
+# expiry from that. Tokens set outside the app have no record → "age unknown".
+
+UI_SETTINGS_PATH = Path(__file__).resolve().parent / ".ui_settings.json"
+TOKEN_TTL_DAYS = 90
+TOKEN_WARN_DAYS = 75
+_TOKEN_DATES_KEY = "token_set_dates"
+_LEVEL_ICON = {"ok": "🟢", "warn": "🟠", "expired": "🔴", "unknown": "⚪"}
+
+
+def token_age_note(set_date_iso: Optional[str], today_iso: str) -> Tuple[str, str]:
+    """Pure: (human note, level) for a token set on ``set_date_iso``. Level is
+    one of ok / warn / expired / unknown. Tokens age out at ~90 days."""
+    if not set_date_iso:
+        return ("age unknown (set outside the app)", "unknown")
+    try:
+        age = (date.fromisoformat(today_iso) - date.fromisoformat(set_date_iso)).days
+    except ValueError:
+        return ("age unknown", "unknown")
+    left = TOKEN_TTL_DAYS - age
+    if left < 0:
+        return (f"set {age}d ago — likely EXPIRED ({-left}d past {TOKEN_TTL_DAYS})", "expired")
+    if age >= TOKEN_WARN_DAYS:
+        return (f"set {age}d ago — expires in ~{left}d", "warn")
+    return (f"set {age}d ago — ~{left}d left", "ok")
+
+
+def _load_ui_settings() -> dict:
+    try:
+        if UI_SETTINGS_PATH.exists():
+            data = json.loads(UI_SETTINGS_PATH.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return data
+    except (OSError, ValueError):
+        pass
+    return {}
+
+
+def _record_token_date(slug: str) -> None:
+    """Stamp today's date as when ``slug``'s token was set (merge-write)."""
+    settings = _load_ui_settings()
+    dates = settings.get(_TOKEN_DATES_KEY)
+    if not isinstance(dates, dict):
+        dates = {}
+    dates[slug] = date.today().isoformat()
+    settings[_TOKEN_DATES_KEY] = dates
+    try:
+        UI_SETTINGS_PATH.write_text(json.dumps(settings, indent=2), encoding="utf-8")
+    except OSError:
+        pass  # read-only dir — the reminder just won't persist
+
+
+def _token_set_date(slug: str) -> Optional[str]:
+    dates = _load_ui_settings().get(_TOKEN_DATES_KEY)
+    return dates.get(slug) if isinstance(dates, dict) else None
 
 
 # --- write path (UI-free, unit-testable) ------------------------------------
@@ -227,7 +288,9 @@ def _render_edit_form(reg: LeagueRegistry, slug: str) -> None:
                 help="StatsPlus Preferences token (UUID). Valid ~90 days. "
                      "Stored in the gitignored statsplus_tokens.json.")
             if cfg.token:
-                st.caption(f"Current token: `{_mask_token(cfg.token)}` (explicit, per-league)")
+                note, level = token_age_note(_token_set_date(slug), date.today().isoformat())
+                st.caption(f"Current token: `{_mask_token(cfg.token)}` (explicit) · "
+                           f"{_LEVEL_ICON[level]} {note}")
             elif cfg.uses_default_token:
                 st.caption("Current token: using shared `_default`")
             else:
@@ -266,6 +329,8 @@ def _render_edit_form(reg: LeagueRegistry, slug: str) -> None:
         except RegistryError as e:
             st.error(f"Not saved — {e}")
             return
+        if "token" in changed:
+            _record_token_date(slug)
         if changed:
             _flash(f"Saved {slug.upper()}: {', '.join(changed)}.")
         else:
@@ -416,6 +481,8 @@ def _render_add_league(reg: LeagueRegistry) -> None:
                         st.session_state["selected_league"] = slug
                         return
                 box.update(label=f"{slug.upper()} provisioned ✓", state="complete")
+            if (token or "").strip():
+                _record_token_date(slug)
             st.session_state["selected_league"] = slug
             _flash(f"Provisioned {slug.upper()} "
                    f"({manifest['teams_count']} teams, {manifest['orgs_count']} orgs).")

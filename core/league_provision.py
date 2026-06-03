@@ -48,15 +48,89 @@ from league_registry import LeagueRegistry, LeagueConfig, RegistryError
 # cases; present a browser-ish UA like the other fetch tools do.
 _USER_AGENT = "Mozilla/5.0 (compatible; vosball-provision/1.0; +ratings-tooling)"
 
-# Tool ratings that get a neutral (1.0) park multiplier, grouped as the
-# hand-authored files group them. Replicating the key sets means a generated
-# file is consumed byte-for-byte the same way an existing one is.
+# Tool ratings left at a neutral (1.0) park multiplier. The batting tools are
+# computed from the raw factors (the deterministic "SAHL conversion formulas");
+# defense / baserunning / pitcher were hand-tuned per park in the original files
+# with no formula, so we leave them neutral (ticket 0003 Phase 5 decision).
+# Replicating the key sets means a generated file is consumed byte-for-byte the
+# same way a hand-authored one is.
 _NEUTRAL_TOOLS: Dict[str, List[str]] = {
-    "batting": ["Pow", "Gap", "Eye", "Ks"],
     "defense": ["OFR", "IFR", "OFE", "OFA", "IFE", "IFA", "TDP", "CArm", "CBlk", "CFrm"],
     "baserunning": ["Speed", "Run", "StealAbi", "StlRt"],
     "pitcher_ability": ["Stuff", "Movement", "Control", "HR_Avoid"],
 }
+
+
+def _r(x: float) -> float:
+    return round(x, 3)
+
+
+def compute_batting_adjustments(raw: Dict[str, float]) -> Dict[str, float]:
+    """The deterministic SAHL raw→tool conversion for the batting tools.
+    Verified to reproduce the hand-authored files exactly:
+      Pow = 1 + (hr_overall - 1)·0.6
+      Gap = 1 + (doubles - 1)·0.5 + (triples - 1)·0.3
+      Eye = 1 + (avg_overall - 1)·0.3
+      Ks  = 1 + (avg_overall - 1)·(-0.2)
+    """
+    avg, d, t = raw["avg_overall"], raw["doubles"], raw["triples"]
+    hr = raw["hr_overall"]
+    return {
+        "Pow": _r(1.0 + (hr - 1.0) * 0.6),
+        "Gap": _r(1.0 + (d - 1.0) * 0.5 + (t - 1.0) * 0.3),
+        "Eye": _r(1.0 + (avg - 1.0) * 0.3),
+        "Ks": _r(1.0 + (avg - 1.0) * -0.2),
+    }
+
+
+def compute_handedness_pow(raw: Dict[str, float]) -> Dict[str, Dict[str, float]]:
+    """Per-hand Power multipliers from the handed HR factors (same ·0.6)."""
+    return {
+        "RHB": {"Pow": _r(1.0 + (raw["hr_rhb"] - 1.0) * 0.6)},
+        "LHB": {"Pow": _r(1.0 + (raw["hr_lhb"] - 1.0) * 0.6)},
+    }
+
+
+def build_park_profile(raw: Dict[str, float], bp: Dict[str, Any]) -> Dict[str, Any]:
+    """A human-readable park summary derived from the raw factors + the stadium
+    facts /ballparks provides. Heuristic classification — purely descriptive,
+    not consumed by scoring."""
+    avg, d, t, hr = raw["avg_overall"], raw["doubles"], raw["triples"], raw["hr_overall"]
+
+    def pct(x: float) -> str:
+        return f"{(x - 1.0) * 100:+.1f}%"
+
+    chars: List[str] = []
+    if abs(hr - 1.0) >= 0.02:
+        chars.append(f"Home runs {pct(hr)}")
+    if abs(d - 1.0) >= 0.02:
+        chars.append(f"Doubles {pct(d)}")
+    if abs(t - 1.0) >= 0.02:
+        chars.append(f"Triples {pct(t)}")
+    if abs(avg - 1.0) >= 0.01:
+        chars.append(f"Batting average {pct(avg)}")
+
+    if hr >= 1.04:
+        ptype = "hr_park"
+    elif hr <= 0.97 and (d >= 1.03 or t >= 1.03):
+        ptype = "gap_park"
+    elif avg <= 0.98 and hr <= 0.98:
+        ptype = "pitchers_park"
+    elif avg >= 1.02 or d >= 1.04 or t >= 1.04:
+        ptype = "hitters_park"
+    else:
+        ptype = "neutral_park"
+
+    return {
+        "_comment": "Auto-generated from /ballparks raw factors.",
+        "type": ptype,
+        "description": f"Auto-classified as {ptype.replace('_', ' ')} from raw "
+                       "park factors; review and refine as needed.",
+        "key_characteristics": chars or ["Near league-average in all factors"],
+        "capacity": bp.get("capacity"),
+        "stadium_type": bp.get("stadium_type"),
+        "surface": bp.get("surface"),
+    }
 
 
 class ProvisionError(RuntimeError):
@@ -108,8 +182,10 @@ def parse_teams_csv(text: str) -> Dict[str, Dict[str, Any]]:
     return out
 
 
-def _neutral_team_entry(bp: Dict[str, Any]) -> Dict[str, Any]:
-    """Build one neutral park-factors entry from a /ballparks team object."""
+def _build_team_entry(bp: Dict[str, Any]) -> Dict[str, Any]:
+    """Build one park-factors entry from a /ballparks team object: real batting
+    + handedness multipliers from the SAHL formulas; defense/baserunning/pitcher
+    left neutral (no formula exists for them)."""
     def f(key: str, default: float = 1.0) -> float:
         v = bp.get(key)
         try:
@@ -117,10 +193,21 @@ def _neutral_team_entry(bp: Dict[str, Any]) -> Dict[str, Any]:
         except (TypeError, ValueError):
             return default
 
-    tool_adjustments = {
-        group: {tool: 1.0 for tool in tools}
-        for group, tools in _NEUTRAL_TOOLS.items()
+    raw = {
+        "avg_overall": f("avg"), "avg_rhb": f("avg_r"), "avg_lhb": f("avg_l"),
+        "doubles": f("d"), "triples": f("t"),
+        "hr_overall": f("hr"), "hr_rhb": f("hr_r"), "hr_lhb": f("hr_l"),
     }
+
+    tool_adjustments: Dict[str, Any] = {
+        "_comment": "Batting computed from raw factors (SAHL formulas); "
+                    "defense/baserunning/pitcher left neutral (no formula).",
+        "batting": compute_batting_adjustments(raw),
+    }
+    for group, tools in _NEUTRAL_TOOLS.items():
+        tool_adjustments[group] = {tool: 1.0 for tool in tools}
+
+    handed = compute_handedness_pow(raw)
     return {
         "team_info": {
             "team_name": bp.get("display_name") or bp.get("name") or "",
@@ -129,31 +216,15 @@ def _neutral_team_entry(bp: Dict[str, Any]) -> Dict[str, Any]:
         },
         "raw_park_factors": {
             "_comment": "Raw park factors from /ballparks - 1.0 = league average",
-            "avg_overall": f("avg"),
-            "avg_rhb": f("avg_r"),
-            "avg_lhb": f("avg_l"),
-            "doubles": f("d"),
-            "triples": f("t"),
-            "hr_overall": f("hr"),
-            "hr_rhb": f("hr_r"),
-            "hr_lhb": f("hr_l"),
+            **raw,  # preserve API fidelity; only computed adjustments are rounded
         },
-        "park_profile": {
-            "_comment": "Auto-generated from /ballparks; not yet analyzed.",
-            "type": "auto_generated",
-            "capacity": bp.get("capacity"),
-            "stadium_type": bp.get("stadium_type"),
-            "surface": bp.get("surface"),
-        },
-        "tool_adjustments": {
-            "_comment": "NEUTRAL (1.0) — auto-generated. Tune via the SAHL "
-                        "conversion formulas (ticket 0003 Phase 5) when ready.",
-            **tool_adjustments,
-        },
+        "park_profile": build_park_profile(raw, bp),
+        "tool_adjustments": tool_adjustments,
         "handedness_splits": {
+            "_comment": "Per-hand Power from handed HR factors; disabled by default.",
             "enabled": False,
-            "RHB": {"Pow": 1.0},
-            "LHB": {"Pow": 1.0},
+            "RHB": handed["RHB"],
+            "LHB": handed["LHB"],
         },
         "application_rules": {
             "apply_to_prospects": True,
@@ -177,12 +248,13 @@ def build_park_factors(ballparks: Dict[str, Any]) -> Dict[str, Any]:
         name = bp.get("display_name") or bp.get("name")
         if not name:
             continue
-        teams[name] = _neutral_team_entry(bp)
+        teams[name] = _build_team_entry(bp)
     if not teams:
         raise ProvisionError("/ballparks produced no usable team entries.")
     return {
         "_comment": "Park factors by team for VOS Evaluation",
-        "_comment_2": "Auto-generated from /ballparks with NEUTRAL tool_adjustments.",
+        "_comment_2": "Auto-generated from /ballparks. Batting tool_adjustments "
+                      "computed from raw factors; defense/baserunning/pitcher neutral.",
         "teams": teams,
     }
 
@@ -316,6 +388,9 @@ __all__ = [
     "build_park_factors",
     "build_orgs",
     "ml_lid_from_ballparks",
+    "compute_batting_adjustments",
+    "compute_handedness_pow",
+    "build_park_profile",
     "fetch_text",
     "fetch_json",
     "provision_league",

@@ -111,9 +111,13 @@ Bonus: `/ballparks` `display_name`s are exactly the contents of
   `fetch_player_data.py` auth (`load_league_base`, `load_token_for`); `/teams`
   and `/ballparks` are single-shot (no polling). Remove = reverse, with
   confirmation + backup.
-- **Phase 5 (optional)** — port SAHL conversion formulas (raw → real
-  `tool_adjustments`) + generate `park_profile` from `capacity`/`stadium_type`/
-  `surface`; token-expiry reminders.
+- **Phase 5** ✅ — ported the SAHL conversion formulas for the **batting** tools
+  (Pow/Gap/Eye/Ks) + handedness Pow into `league_provision` (verified to
+  reproduce the hand-authored files exactly); generate `park_profile`
+  (type/characteristics + `capacity`/`stadium_type`/`surface`); UI token-expiry
+  reminders (UI-set dates tracked in the gitignored ui-settings; ~90-day warn).
+  **Decision:** defense/baserunning/pitcher have no formula (hand-tuned per park)
+  — left **neutral 1.0** rather than invent values.
 
 ## Open question to resolve in Phase 0/4
 
