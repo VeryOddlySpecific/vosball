@@ -1,57 +1,75 @@
 # Organizational Depth Analysis
 
-Python tool for analyzing baseball organizational depth across positions, league levels, and skill sets. Reads VOS v2 `evaluation_summary_*.csv` output and identifies weak spots, stockpiles, and strategic opportunities.
+CLI tools for rolling up an organization's depth across positions, league levels,
+and skill sets — surfacing weak spots, stockpiles, and strategic opportunities.
+
+> **Per-org Depth Charts live in the web app.** For interactive per-level
+> lineup/depth/staff views, open the **Depth Charts** page in the local app
+> (`py -m streamlit run webapp/app.py`, or `run_ui.bat`). The tools below are
+> batch/CLI rollups that operate at the **org** level and consume the evaluation
+> summary CSV produced by `run_vos.py` (the VOS v10 engine in the `vosball/`
+> package).
+
+Two related CLI tools:
+
+- **`tools/org_depth_analysis.py`** (this doc) — positional strength, weak
+  spots, and stockpiles for an org, read straight from the eval CSV.
+- **`tools/org_strength_report.py`** — rolls up per-level **depth-chart** CSVs
+  (from `core/depth_chart.py`) into an org strength report with league-relative
+  percentiles. Run `py tools\org_strength_report.py --league <league> --org "<Org>"`
+  (or `--all-orgs`).
 
 ## Usage
 
-```bash
-python org_depth_analysis.py <evaluation_file>
+```powershell
+py tools\org_depth_analysis.py <evaluation_file>
 # or
-python org_depth_analysis.py --league <league>
+py tools\org_depth_analysis.py --league <league>
 ```
 
 **Examples:**
 
-```bash
+```powershell
 # Basic run with specific file
-python org_depth_analysis.py evaluation_summary_sky_20260203_200615.csv
+py tools\org_depth_analysis.py evaluation_summary_sky_20260203_200615.csv
 
 # Auto-detect latest evaluation file for league
-python org_depth_analysis.py --league sky
+py tools\org_depth_analysis.py --league sky
 
 # Filter to a single organization
-python org_depth_analysis.py evaluation_summary_sky_20260203_200615.csv -o "Atlanta Braves"
+py tools\org_depth_analysis.py evaluation_summary_sky_20260203_200615.csv -o "Atlanta Braves"
 
 # Full export: text, CSV, player details, HTML
-python org_depth_analysis.py --league sky -o "Boston Red Sox" --csv --player-details --html
+py tools\org_depth_analysis.py --league sky -o "Boston Red Sox" --csv --player-details --html
 
 # Custom output path
-python org_depth_analysis.py evaluation_summary_tlg.csv --output reports/braves_depth.txt
+py tools\org_depth_analysis.py evaluation_summary_tlg.csv --output reports\braves_depth.txt
 ```
 
 ## Options
 
 | Option | Description |
 |--------|-------------|
-| `evaluation_file` | Path to evaluation_summary CSV. Omit if using `--league`. |
-| `--league` | League abbreviation (e.g. `sky`, `woba`, `tlg`). Auto-detects latest `evaluation_summary_{league}_*.csv` in current directory. |
+| `eval_path` | Positional path to evaluation_summary CSV. Omit if using `-e`/`--league`. |
+| `-e`, `--evaluation-file` | Path to evaluation_summary CSV (alternative to the positional arg). |
+| `--league` | League abbreviation (e.g. `sky`, `woba`, `tlg`). Auto-detects latest `evaluation_summary_{league}_*.csv`. |
 | `-o`, `--org` | Filter to specific organization. Exact match on `Org` column (e.g. `"Atlanta Braves"`). |
 | `--output` | Custom output base path. Default: `org_depth_analysis_{abbrev}.txt` (abbrev from org name or `all`). |
 | `--csv` | Export position and skillset CSV reports. |
 | `--player-details` | Export player details CSV (all players grouped by ideal position). |
 | `--html` | Export interactive HTML report. |
 | `--no-level-breakdown` | Omit the "Depth by Level" section from the text report. |
-| `--weight-by-level` | Reserved for future use. |
-| `--data-dir` | Directory for data files when using `--league` (default: current directory). |
+| `--weight-by-level` | Weight players by league level. |
 
 ## Inputs
 
-- **evaluation_summary_{league}_{timestamp}.csv** — Output from VOS v2 (`vos_v2.py`). Must include:
+- **evaluation_summary_{league}_{timestamp}.csv** — Output from `run_vos.py`
+  (written to `{league}/eval/`). Must include:
   - **Identifiers:** ID, Name, Pos, Age, Team, Org, League_Level
   - **Scores:** VOS_Score, Ideal_Position, Ideal_Value
   - **Component scores (optional):** Batting_Score, Defense_Score, Baserunning_Score (hitters); Pitching_Ability_Score, Pitching_Arsenal_Score (pitchers)
 
-The tool supports both VOS v2 column names (`Org`, `League_Level`, `Ideal_Position`, etc.) and legacy names (`Organization`, `League Level`, `Ideal Pos`) via built-in mappings.
+The tool supports both current VOS column names (`Org`, `League_Level`, `Ideal_Position`, etc.) and legacy names (`Organization`, `League Level`, `Ideal Pos`) via built-in mappings.
 
 ## Output
 
@@ -116,7 +134,7 @@ Position-specific thresholds for "quality" players:
 - 3B, CF: 54
 - 1B, LF, RF, DH, SP: 55–56
 
-These are tuned for VOS v2’s sigmoid-normalized 20–80 scale (50 = average).
+These are tuned for VOS's sigmoid-normalized 20–80 scale (50 = average).
 
 ## File Naming
 
@@ -128,13 +146,23 @@ Output filenames use organization abbreviations:
 
 ## Workflow
 
-1. Run VOS v2 to generate `evaluation_summary_{league}_{timestamp}.csv`
-2. Run org_depth_analysis with that file (or `--league` to use latest)
+1. Run `run_vos.py` to generate `{league}/eval/evaluation_summary_{league}_{timestamp}.csv`
+2. Run `org_depth_analysis.py` with that file (or `--league` to use latest)
 3. Use `-o "Org Name"` to analyze a single organization
 4. Add `--csv`, `--player-details`, `--html` as needed for exports
 
 ## Compatibility
 
-- **VOS v2:** Primary target. Uses `Org`, `League_Level`, `Ideal_Position`, `Ideal_Value`, and component score columns.
-- **Legacy:** Falls back to `Organization`, `League Level`, `Ideal Pos`, `Ideal Value` if VOS v2 names are missing.
-- **Pitchers:** VOS v2 evaluates all pitchers as SP; the tool uses SP expected depth (40) for all pitchers.
+- **Current VOS (`run_vos.py`):** Primary target. Uses `Org`, `League_Level`, `Ideal_Position`, `Ideal_Value`, and component score columns.
+- **Legacy:** Falls back to `Organization`, `League Level`, `Ideal Pos`, `Ideal Value` if the current names are missing.
+- **Pitchers:** the eval evaluates all pitchers as SP; the tool uses SP expected depth (40) for all pitchers.
+
+## See also
+
+- `../run_vos.py` and the `vosball/` package — VOS v10 scoring and evaluation
+  summary generation (replaces the retired `vos_v2.py`; its old doc is archived at
+  `archive/README_VOS_V2.md`).
+- `../tools/org_strength_report.py` — per-level depth-chart rollup with
+  league-relative percentiles.
+- `../core/depth_chart.py` — produces the per-level depth CSVs `org_strength_report.py` consumes.
+- `FARM_VALUE_README.md` — org farm-system valuation and ranking.

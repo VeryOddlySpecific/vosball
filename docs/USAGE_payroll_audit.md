@@ -2,6 +2,8 @@
 
 Service-time-based payroll composition audit for an OOTP league. Buckets every active ML contract into CC / EXT / FA based on **MLB service time at signing** (not age), then aggregates per team and per bucket to surface where payroll dispersion comes from.
 
+> VOSBall's primary interface is the local Streamlit web app (`webapp/`). Finances aren't in the app yet (a Finances page is planned); run these from the command line.
+
 Methodology details live in `<league>/contract_audit/PAYROLL_AUDIT_README.md`. This file covers how to run the script.
 
 ## What it does
@@ -20,7 +22,7 @@ For each active ML contract in the evaluation CSV:
 
 | Input | Source | Purpose |
 |---|---|---|
-| `--eval` | `<league>/eval/evaluation_summary_<league>_<TS>.csv` (from `vos_v2 --contracts`) | Per-player evaluation + contract data |
+| `--eval` | `<league>/eval/evaluation_summary_<league>_<TS>.csv` (from `run_vos.py --contracts`) | Per-player evaluation + contract data |
 | `--players` | `<league>/cache/stats/players.csv` (auto-cached by the ratings pipeline) | Service-time lookup (`mlb_service_years` column) |
 | `--league` | League slug — `sdmb`, `sahl`, `tlg`, etc. | Used for output filenames and to load `config/teams-<league>.json` for canonical team names |
 | `--config-dir` (optional) | Defaults to `./config` next to the script | Where `teams-<league>.json` lives |
@@ -34,32 +36,32 @@ Written to the output directory, all stamped with the current timestamp:
 |---|---|
 | `payroll_composition_audit_<league>_<TS>_svc.md` | Main commissioner-facing report: bucket totals, dispersion, variance contribution, per-team breakdown, full EXT roster |
 | `payroll_audit_compare_<league>_<TS>_svc.md` | Diff of legacy age-based buckets vs new service-time buckets — useful for explaining "why these numbers are different than last time" |
-| `payroll_audit_contracts_<league>_<TS>_svc.csv` | One row per active ML contract with all derived fields (svc, bucket, AAV, etc.) — input for `budget_audit.py` |
+| `payroll_audit_contracts_<league>_<TS>_svc.csv` | One row per active ML contract with all derived fields (svc, bucket, AAV, etc.) — input for `tools/budget_audit.py` |
 
 ## Usage
 
-```
-python payroll_audit.py \
-    --league sdmb \
-    --eval   sdmb/eval/evaluation_summary_sdmb_20260513_145214.csv \
-    --players sdmb/cache/stats/players.csv
+```powershell
+py tools\payroll_audit.py ^
+    --league sdmb ^
+    --eval    sdmb\eval\evaluation_summary_sdmb_20260513_145214.csv ^
+    --players sdmb\cache\stats\players.csv
 ```
 
 For other leagues, swap the slug and paths:
 
-```
-python payroll_audit.py \
-    --league sahl \
-    --eval   sahl/eval/evaluation_summary_sahl_<TS>.csv \
-    --players sahl/cache/stats/players.csv
+```powershell
+py tools\payroll_audit.py ^
+    --league sahl ^
+    --eval    sahl\eval\evaluation_summary_sahl_<TS>.csv ^
+    --players sahl\cache\stats\players.csv
 ```
 
 ## Generalizing to a new league
 
 The script is league-agnostic by design. To run it on a league you haven't analyzed before:
 
-1. **Have a current eval CSV.** Run `vos_v2.py --contracts --league <slug>` if you don't have one. The eval CSV must include the `Contract_*` columns.
-2. **Have a current players cache.** This is `<league>/cache/stats/players.csv`. It's populated by the broader ratings pipeline (`contract_audit.py`, `farm_value_old.py`, etc.). If missing, those scripts populate it the first time they hit the `/players` endpoint. Or refresh it manually.
+1. **Have a current eval CSV.** Run `py run_vos.py --contracts --league <slug>` if you don't have one. The eval CSV must include the `Contract_*` columns.
+2. **Have a current players cache.** This is `<league>/cache/stats/players.csv`. It's populated by the broader ratings pipeline (`tools/contract_audit.py`, `core/farm_value_old.py`, etc.). If missing, those scripts populate it the first time they hit the `/players` endpoint. Or refresh it manually.
 3. **Confirm `config/teams-<league>.json` exists.** If yes, team names are canonicalized automatically. If no, the script falls back to the raw `Org` field from the eval CSV (works, just less clean).
 4. **Run with `--league <slug>`.** Outputs land in `<league>/contract_audit/` by default.
 
@@ -78,8 +80,8 @@ The `$8M` AAV threshold is where "extension that's actually paying real money" c
 ## Troubleshooting
 
 **"Contracts analyzed: 0"** — Almost certainly the eval CSV's `League_Level` column isn't being set to `"ML"`. Check what values are there:
-```
-awk -F, 'NR==1{for(i=1;i<=NF;i++)if($i=="League_Level")c=i} NR>1{print $c}' eval.csv | sort -u
+```powershell
+Import-Csv eval.csv | Group-Object League_Level | Select-Object Name, Count
 ```
 
 **"Missing service-time fallbacks: N"** — N players didn't match in `players.csv` (or had blank `mlb_service_years`). Those rows used the age<28 heuristic instead. If N is large, refresh the players cache and re-run. <5% is fine to ignore.
@@ -93,13 +95,15 @@ awk -F, 'NR==1{for(i=1;i<=NF;i++)if($i=="League_Level")c=i} NR>1{print $c}' eval
 ## Pipeline position
 
 ```
-vos_v2 --contracts ──► evaluation_summary_<league>_<TS>.csv
+run_vos.py --contracts ──► evaluation_summary_<league>_<TS>.csv
                                 │
                                 │
-              players.csv ──► payroll_audit.py ──► payroll_audit_contracts_<...>.csv
-                                │                  │
-                                │                  ├──► payroll_composition_audit_<...>.md
-                                │                  └──► payroll_audit_compare_<...>.md
+              players.csv ──► tools/payroll_audit.py ──► payroll_audit_contracts_<...>.csv
+                                │                         │
+                                │                         ├──► payroll_composition_audit_<...>.md
+                                │                         └──► payroll_audit_compare_<...>.md
                                 │
-                                └─────────────────► budget_audit.py (next stage)
+                                └────────────────────────► tools/budget_audit.py (next stage)
 ```
+
+See [`USAGE_budget_audit.md`](USAGE_budget_audit.md) and [`USAGE_financial_audit_pipeline.md`](USAGE_financial_audit_pipeline.md).

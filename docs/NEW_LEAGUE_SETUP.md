@@ -1,6 +1,6 @@
 # New League Setup Guide
 
-This guide covers everything required to onboard a new league into the ratings pipeline. The pipeline is config-driven: no code changes are needed for a new league (with one documented exception). Throughout this guide, replace `xxx` with the new league's lowercase ID (e.g. `ndl`).
+This guide covers everything required to onboard a new league into VOSBall. The suite is config-driven: no code changes are needed for a new league (with one documented exception). Throughout this guide, replace `xxx` with the new league's lowercase ID (e.g. `ndl`).
 
 ## Information to gather first
 
@@ -15,7 +15,7 @@ Before touching any files, collect the following from the league:
 
 ## Config files to create
 
-All of the following live in `F:\ratings\config\`.
+All of the following live in `config\`.
 
 ### league_url.json (edit existing)
 
@@ -67,9 +67,9 @@ A flat array of org display names:
 ["Arizona Diamondbacks", "Atlanta Braves", "Baltimore Orioles"]
 ```
 
-### park-factors-xxx.json (new file, recommended)
+### xxx-park-factors.json (new file, recommended)
 
-Per-team adjustments for batting, defense, baserunning, and pitching. Use `sahl-park-factors.json` as a multi-park template, or `park-factors-lvk.json` for a single-park league. If omitted, evaluations run unadjusted.
+Per-team adjustments for batting, defense, baserunning, and pitching, in the combined `teams[]` format. Use an existing `{league}-park-factors.json` (e.g. `sahl-park-factors.json`) as a template. If omitted, evaluations run unadjusted. Legacy single-park files live in `config/archive/`.
 
 ### divisions-xxx.json (new file, optional)
 
@@ -88,7 +88,7 @@ Team names here must match the `Org` column in the player data and the team keys
 
 ## Player data file
 
-Save the OOTP export as `F:\ratings\data\PlayerData-xxx.csv`. Three column-level requirements:
+Save the OOTP export as `data\PlayerData-xxx.csv` (or pull it with `py core\fetch_player_data.py --league xxx` once `league_url.json` is set). Three column-level requirements:
 
 - `Team` — integer matching a key in `teams-xxx.json`
 - `Org` — display name matching the park-factors team keys and division lists exactly
@@ -98,7 +98,7 @@ The export must include all standard OOTP tool columns (batting, potential batti
 
 ## Directory skeleton
 
-Create `F:\ratings\xxx\` with the following subdirectories:
+Create `xxx\` (at the repo root) with the following subdirectories:
 
 ```
 xxx/
@@ -117,25 +117,35 @@ xxx/
 
 These are shared across all leagues and must not be modified during onboarding:
 
-- `weights_v2.json` — VOS weights, position standards, age curve
+- `weights_v10.json` — VOS v10 weights, position standards, age curve
 - `id_maps.json` — league-level label constants
 - `contract_config.json` — contract valuation defaults
 - `depth_config.json` — depth chart analysis settings
 
 ## Known code-level exception
 
-`scrape_prospects.py` is hardcoded to SAHL. If the new league needs prospect scraping, update the `SOURCE_FILE` path in that script. Every other script in the pipeline reads `--league xxx` from the CLI and resolves all configs by convention.
+`tools\scrape_prospects.py` is hardcoded to SAHL. If the new league needs prospect scraping, update the `SOURCE_FILE` path in that script. Every other tool reads `--league xxx` from the CLI and resolves all configs by convention.
 
 ## Validation steps
 
 After the configs and data file are in place, run these to confirm wiring:
 
-1. `vos_v2.py --league xxx` — produces `xxx/eval/` output
-2. `depth_chart.py --league xxx --org "[Team Name]" --level ML` — confirms team/org lookup
-3. `stats.py --league xxx --lids [ML id]` — confirms API connectivity
-4. `org_depth_analysis.py` on the eval CSV — confirms org and division parsing
+1. `py run_vos.py --league xxx` — produces `xxx/eval/` output
+2. `py core\depth_chart.py --league xxx --org "[Team Name]" --level ML` — confirms team/org lookup
+3. `py core\stats.py --league xxx --lids [ML id]` — confirms API connectivity
+4. `py tools\org_depth_analysis.py` on the eval CSV — confirms org and division parsing
 
 If any step fails, the cause is almost always a mismatch between `Team` IDs, `Org` names, or league IDs across the config files and the player CSV.
+
+## Open it in the app
+
+Once the eval produces output, launch the web app and confirm the league shows up:
+
+```powershell
+py -m streamlit run webapp\app.py    # or run_ui.bat
+```
+
+Pick the new league in the **League Hub**, run the eval, and browse the pages (Eval Browser, Depth Charts, Prospects, Farm Value). The app scores the league in-process from `data\PlayerData-xxx.csv`, so it works as soon as the configs and CSV are in place.
 
 ## Fastest path
 

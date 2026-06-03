@@ -2,12 +2,14 @@
 
 Joins the service-time payroll audit with team financial data to produce a per-team integrated view (committed contracts × budget × revenue) plus floor/cap stress-test scenarios.
 
-This is the third stage of the pipeline. It depends on outputs from `payroll_audit.py` and `parse_financials.py`.
+This is the third stage of the pipeline. It depends on outputs from `tools/payroll_audit.py` and `tools/parse_financials.py`.
+
+> VOSBall's primary interface is the local Streamlit web app (`webapp/`). Finances aren't in the app yet (a Finances page is planned); run these from the command line.
 
 ## What it does
 
-1. Loads the per-contract audit CSV from `payroll_audit.py`.
-2. Loads the per-team financials CSV from `parse_financials.py`.
+1. Loads the per-contract audit CSV from `tools/payroll_audit.py`.
+2. Loads the per-team financials CSV from `tools/parse_financials.py`.
 3. Joins them — preferring `team_id` (numeric, stable), falling back to case-insensitive normalized team name.
 4. Produces:
    - A per-team table combining committed contract $ (CC/EXT/FA buckets) with budget, payroll, media revenue, total revenue, and projected balance.
@@ -19,8 +21,8 @@ This is the third stage of the pipeline. It depends on outputs from `payroll_aud
 
 | Input | Required? | Purpose |
 |---|---|---|
-| `--audit-csv` | yes | `payroll_audit_contracts_<league>_<TS>_svc.csv` from `payroll_audit.py` |
-| `--financials` | yes | `<league>_team_financials.csv` from `parse_financials.py` |
+| `--audit-csv` | yes | `payroll_audit_contracts_<league>_<TS>_svc.csv` from `tools/payroll_audit.py` |
+| `--financials` | yes | `<league>_team_financials.csv` from `tools/parse_financials.py` |
 | `--league` | optional | League slug for output filenames |
 | `--out-dir` | optional | Defaults to `dirname(--audit-csv)` |
 
@@ -34,20 +36,33 @@ This is the third stage of the pipeline. It depends on outputs from `payroll_aud
 
 ## Usage
 
-```
-python budget_audit.py \
-    --league sdmb \
-    --audit-csv  sdmb/contract_audit/payroll_audit_contracts_sdmb_<TS>_svc.csv \
-    --financials sdmb/contract_audit/sdmb_team_financials.csv
+```powershell
+py tools\budget_audit.py ^
+    --league sdmb ^
+    --audit-csv  sdmb\contract_audit\payroll_audit_contracts_sdmb_<TS>_svc.csv ^
+    --financials sdmb\contract_audit\sdmb_team_financials.csv
 ```
 
-For other leagues:
+For other leagues, swap the slug and paths:
 
+```powershell
+py tools\budget_audit.py ^
+    --league sahl ^
+    --audit-csv  sahl\contract_audit\payroll_audit_contracts_sahl_<TS>_svc.csv ^
+    --financials sahl\contract_audit\sahl_team_financials.csv
 ```
-python budget_audit.py \
-    --league sahl \
-    --audit-csv  sahl/contract_audit/payroll_audit_contracts_sahl_<TS>_svc.csv \
-    --financials sahl/contract_audit/sahl_team_financials.csv
+
+To model explicit proposed thresholds (instead of the default % scenarios), add `--floor-dollars`, `--cap-dollars`, an optional `--cap-phase N` phase-in, and `--basis {budget,...}`:
+
+```powershell
+py tools\budget_audit.py ^
+    --league sdmb ^
+    --audit-csv  sdmb\contract_audit\payroll_audit_contracts_sdmb_<TS>_svc.csv ^
+    --financials sdmb\contract_audit\sdmb_team_financials.csv ^
+    --floor-dollars 135000000 ^
+    --cap-dollars   200000000 ^
+    --cap-phase     3 ^
+    --basis         budget
 ```
 
 ## Generalizing to a new league
@@ -98,7 +113,7 @@ The cash-payroll basis is the realistic one for current-season cap/floor proposa
 **"WARN: teams in audit with no financials match: [...]"** — One or more teams from the audit CSV didn't find a match in the financials CSV. Causes:
 
 1. The team isn't in the financial report HTML (was it not yet promoted to ML?). Fix the input or accept the gap.
-2. Team name in the audit CSV doesn't match the financial CSV. Re-run `payroll_audit.py` with `--league <slug>` so canonical names come from `config/teams-<league>.json` on both sides.
+2. Team name in the audit CSV doesn't match the financial CSV. Re-run `tools/payroll_audit.py` with `--league <slug>` so canonical names come from `config/teams-<league>.json` on both sides.
 3. `team_id` in the audit CSV is 0 (the eval CSV's `Contract_team_id` column was empty for that team). Check the eval CSV.
 
 **Floor scenarios show "No teams below this floor"** — Median payroll is already below the floor level on a small league. Lower the floor percentage in the script, or check that you're using the right basis (cash payroll vs committed).
@@ -110,14 +125,16 @@ The cash-payroll basis is the realistic one for current-season cap/floor proposa
 ## Pipeline position
 
 ```
-payroll_audit.py ──► payroll_audit_contracts_<...>.csv ──┐
-                                                          │
-parse_financials.py ──► <league>_team_financials.csv ────┤
-                                                          │
-                                                          ▼
-                                                  budget_audit.py
-                                                          │
-                                                          ├──► payroll_budget_per_team_<...>.md
-                                                          ├──► payroll_budget_per_team_<...>.csv
-                                                          └──► cap_floor_scenarios_<...>.md
+tools/payroll_audit.py ──► payroll_audit_contracts_<...>.csv ──┐
+                                                                │
+tools/parse_financials.py ──► <league>_team_financials.csv ────┤
+                                                                │
+                                                                ▼
+                                                    tools/budget_audit.py
+                                                                │
+                                                                ├──► payroll_budget_per_team_<...>.md
+                                                                ├──► payroll_budget_per_team_<...>.csv
+                                                                └──► cap_floor_scenarios_<...>.md
 ```
+
+See [`USAGE_payroll_audit.md`](USAGE_payroll_audit.md), [`USAGE_parse_financials.md`](USAGE_parse_financials.md), and [`USAGE_financial_audit_pipeline.md`](USAGE_financial_audit_pipeline.md) for the rest of the pipeline.

@@ -1,8 +1,44 @@
-# VOSBall Pipeline User Guide
+# VOSBall User Guide
 
-_Last updated: 2026-05-29_
+VOSBall is a baseball player-evaluation suite for OOTP leagues run on **StatsPlus**. Everything is built on **VOS (VOS Optimized Score)** — a 20–80-scale rating (50 = MLB average, σ ≈ 15) produced by the **VOS v10** engine.
 
-This guide explains how to run and test the VOSBall pipeline now that the suite uses the **layered `vosball/` package structure**. The code has been split into clean layers (`engine` → `data` → `services` → `cli` + `reporting`), but **nothing changed for you as a user**: the `run_vos.py` command, its flags, its defaults, and its output are all **byte-identical** to the previous version. A golden-test harness guards that guarantee. This document targets the **sandbox at `G:\vosball`**; the deployed suite lives at `G:\ratings`. Run and test changes in the sandbox first, then promote.
+There are two ways to use it:
+
+1. **The web app (primary).** A local Streamlit app that scores a league in-process and presents it through interactive pages. This is the day-to-day interface.
+2. **The CLI + batch runners (power use).** `run_vos.py` writes eval CSVs to `{league}/eval/...`, and the CLI tools (`core/`, `tools/`) consume those CSVs for depth charts, prospect boards, trade lists, draft packages, contract audits, and more.
+
+---
+
+## Quick start — the web app
+
+Launch it from the repo root:
+
+```powershell
+py -m streamlit run webapp\app.py
+# or just double-click / run:
+run_ui.bat
+```
+
+It opens in your browser. Pick a league in the **League Hub**, then work through the pages.
+
+**Built pages:**
+
+| Page | What it does |
+| --- | --- |
+| **Eval Browser** | Sortable / filterable / searchable eval table; canonical CSV export (byte-identical to `run_vos.py`) |
+| **Player Card** | Single-player detail, rendered entirely from the eval row |
+| **Depth Charts** | Lineups & staff by level for your org |
+| **Prospects** | Prospect board |
+| **Farm Value** | Org farm systems, ranked by dollar value |
+| **Trade Targets** | League trade blocks scored against your needs |
+| **Free Agents** | Biggest roster holes → best-fit free agents |
+| **League Hub** | Pick the active league; per-sim checklist; quick-link grid to every module |
+
+*Planned:* Draft Room, Finances.
+
+**How it works.** The app scores the active league **in-process** by calling `vosball.services.evaluate_league(...)` over the player CSV in `data/`. Network access — pulling **fresh ratings** from StatsPlus, contract fields, and live stats — is **opt-in and fails open**: if you don't trigger it (or it can't reach StatsPlus), the app still renders from whatever local data and last eval you have. Pulling fresh ratings is roughly a once-or-twice-per-season action, not a per-sim chore.
+
+The rest of this guide covers the CLI/batch path that produces and consumes the eval CSVs.
 
 ---
 
@@ -10,84 +46,75 @@ This guide explains how to run and test the VOSBall pipeline now that the suite 
 
 ```mermaid
 flowchart TD
-    SP[StatsPlus API<br/>/ratings export] -->|fetch_player_data.py /<br/>fetch_all_player_data.py| PD[data/PlayerData-{league}.csv<br/>canonical input]
+    SP[StatsPlus API<br/>/ratings export] -->|core/fetch_player_data.py /<br/>tools/fetch_all_player_data.py| PD[data/PlayerData-{league}.csv<br/>canonical input]
     CFG[config/<br/>weights_v10.json, teams-*.json,<br/>league_settings.json, park-factors] --> EVAL
     PD --> EVAL[run_vos.py<br/>--> vosball.services.evaluate_league]
     EVAL --> OUT[{league}/eval/<br/>evaluation_summary_{league}_{ts}.csv + .md<br/>VOS_Reach / VOS_Career / VOS_Blended]
-    OUT --> DOWN[Downstream tools]
-    DOWN --> D1[prospect_rankings.py / farm_value.py]
-    DOWN --> D2[depth_chart.py / project_season.py / org_*]
-    DOWN --> D3[trade_block.py / trade_targets.py / waiver_wire.py]
-    DOWN --> D4[draft_pool_analysis.py / draft_board.py / draft_grades.py]
-    DOWN --> D5[contract_audit.py / awards_rank.py / hof_grade.py]
+    OUT --> DOWN[Downstream tools / web app pages]
+    DOWN --> D1[core/prospect_rankings.py · core/farm_value.py]
+    DOWN --> D2[core/depth_chart.py · tools/project_season.py · tools/org_*]
+    DOWN --> D3[core/trade_block.py · core/trade_targets.py · tools/waiver_wire.py]
+    DOWN --> D4[tools/draft_pool_analysis.py · tools/draft_board.py · tools/draft_grades.py]
+    DOWN --> D5[tools/contract_audit.py · tools/awards_rank.py · core/hof_grade.py]
 ```
 
 **Walk-through:**
 
-1. **Ingest** — StatsPlus exposes a `/ratings` export. `fetch_player_data.py` (single league) or `fetch_all_player_data.py` (all leagues, parallel) queues the export, polls until the CSV is ready, and writes it to **`data/PlayerData-{league}.csv`**. This file is the canonical input for everything downstream.
+1. **Ingest** — StatsPlus exposes a `/ratings` export. `core\fetch_player_data.py` (single league) or `tools\fetch_all_player_data.py` (all leagues, parallel) queues the export, polls until the CSV is ready, and writes it to **`data/PlayerData-{league}.csv`** — the canonical input for everything downstream. (The web app's "fetch fresh ratings" button drives the same flow.)
 2. **Configure** — Per-league behavior is read from **`config/`** (notably `weights_v10.json` for scoring, `teams-{league}.json`, `{league}-park-factors.json`, and `league_settings.json` for org/year/rating-scale).
-3. **Core eval** — `run_vos.py` (now a thin shim over `vosball.cli` → `vosball.services.evaluate_league`) reads the PlayerData CSV plus config, scores every player, and writes **`{league}/eval/evaluation_summary_{league}_{timestamp}.csv`** (plus a `.md` summary). This eval CSV is the **single source of truth** for all downstream tools.
-4. **Fan out** — Downstream tools consume the eval CSV (and sometimes live StatsPlus stat/contract APIs) to produce prospect boards, depth charts, trade lists, draft boards, contract audits, awards, and more, each under its own `{league}/` subdirectory.
+3. **Core eval** — `run_vos.py` (a thin entry point over `vosball.cli` → `vosball.services.evaluate_league`) reads the PlayerData CSV plus config, scores every player, and writes **`{league}/eval/evaluation_summary_{league}_{timestamp}.csv`** (plus a `.md` summary). This eval CSV is the **single source of truth** for the CLI tools.
+4. **Fan out** — Downstream tools (and the app pages) consume the eval CSV — and sometimes live StatsPlus stat/contract APIs — to produce prospect boards, depth charts, trade lists, draft boards, contract audits, awards, and more, each under its own `{league}/` subdirectory.
 
 ---
 
-## The expected workflow
+## The CLI workflow
 
-A normal per-sim session moves **ingest → core eval → downstream**. Commands below are exact to the findings (`py` is the project's Python launcher; substitute `python` if you prefer).
+A normal per-sim session moves **ingest → core eval → downstream**. `py` is the project's Python launcher; substitute `python` if you prefer.
 
-### Per-sim checklist (single league)
+### Per-sim (single league)
 
-1. **Download fresh data:**
-   ```bash
-   py fetch_player_data.py --league {league}
-   # (optional, for live win projections)
-   py current_standings.py --league {league}
-   ```
+```powershell
+# 1. Download fresh data
+py core\fetch_player_data.py --league {league}
+py tools\current_standings.py --league {league}    # optional, for live win projections
 
-2. **Run the core evaluation + farm:**
-   ```bash
-   py run_vos.py --league {league} --park-factors config/{league}-park-factors.json --contracts --per-org-evals
-   py prospect_rankings.py --league {league}
-   py farm_value.py --league {league}
-   ```
+# 2. Run the core evaluation + farm
+py run_vos.py --league {league} --park-factors config/{league}-park-factors.json --contracts --per-org-evals
+py core\prospect_rankings.py --league {league}
+py core\farm_value.py --league {league}
 
-3. **Analyze your org:**
-   ```bash
-   py depth_chart.py --league {league} --org "{org}" --year {year} --all-level-charts --no-pdf
-   py project_season.py --league {league} --org "{org}" --level ML --year {year}
-   # (optional, single-player deep dive)
-   py player_card.py --league {league} --id <player_id>
-   ```
-
-4. **Make roster decisions + upload:** set lineups / rotation / bullpen per the depth-chart output, process trades and waiver claims, and upload changes back to StatsPlus.
-
-5. **Daily flavor (optional):**
-   ```bash
-   py statsplus_paper_news.py --league {league}
-   ```
-
-### Daily routine across all leagues
-
-When running every league at once, prefer the batch runners — they resolve org/year/flags from `league_settings.json` so you don't repeat CLI args eight times:
-
-```bash
-py fetch_all_player_data.py        # all leagues, parallel (~3-5 min)
-py run_vos_all.py                  # eval CSVs for every league (applies --contracts, --per-org-evals, --park-factors, --rating-scale per league_settings.json)
-py run_depth_chart_all.py          # all-level depth charts for your org in every league
+# 3. Analyze your org
+py core\depth_chart.py --league {league} --org "{org}" --year {year} --all-level-charts --no-pdf
+py tools\project_season.py --league {league} --org "{org}" --level ML --year {year}
+py tools\player_card.py --league {league} --id <player_id>    # optional deep dive
 ```
-Then check trade offers / waiver claims in the league dashboards, glance at injuries, and do your inbox sweep.
+
+4. **Make roster decisions + upload** — set lineups / rotation / bullpen per the depth-chart output, process trades and waiver claims, and upload changes back to StatsPlus.
+5. **Daily flavor (optional)** — `py tools\statsplus_paper_news.py --league {league}`.
+
+### All leagues at once (batch)
+
+The batch runners resolve org/year/flags from `league_settings.json`, so you don't repeat CLI args for every league:
+
+```powershell
+py tools\fetch_all_player_data.py     # all leagues, parallel (~3-5 min)
+py tools\run_vos_all.py               # eval CSVs for every league (applies --contracts, --per-org-evals, --park-factors, --rating-scale per league_settings.json)
+py tools\run_depth_chart_all.py       # all-level depth charts for your org in every league
+```
+
+Then check trade offers / waiver claims, glance at injuries, and do your inbox sweep.
 
 ### Periodic / situational
 
-- **Weekly:** `py org_depth_analysis.py`, `py org_strength_report.py --all-levels`, `py contract_audit.py --league {league}`, `py trade_block.py --league {league} --org "{org}"`, `py trade_targets.py --league {league}`.
-- **Trade deadline:** daily `py trade_targets.py` per league, refresh `trade_block.py` after moves, `py what_if.py` to vet targets, `py top_salary_avg.py` for salary matching.
+- **Weekly:** `tools\org_depth_analysis.py`, `tools\org_strength_report.py --all-levels`, `tools\contract_audit.py`, `core\trade_block.py`, `core\trade_targets.py`.
+- **Trade deadline:** daily `core\trade_targets.py` per league, refresh `core\trade_block.py` after moves, `core\what_if.py` to vet targets, `tools\top_salary_avg.py` for salary matching.
 - **Pre-draft:**
-  ```bash
-  py draft_pool_analysis.py --league {league} --name {year}_draft
-  py draft_board.py --team {team} --league {league}
+  ```powershell
+  py tools\draft_pool_analysis.py --league {league} --name {year}_draft
+  py tools\draft_board.py --team {team} --league {league}
   ```
-- **Post-draft:** `py draft_grades.py --league {league} --num-teams 30 {league}/drafts/draft_pool_analysis_{name}/` (optional `py draft_grades_pdf.py`).
-- **Offseason:** `py free_agent_market.py --league {league} --org "{org}" --level ML`, `py fa_cohort_analysis.py --league {league}` (UBA), `py park_recommender.py`, `py contract.py`, `py spring_training_invites.py --league {league}` (SAHL).
+- **Post-draft:** `py tools\draft_grades.py --league {league} --num-teams 30 {league}/drafts/draft_pool_analysis_{name}/` (optional `tools\draft_grades_pdf.py`).
+- **Offseason:** `core\free_agent_market.py --league {league} --org "{org}" --level ML`, `tools\fa_cohort_analysis.py` (UBA), `tools\park_recommender.py`, `core\contract.py`, `tools\spring_training_invites.py` (SAHL).
 
 ---
 
@@ -95,11 +122,11 @@ Then check trade offers / waiver claims in the league dashboards, glance at inju
 
 `run_vos.py` is the entry point. Minimum invocation:
 
-```bash
+```powershell
 py run_vos.py --league wwoba
 ```
 
-This writes (by default) to:
+This writes (by default):
 
 ```
 {league}/eval/evaluation_summary_{league}_{timestamp}.csv
@@ -108,7 +135,7 @@ This writes (by default) to:
 
 ### Common flags
 
-```bash
+```powershell
 # Apply ballpark adjustments
 py run_vos.py --league wwoba --park-factors config/wwoba-park-factors.json
 
@@ -135,17 +162,17 @@ py run_vos.py --league wwoba --weights config/weights_v10.json
 - **Default is `20-80`** (the scouting convention: 50 = MLB average, σ ≈ 15). Most leagues use this.
 - **NDL exports on a `1-100` scale.** For those, pass `--rating-scale 1-100`; the loader linearly remaps the input components to 20–80 at load time, so the **output scores are normalized the same way regardless** — the scale is just the label for the input CSV.
 
-```bash
+```powershell
 py run_vos.py --league ndl --rating-scale 1-100
 ```
 
-> Tip: `run_vos_all.py` already applies the correct `--rating-scale`, `--park-factors`, `--contracts`, and `--per-org-evals` per league from `league_settings.json`, so you rarely need to set the scale by hand in batch runs.
+> Tip: `tools\run_vos_all.py` already applies the correct `--rating-scale`, `--park-factors`, `--contracts`, and `--per-org-evals` per league from `league_settings.json`, so you rarely set the scale by hand in batch runs.
 
 The eval CSV columns include `ID, Name, Org, Pos, Age, Level`, the headline scores `VOS_Reach` (logistic P(reach MLB)), `VOS_Career` (current + age decay), `VOS_Blended` (0.4·reach + 0.6·career), plus all positional composites, age adjustments, personality, proneness, and BABIP. All scores are normalized to the 20–80 scale (hard floor 20, ceiling 80, center 50.0, scale 15.0).
 
 ---
 
-## Using the new programmatic API
+## Programmatic API
 
 When you want VOS scores **inside your own Python** (a notebook, an ad-hoc analysis, a new tool) without shelling out and re-reading a CSV, call `vosball.services.evaluate_league()` directly. Use the **CLI** for normal runs and the **API** for embedding / experimentation.
 
@@ -194,40 +221,37 @@ rows = evaluate_players(
 | You want the standard CSV + MD outputs in `{league}/eval/` | You want the rows in memory to process further |
 | You want timestamped files and per-org variants | You want to control I/O / output format yourself |
 
+The web app's Eval Browser is the canonical consumer of this API — copy its shape for new tools.
+
 ---
 
-## Testing the new structure
+## Testing
 
-The refactor is guarded by a **golden harness** that proves the output has not drifted.
+The `vosball` package is guarded by a **golden harness** that proves the output has not drifted.
 
-```bash
+```powershell
 # Verify current output is byte-identical to the committed baseline
-py tests/test_golden.py
+py tests\test_golden.py
 
 # Regenerate fixtures + snapshots AFTER an intentional logic change
-py tests/test_golden.py --update
+py tests\test_golden.py --update
 ```
 
 **What it checks:**
 
-- Two cases: **`engine_wwoba_20-80`** (20–80 scale) and **`engine_ndl_1-100`** (1–100 scale with remap) — both supported rating scales are covered.
-- Input: pinned 201-row fixture subsets (header + first 200 rows) committed at `tests/fixtures/data/PlayerData-{league}.csv`.
-- Output: the full evaluation CSV (VOS_Reach, VOS_Career, VOS_Blended, VOS_Ceiling, component scores, adjustments) compared **byte-for-byte** (after stripping timestamps) against `tests/golden/engine_{case}.csv`.
-- Why a 200-row subset is enough: VOS scores are **per-player absolute** (fixed center/scale, no cohort-relative terms), so a subset yields the same per-player numbers as a full file — but runs in seconds.
+- Two cases: **`engine_wwoba_20-80`** (20–80 scale) and **`engine_ndl_1-100`** (1–100 scale with remap) — both supported rating scales — each run through both the `cli` and `service` paths.
+- Input: pinned 201-row fixture subsets (header + first 200 rows) at `tests/fixtures/data/PlayerData-{league}.csv`.
+- Output: the full evaluation CSV compared **byte-for-byte** (timestamps stripped) against `tests/golden/engine_{case}.csv`.
+- A 200-row subset is enough because VOS scores are **per-player absolute** (fixed center/scale, no cohort-relative terms), so a subset yields the same per-player numbers as a full file — but runs in seconds.
+
+See [tests/test_golden.py](../tests/test_golden.py) and [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md) for the full maintenance workflow.
 
 **Sanity-test your own league end-to-end:**
 
 1. Confirm `data/PlayerData-{league}.csv` and `config/weights_v10.json` are present.
-2. Run it to a scratch file:
-   ```bash
-   py run_vos.py --league <league> --output test_eval.csv
-   ```
-3. Eyeball `test_eval.csv` for the expected columns and reasonable ranges — VOS scores should sit in 20–80; watch the INFO logs for any out-of-range warnings.
-4. For a regression check, save that CSV, make your code change, re-run, and diff. **Zero diff means no logic changed.**
-
-**Back-compat is preserved.** `run_vos.py` is now a small shim that re-exports all the engine/data/services symbols and calls `cli.main(app_root=SCRIPT_DIR)`. Tools that `import run_vos` — `player_card.py`, `what_if.py`, and `lib/draft_score.py` — continue to work unchanged (they still reach `run_vos.DEFAULT_CONFIG_DIR`, `run_vos.build_hitter_row()`, `build_pitcher_row()`, etc.). The CLI command, flags, defaults, and output location are all unchanged.
-
-> The `G:\vosball` sandbox data is a **point-in-time snapshot** of the deployed suite as of **2026-05-29**, so you can run and test offline without touching live data. Golden tests currently pass on both rating scales.
+2. Run it to a scratch file: `py run_vos.py --league <league> --output test_eval.csv`.
+3. Eyeball `test_eval.csv` for the expected columns and reasonable ranges — VOS scores should sit in 20–80; watch the INFO logs for out-of-range warnings.
+4. For a regression check, save that CSV, make your change, re-run, and diff. **Zero diff means no logic changed.**
 
 ---
 
@@ -266,13 +290,11 @@ py tests/test_golden.py --update
 | `waiver_wire/` | `{org}_waiver_wire_{ts}.md` + `.csv` (tiered claim grades) |
 | `cache/` | Stat-fetch cache (calendar-day TTL) |
 
-Plus, at the league root: `{org}_contract_audit_{ts}.md` + `.csv` (from `contract_audit.py`) and `awards/awards_{year}_{ts}.md` (from `awards_rank.py`).
+Plus, at the league root: `{org}_contract_audit_{ts}.md` + `.csv` (from `tools\contract_audit.py`) and `awards/awards_{year}_{ts}.md` (from `tools\awards_rank.py`).
 
 ---
 
 ## Notes & caveats
 
-- **Credentials for fetching.** `fetch_player_data.py` / `fetch_all_player_data.py` need StatsPlus auth. API tokens in `config/statsplus_tokens.json` (keyed by league, or `_default`) are preferred and expire about every 90 days; the session-cookie fallback in `config/statsplus_session.json` is pulled from browser DevTools and is used for `/tradeblock` auth. If a fetch fails, refresh the token/cookie first.
-- **Snapshot data.** The `G:\vosball` sandbox `data/` and `config/` are a frozen copy as of **2026-05-29** (covering `bwb`, `ndl`, `sahl`, `sdmb`, `sky`, `tlg`, `uba`, `woba`, `wwoba`). You can run `run_vos.py` and the golden tests against it without network access, but the numbers reflect that date — re-fetch for live decisions.
-- **Sandbox vs deployed.** `G:\vosball` is the development sandbox (new layered package + tests). The live suite is `G:\ratings`. Validate code changes in the sandbox (run the golden harness, eyeball a real league) before promoting to the deployed suite.
-- **No new flags.** Everything in this guide uses flags that exist today. The package refactor changed internals only; the CLI surface is unchanged.
+- **Credentials for fetching.** `core\fetch_player_data.py` / `tools\fetch_all_player_data.py` (and the app's fetch button) need StatsPlus auth. API tokens in `config/statsplus_tokens.json` (keyed by league, or `_default`) are preferred and expire about every 90 days; the session-cookie fallback in `config/statsplus_session.json` is pulled from browser DevTools and used for `/tradeblock` auth. If a fetch fails, refresh the token/cookie first.
+- **No surprise flags.** Everything in this guide uses flags that exist today. If you're unsure of a tool's options, run it with `--help` or read its source under `core/` or `tools/`.

@@ -4,6 +4,13 @@ End-to-end guide for running a draft analysis under the v10 pipeline,
 starting from raw `PlayerData-{league}.csv` and ending with post-draft
 grading. Updated 2026-05-27 for the v10 refactor.
 
+> Draft tooling isn't in the app yet (Draft Room is a planned page); run
+> it from the command line for now. VOSBall's primary interface is the
+> Streamlit web app (`py -m streamlit run webapp/app.py` or `run_ui.bat`),
+> but the entire draft pipeline below is CLI-only today. The engine is
+> VOS v10 in the `vosball/` package, driven by [run_vos.py](../run_vos.py)
+> at the repo root.
+
 ## Quick reference
 
 | Stage | Script | Inputs | Outputs |
@@ -101,7 +108,7 @@ pre-v10 eval — re-run [run_vos.py](../run_vos.py).
 scores. Generate it for your team before drafting.
 
 ```
-py org_depth_analysis.py --league sahl --org "Houston Astros" --csv
+py tools\org_depth_analysis.py --league sahl --org "Houston Astros" --csv
 ```
 
 `--csv` writes the `*_positions.csv` file [draft_board.py](../tools/draft_board.py) expects.
@@ -127,7 +134,7 @@ and emits 8 reports.
 **Auto-resolve (recommended):**
 
 ```
-py draft_pool_analysis.py --league sahl --name 2061_draft
+py tools\draft_pool_analysis.py --league sahl --name 2061_draft
 ```
 
 This will:
@@ -186,13 +193,13 @@ column means.
 **Auto-resolve (uses newest draft folder in `{league}/drafts/`):**
 
 ```
-py draft_board.py --team houston_astros --league sahl
+py tools\draft_board.py --team houston_astros --league sahl
 ```
 
 **Tuning the need weight:**
 
 ```
-py draft_board.py --team houston_astros --league sahl --need-alpha 1.5
+py tools\draft_board.py --team houston_astros --league sahl --need-alpha 1.5
 ```
 
 Higher α gives need-fit more sway over raw BPA. Default is 1.0.
@@ -265,7 +272,7 @@ for the planned refactor.
 To run it as-is:
 
 ```
-py draft_grades.py --league sahl --num-teams 30 \
+py tools\draft_grades.py --league sahl --num-teams 30 `
    sahl/drafts/draft_pool_analysis_2061_draft
 ```
 
@@ -332,15 +339,15 @@ ratings/
 py run_vos.py --league sahl --draft --contracts --per-org-evals
 
 # 2. Generate the org_depth strength CSV your team needs
-py org_depth_analysis.py --league sahl --org "Houston Astros" --csv
+py tools\org_depth_analysis.py --league sahl --org "Houston Astros" --csv
 
 # 3. Build the draft pool analysis (auto-applies the data/draft_pool_sahl.csv
 #    ID filter; sorted by Outlook with Ideal Value as cross-reference)
-py draft_pool_analysis.py --league sahl --name 2061_draft
+py tools\draft_pool_analysis.py --league sahl --name 2061_draft
 
 # 4. Generate your team's draft board (auto-detects newest draft folder;
 #    Board A is BPA sorted by Outlook, Board B is need-adjusted)
-py draft_board.py --team houston_astros --league sahl
+py tools\draft_board.py --team houston_astros --league sahl
 ```
 
 ### Re-running the board mid-draft
@@ -348,14 +355,14 @@ py draft_board.py --team houston_astros --league sahl
 ```
 # Just re-run the board after picks have happened (need scores stay
 # the same unless you regenerate org_depth)
-py draft_board.py --team houston_astros --league sahl
+py tools\draft_board.py --team houston_astros --league sahl
 ```
 
 ### Post-draft grading
 
 ```
-py draft_grades.py --league sahl --num-teams 30 \
-   sahl/drafts/draft_pool_analysis_2061_draft \
+py tools\draft_grades.py --league sahl --num-teams 30 `
+   sahl/drafts/draft_pool_analysis_2061_draft `
    --park-adjusted --pdf
 ```
 
@@ -388,8 +395,8 @@ existing prospects, not amateurs. v10 refactor for that is Phase 6.
 - [DRAFT_GRADES_PHASE4.md](archive/DRAFT_GRADES_PHASE4.md) — what's left to do
   on `draft_grades.py`
 - [lib/draft_score.py](../lib/draft_score.py) — Outlook computation
-- [OOTP Study 27/v5_design.md](../OOTP Study 27/v5_design.md) — the
+- `OOTP Study 27/v5_design.md` *(external research notes, not in this repo)* — the
   two-track scoring architecture v10 inherits
-- [OOTP Study 27/career_logistic_followup.md](../OOTP Study 27/career_logistic_followup.md)
-  — empirical validation that the heuristic Career composite that
+- `OOTP Study 27/career_logistic_followup.md` *(external research notes, not in this
+  repo)* — empirical validation that the heuristic Career composite that
   Draft_Outlook reuses is the right choice

@@ -1,6 +1,8 @@
 # Draft Pool Analysis — User Guide
 
-Quick reference for `draft_pool_analysis.py`. Generates a multi-file analysis package from a VOS v2 evaluation summary CSV (post-draft or pre-draft pool).
+Quick reference for [`tools/draft_pool_analysis.py`](../tools/draft_pool_analysis.py). Generates a multi-file analysis package from a VOS v10 draft-pool evaluation CSV.
+
+> Draft tooling isn't in the app yet (Draft Room is a planned page); run it from the command line for now. The primary VOSBall interface is the Streamlit web app (`py -m streamlit run webapp/app.py`), but the draft pipeline is CLI-only today.
 
 ---
 
@@ -19,20 +21,33 @@ Tier cutoffs (hard-coded in `VOS_TIER_BENCHMARKS`):
 
 ## Run it
 
+Auto-resolve from a league slug (recommended) — finds the newest draft eval and computes the Outlook column:
+
 ```
-py draft_pool_analysis.py <draft_pool.csv>
+py tools\draft_pool_analysis.py --league sahl --name 2061_draft
+```
+
+Or pass an explicit CSV path:
+
+```
+py tools\draft_pool_analysis.py <draft_pool.csv>
 ```
 
 Input must have `Projected_Position` (or `Ideal_Position`/`Ideal Pos`) and `Ideal_Value` (or `VOS_Potential`/`VOS Potential`) columns. Rows missing either are silently dropped.
 
-**Flags:**
+**Common flags:**
 
-- `--output-dir PATH` — write reports to a specific folder (skips auto-naming).
+- `--league SLUG` — auto-resolve the newest `draft_evaluation_{league}_*.csv` under `{league}/eval/` (falls back to `evaluation_summary_*`). Mutually exclusive with the positional CSV path.
 - `--name LABEL` — folder becomes `draft_pool_analysis_{LABEL}` instead of a timestamp.
+- `--output-dir PATH` — write reports to a specific folder (skips auto-naming).
+- `--org-code CODE` — with `--league`, look in `{league}/eval/{org_code}/` first.
+- `--no-prefer-draft` — skip `draft_evaluation_*` and use `evaluation_summary_*` (mid-season, when `--draft` hasn't been re-run).
+- `--skip-outlook` — don't compute the Outlook column (use when PlayerData isn't available).
+- `--draft-pool-ids PATH` / `--no-draft-pool-filter` — control the draft-eligible ID filter (auto-detected at `data/draft_pool_{league}.csv` with `--league`).
 
 **Path resolution:** Relative input paths are tried against the script dir, then the parent dir, then used as-is.
 
-**Auto-output location:** If `--output-dir` is omitted, the script infers the league from filenames starting with `evaluation_summary_{league}_*.csv` and writes to `{league}/drafts/draft_pool_analysis_{timestamp}/`. Otherwise it drops the folder next to the script.
+**Auto-output location:** With `--league` (or when the script infers the league from `draft_evaluation_{league}_*.csv` / `evaluation_summary_{league}_*.csv`), reports land in `{league}/drafts/draft_pool_analysis_{name|timestamp}/`. Otherwise the folder drops next to the script.
 
 ---
 
@@ -53,9 +68,11 @@ Input must have `Projected_Position` (or `Ideal_Position`/`Ideal Pos`) and `Idea
 
 ## Typical workflow
 
-1. Run `vos_v2.py` on the draft pool data → produces `evaluation_summary_{league}_{ts}.csv`.
-2. Feed that CSV into `draft_pool_analysis.py`.
+1. Run the engine in draft mode: `py run_vos.py --league sahl --draft` → produces `{league}/eval/draft_evaluation_{league}_{ts}.csv` (the draft-pool eval). The `--draft` flag enables the draft-mode adjustment stack (Readiness, Draft_Age, Draft_RP_Penalty).
+2. Feed that into `py tools\draft_pool_analysis.py --league sahl --name 2061_draft` (or pass the CSV path explicitly).
 3. Open `00_summary.txt` first for the overview. Use `05_draft_pool.md` as the working board during the draft. Use `summary_data.md` for quick-reference tables in Obsidian.
+
+For the full end-to-end draft pipeline (org depth, draft board, post-draft grading) see [DRAFT_WORKFLOW.md](DRAFT_WORKFLOW.md).
 
 ---
 

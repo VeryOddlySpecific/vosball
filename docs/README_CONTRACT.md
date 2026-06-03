@@ -1,29 +1,31 @@
-# contract.py — Player Contract Valuation
+# core/contract.py — Player Contract Valuation
 
-Computes fair contract value for a player by combining three ingredients:
+Part of VOSBall, a baseball player-evaluation suite for OOTP leagues run on StatsPlus, built on **VOS (VOS Optimized Score)** on a 20–80 scale. The current engine is **VOS v10** in the `vosball/` package; run it via **`run_vos.py`** at the repo root, which writes eval CSVs to `{league}/eval/...`.
+
+`core/contract.py` computes fair contract value for a player by combining three ingredients:
 
 1. **VPC** (dollars per VOS point), calibrated from the league's MLB salaries
 2. **Per-year projected VOS**, using an age-decline curve
 3. **Context multipliers**: contract type (arb / extension / FA), elite-premium tier, and a risk discount for prospect-bust exposure
 
-Then hands the resulting `total_max_value` to `contract_builder.py` for structuring (or falls back to a built-in min-guaranteed structurer if the main solver can't hit the target).
+Then hands the resulting `total_max_value` to [`../core/contract_builder.py`](../core/contract_builder.py) for structuring (or falls back to a built-in min-guaranteed structurer if the main solver can't hit the target).
 
 ---
 
 ## Quick start
 
-```bash
+```powershell
 # Open-market FA, 5 years
-python contract.py --league sahl --id 73114 --years 5 --type market
+py core\contract.py --league sahl --id 73114 --years 5 --type market
 
 # Pre-FA extension, 6 years, 3 arb years remaining
-python contract.py --league sahl --id 84280 --years 6 --type extension --arb-years 3
+py core\contract.py --league sahl --id 84280 --years 6 --type extension --arb-years 3
 
 # Valuation only, no structuring
-python contract.py --league woba --id 52898 --years 3 --type market --no-structure
+py core\contract.py --league woba --id 52898 --years 3 --type market --no-structure
 
 # Strict FA-only VPC calibration (excludes arb deals from the pool)
-python contract.py --league woba --id 52898 --years 3 --type market --market-only
+py core\contract.py --league woba --id 52898 --years 3 --type market --market-only
 ```
 
 ---
@@ -216,7 +218,7 @@ Implied AAV:          $6,533,333
 
 ### Structured contract
 
-Per-year base salaries, max incentives, guaranteed totals, and 2x-rule compliance check. Same format as `contract_builder.py` standalone output.
+Per-year base salaries, max incentives, guaranteed totals, and 2x-rule compliance check. Same format as `core/contract_builder.py` standalone output.
 
 If `contract_builder`'s solver misses the target by more than one rounding unit, the tool falls back to a built-in min-guaranteed 2x-compliant structurer and labels the output:
 
@@ -245,10 +247,10 @@ Fallback pattern: `(N−1)` years at `L`, one year at `H = 2L`, with per-year in
 ## Files
 
 ```
-contract.py                          # CLI tool (this doc)
-contract_builder.py                  # Structuring engine (imported, unmodified)
-farm_value_old.py                    # VPC calibration + /players lookup (imported, unmodified)
+core/contract.py                     # CLI tool (this doc)
+core/contract_builder.py             # Structuring engine (imported, unmodified)
+core/farm_value_old.py               # VPC calibration + /players lookup (imported, unmodified)
 config/contract_config.json          # All tunable knobs
 config/league_url.json               # League slug → /players base URL
-<league>/eval/evaluation_summary_*.csv   # Input — latest auto-resolved
+<league>/eval/evaluation_summary_*.csv   # Input — latest auto-resolved (from run_vos.py)
 ```

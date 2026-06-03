@@ -5,9 +5,13 @@
 > records how the package was built. **Read this before editing anything in
 > `vosball/`.**
 
-The whole package was extracted from the old monolithic `run_vos.py` **without
-changing a single output number**, and a golden harness keeps it that way. The
-process below exists to preserve that guarantee while the suite keeps evolving.
+The `vosball` package was extracted from the old monolithic `run_vos.py`
+**without changing a single output number**, and a golden harness keeps it that
+way. The process below exists to preserve that guarantee while the suite keeps
+evolving. (The pre-v10 engine, `vos_v2.py`, is retired and archived at
+[../tools/archive/vos_v2.py](../tools/archive/vos_v2.py); its doc is at
+[archive/README_VOS_V2.md](archive/README_VOS_V2.md). Logic changes happen in
+`vosball/`, never there.)
 
 ---
 
@@ -71,8 +75,7 @@ The contract is [tests/test_golden.py](../tests/test_golden.py): two leagues
 (`evaluate_league` in-process) — asserted **byte-identical** (timestamps
 stripped) to committed snapshots in `tests/golden/`.
 
-```bash
-cd F:\vosball
+```powershell
 py tests\test_golden.py            # before AND after every change — must stay green
 py tests\test_golden.py --update   # ONLY after an intentional output change
 ```
@@ -144,8 +147,8 @@ the three remaining real consumers — `player_card.py`, `what_if.py`,
   dependency.
 - **The shim shrinks/retires** only when the last legacy consumer is gone. To
   check who still depends on it:
-  ```bash
-  grep -rnE "import run_vos|from run_vos" --include=*.py .
+  ```powershell
+  rg -nE "import run_vos|from run_vos" -g "*.py" .
   ```
   When that returns only `run_vos.py` itself (and the test harness, which
   intentionally exercises the CLI path), the shim's re-exports can be retired.
@@ -169,14 +172,14 @@ When a new path becomes load-bearing, pin it. In
 
 ---
 
-## 7. Cut-over note (deferred)
+## 7. History
 
-This is still the **sandbox** (`F:\vosball`, fresh git, no remote). The live
-suite is `F:\ratings` (still the pre-refactor monolith) and has **not** been
-touched. Promoting the sandbox to live is a separate, deferred phase — see
-[REFACTOR_LOG.md](archive/REFACTOR_LOG.md) §"Next phases → Cut-over". Key things not to
-forget when that day comes:
-
-- keep the `vos_v2.py` rollback path available as an escape hatch;
-- reconcile the point-in-time `data/` snapshot (a 2026-05-29 copy) against live
-  data and the ~20 GB of generated output/caches excluded from the sandbox.
+This repo IS the project — the layered `vosball` package plus its golden tests,
+the CLI tools under `core/` and `tools/`, and the web app under `webapp/`. How
+the package was carved out of the old monolith (phase by phase, output held
+byte-identical the whole way) is recorded in
+[REFACTOR_LOG.md](archive/REFACTOR_LOG.md). The retired pre-v10 engine,
+`vos_v2.py`, survives only as an archived reference at
+[../tools/archive/vos_v2.py](../tools/archive/vos_v2.py) — it is not part of any
+live path and is not a rollback target. All engine work goes through `vosball/`
+and the golden harness.

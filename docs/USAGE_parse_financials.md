@@ -1,10 +1,12 @@
 # `parse_financials.py` — Usage Guide
 
-Parses an OOTP "League Financial Report" HTML page into a per-team CSV. Used to feed team budget / revenue / expense / projected-balance data into `budget_audit.py`.
+Parses an OOTP "League Financial Report" HTML page into a per-team CSV. Used to feed team budget / revenue / expense / projected-balance data into `tools/budget_audit.py`.
+
+> VOSBall's primary interface is the local Streamlit web app (`webapp/`). Finances aren't in the app yet (a Finances page is planned); run these from the command line.
 
 ## What it does
 
-The OOTP financial report HTML (exported from in-game BNN reports) has one section per team with three sub-tables: GENERAL INFORMATION, CURRENT FINANCIAL OVERVIEW, LAST SEASON OVERVIEW. This script flattens all of them into one CSV row per team. Team names are canonicalized via `config/teams-<league>.json` so they match what `payroll_audit.py` produces.
+The OOTP financial report HTML (exported from in-game BNN reports) has one section per team with three sub-tables: GENERAL INFORMATION, CURRENT FINANCIAL OVERVIEW, LAST SEASON OVERVIEW. This script flattens all of them into one CSV row per team. Team names are canonicalized via `config/teams-<league>.json` so they match what `tools/payroll_audit.py` produces.
 
 ## Getting the input HTML
 
@@ -32,7 +34,7 @@ A CSV with one row per team and ~30 columns. Key fields:
 
 | Field | Source | Notes |
 |---|---|---|
-| `team` | Canonical from `teams-<league>.json`, fallback to title-cased HTML text | Join key for `budget_audit.py` |
+| `team` | Canonical from `teams-<league>.json`, fallback to title-cased HTML text | Join key for `tools/budget_audit.py` |
 | `team_id` | URL in HTML (`team_NN.html`) | Stable numeric ID, preferred join key |
 | `current_budget` | GENERAL INFO | Owner-set spending ceiling for the season |
 | `player_payroll` | GENERAL INFO | Current cash payroll (this season only) |
@@ -52,20 +54,20 @@ Rows are sorted by `current_budget` descending in the output for convenience.
 
 ## Usage
 
-```
-python parse_financials.py \
-    --league sdmb \
-    --input  sdmb/contract_audit/sdmb_league_financials.html \
-    --output sdmb/contract_audit/sdmb_team_financials.csv
+```powershell
+py tools\parse_financials.py ^
+    --league sdmb ^
+    --input  sdmb\contract_audit\sdmb_league_financials.html ^
+    --output sdmb\contract_audit\sdmb_team_financials.csv
 ```
 
 For other leagues:
 
-```
-python parse_financials.py \
-    --league sahl \
-    --input  sahl/contract_audit/sahl_league_financials.html \
-    --output sahl/contract_audit/sahl_team_financials.csv
+```powershell
+py tools\parse_financials.py ^
+    --league sahl ^
+    --input  sahl\contract_audit\sahl_league_financials.html ^
+    --output sahl\contract_audit\sahl_team_financials.csv
 ```
 
 ## Generalizing to a new league
@@ -80,7 +82,7 @@ python parse_financials.py \
 
 **"WARN: team_ids not in teams-<league>.json: [...]"** — Some teams in the HTML aren't in your league teams config. Add them and re-run, or accept the title-cased fallback for those rows.
 
-**Team names don't match payroll_audit output** — Use `--league` on both scripts and make sure `teams-<league>.json` is current. `budget_audit.py` joins on `team_id` first and then case-insensitive name, so minor naming drift is tolerated but consistency is cleaner.
+**Team names don't match payroll_audit output** — Use `--league` on both scripts and make sure `teams-<league>.json` is current. `tools/budget_audit.py` joins on `team_id` first and then case-insensitive name, so minor naming drift is tolerated but consistency is cleaner.
 
 **Money values look wrong** — Check that the HTML contains real dollar values (`$12,345,678`). Older OOTP versions may use different formats. The parser strips everything that isn't a digit or leading minus.
 
@@ -91,10 +93,12 @@ python parse_financials.py \
 ```
 OOTP in-game BNN ──► <league>_league_financials.html
                                 │
-                                │ parse_financials.py
+                                │ tools/parse_financials.py
                                 ▼
                   <league>_team_financials.csv
                                 │
                                 │
-                                └────► budget_audit.py
+                                └────► tools/budget_audit.py
 ```
+
+See [`USAGE_budget_audit.md`](USAGE_budget_audit.md) and [`USAGE_financial_audit_pipeline.md`](USAGE_financial_audit_pipeline.md).

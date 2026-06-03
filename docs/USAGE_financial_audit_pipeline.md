@@ -2,18 +2,20 @@
 
 Three scripts, run in order. Each one's output feeds the next.
 
+> VOSBall's primary interface is the local Streamlit web app (`webapp/`, launched with `py -m streamlit run webapp/app.py` or `run_ui.bat`). Finances aren't in the app yet (a Finances page is planned); run this pipeline from the command line. The eval CSVs these scripts consume come from the **VOS v10** engine via `run_vos.py`.
+
 ## Flow
 
 ```
    ┌─────────────────────────────┐    ┌──────────────────────────────┐
    │  evaluation_summary_<TS>.csv │   │  league_financials.html      │
-   │  (from vos_v2 --contracts)   │   │  (saved from OOTP BNN report) │
+   │  (from run_vos.py --contracts)│  │  (saved from OOTP BNN report) │
    └────────────┬─────────────────┘   └──────────────┬───────────────┘
                 │                                    │
                 │ + players.csv (service times)      │
                 ▼                                    ▼
    ┌─────────────────────────────┐    ┌──────────────────────────────┐
-   │       payroll_audit.py      │    │      parse_financials.py     │
+   │    tools/payroll_audit.py   │    │   tools/parse_financials.py  │
    │  bucket contracts by svc    │    │   OOTP HTML → CSV            │
    └────────────┬─────────────────┘   └──────────────┬───────────────┘
                 │                                    │
@@ -22,7 +24,7 @@ Three scripts, run in order. Each one's output feeds the next.
                 └──────────────┬─────────────────────┘
                                ▼
                 ┌─────────────────────────────┐
-                │       budget_audit.py        │
+                │     tools/budget_audit.py    │
                 │  join + cap/floor scenarios  │
                 └────────────┬─────────────────┘
                              ▼
@@ -35,15 +37,15 @@ Three scripts, run in order. Each one's output feeds the next.
 ## Step 1 — payroll_audit.py
 
 **Needs:**
-- `<league>/eval/evaluation_summary_<league>_<TS>.csv` (from `vos_v2 --contracts`)
+- `<league>/eval/evaluation_summary_<league>_<TS>.csv` (from `run_vos.py --contracts`)
 - `<league>/cache/stats/players.csv` (already maintained by the ratings pipeline)
 
 **Run:**
-```
-python G:\ratings\payroll_audit.py ^
+```powershell
+py tools\payroll_audit.py ^
     --league <league> ^
-    --eval    G:\ratings\<league>\eval\evaluation_summary_<league>_<TS>.csv ^
-    --players G:\ratings\<league>\cache\stats\players.csv
+    --eval    <league>\eval\evaluation_summary_<league>_<TS>.csv ^
+    --players <league>\cache\stats\players.csv
 ```
 
 **Produces** in `<league>/contract_audit/`:
@@ -57,11 +59,11 @@ python G:\ratings\payroll_audit.py ^
 - A saved OOTP BNN financial report HTML. In game: **BNN → League Reports → Financial Report → Save As** (place it in `<league>/contract_audit/`).
 
 **Run:**
-```
-python G:\ratings\parse_financials.py ^
+```powershell
+py tools\parse_financials.py ^
     --league <league> ^
-    --input   G:\ratings\<league>\contract_audit\<league>_league_financials.html ^
-    --output  G:\ratings\<league>\contract_audit\<league>_team_financials.csv
+    --input   <league>\contract_audit\<league>_league_financials.html ^
+    --output  <league>\contract_audit\<league>_team_financials.csv
 ```
 
 **Produces:** `<league>_team_financials.csv` — one row per team with budget, payroll, revenue lines, expenses, projected balance, attendance.
@@ -71,19 +73,19 @@ python G:\ratings\parse_financials.py ^
 **Needs:** outputs of steps 1 and 2.
 
 **Default run (% scenarios only):**
-```
-python G:\ratings\budget_audit.py ^
+```powershell
+py tools\budget_audit.py ^
     --league <league> ^
-    --audit-csv  G:\ratings\<league>\contract_audit\payroll_audit_contracts_<league>_<TS>_svc.csv ^
-    --financials G:\ratings\<league>\contract_audit\<league>_team_financials.csv
+    --audit-csv  <league>\contract_audit\payroll_audit_contracts_<league>_<TS>_svc.csv ^
+    --financials <league>\contract_audit\<league>_team_financials.csv
 ```
 
 **With proposed thresholds + cap phase-in:**
-```
-python G:\ratings\budget_audit.py ^
+```powershell
+py tools\budget_audit.py ^
     --league <league> ^
-    --audit-csv  ...payroll_audit_contracts_<league>_<TS>_svc.csv ^
-    --financials ...<league>_team_financials.csv ^
+    --audit-csv  <league>\contract_audit\payroll_audit_contracts_<league>_<TS>_svc.csv ^
+    --financials <league>\contract_audit\<league>_team_financials.csv ^
     --floor-dollars 135000000 ^
     --cap-dollars   200000000 ^
     --cap-phase     3 ^
@@ -100,15 +102,15 @@ python G:\ratings\budget_audit.py ^
 Before step 1, make sure these exist (most are maintained automatically):
 
 - [ ] `config/teams-<league>.json`
-- [ ] `<league>/eval/evaluation_summary_<league>_<TS>.csv` (run `vos_v2 --contracts --league <league>`)
+- [ ] `<league>/eval/evaluation_summary_<league>_<TS>.csv` (run `py run_vos.py --contracts --league <league>`)
 - [ ] `<league>/cache/stats/players.csv` (refreshed by the ratings pipeline)
 - [ ] `<league>/contract_audit/<league>_league_financials.html` (you save this manually from OOTP)
 
 ## CLI reference
 
 For per-script flag details:
-- `USAGE_payroll_audit.md`
-- `USAGE_parse_financials.md`
-- `USAGE_budget_audit.md`
+- [`USAGE_payroll_audit.md`](USAGE_payroll_audit.md)
+- [`USAGE_parse_financials.md`](USAGE_parse_financials.md)
+- [`USAGE_budget_audit.md`](USAGE_budget_audit.md)
 
 For methodology and findings interpretation, see `<league>/contract_audit/PAYROLL_AUDIT_README.md` (SDMB version is the canonical example).

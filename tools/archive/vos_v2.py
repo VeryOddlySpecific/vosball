@@ -9,7 +9,7 @@ config (weights_v2.json, id_maps, teams). Outputs evaluation_summary_{league}_{t
 from __future__ import annotations
 # --- repo-root + core/ path bootstrap ---
 import os as _os, sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # tools/archive/ -> repo root
 for _p in (_ROOT, _os.path.join(_ROOT, "core")):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)
@@ -31,7 +31,7 @@ from urllib.request import urlopen
 # Paths and constants
 # -----------------------------------------------------------------------------
 
-SCRIPT_DIR = Path(__file__).resolve().parent.parent
+SCRIPT_DIR = Path(__file__).resolve().parent.parent.parent  # tools/archive/ -> repo root
 DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
 DEFAULT_CONFIG_DIR = SCRIPT_DIR / "config"
 WEIGHTS_FILENAME = "weights_v2.json"
