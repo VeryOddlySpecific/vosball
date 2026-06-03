@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# pre-push: keep .gitignore'd files off the remote.
+#
+# If any *tracked* file now matches a .gitignore rule (e.g. it was committed
+# before the ignore rule existed, or force-added with `git add -f`), this hook
+# untracks it (git rm --cached — the working copy is kept on disk), commits the
+# removal, and BLOCKS this push. Run your push again to send the cleanup.
+#
+# A pre-push hook cannot add a commit to the push already in flight (git has
+# locked the SHA being sent), so the re-push is required by design.
+#
+# Enable in a fresh clone with:  git config core.hooksPath .githooks
+#
+set -e
+
+ignored=$(git ls-files --cached --ignored --exclude-standard)
+[ -z "$ignored" ] && exit 0
+
+echo "pre-push: tracked file(s) now match .gitignore — untracking them:" >&2
+printf '%s\n' "$ignored" | sed 's/^/    /' >&2
+
+# Untrack (NUL-safe so paths with spaces are handled correctly); keep on disk.
+git ls-files -z --cached --ignored --exclude-standard | xargs -0 -r git rm --cached --quiet
+
+# Commit the removals. At push time the index normally equals HEAD, so this
+# commit contains only the untrack changes above.
+git commit --quiet -m "chore: untrack files now matching .gitignore"
+
+echo "" >&2
+echo "pre-push: created a cleanup commit and stopped this push." >&2
+echo "pre-push: run your push again to send the cleanup to the remote." >&2
+exit 1
