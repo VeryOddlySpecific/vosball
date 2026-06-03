@@ -64,6 +64,7 @@ import free_agents  # noqa: E402  (Free Agents — biggest-holes-first targeting
 import trade_targets_page  # noqa: E402  (Trade Targets — block scored vs your needs)
 import farm_value_page  # noqa: E402  (Farm Value — org farm systems, ranked)
 import home  # noqa: E402  (cold-boot league-select landing)
+import league_admin  # noqa: E402  (League Admin — per-league settings management)
 import career_war  # noqa: E402  (opt-in accumulated-WAR fetch for the player card)
 
 from state import (  # noqa: E402  per-league result silo + active-league helpers
@@ -275,11 +276,13 @@ def main() -> None:
     farm_value_pg = st.Page(farm_value_page.page, title="Farm Value",
                             icon="💲", url_path="farm_value")
     league_page = st.Page(league_hub.page, title="League Hub", icon="🏟️", url_path="league")
+    league_admin_page = st.Page(league_admin.page, title="League Admin", icon="⚙️",
+                                url_path="league_admin")
     st.session_state["_pages"] = {
         "home": home_page, "eval": eval_page, "card": card_page, "depth": depth_page,
         "prospects": prospects_page, "free_agents": free_agents_page,
         "trade_targets": trade_targets_pg, "farm_value": farm_value_pg,
-        "league": league_page,
+        "league": league_page, "league_admin": league_admin_page,
     }
     _PAGES["card"] = card_page  # existing eval→card bridge
 
@@ -300,7 +303,7 @@ def main() -> None:
 
     nav = st.navigation([home_page, eval_page, card_page, depth_page,
                          prospects_page, free_agents_page, trade_targets_pg,
-                         farm_value_pg, league_page])
+                         farm_value_pg, league_page, league_admin_page])
     # A header chip sets _pending_page; navigate now that the pages are
     # registered (switch_page from the pre-nav chrome isn't reliable).
     goto = st.session_state.pop("_pending_page", None)
@@ -308,8 +311,10 @@ def main() -> None:
         st.switch_page(st.session_state["_pages"][goto])
     # Cold-boot gate: until a league is chosen, force the Home league-select
     # landing — even if a module page is opened directly from the sidebar nav.
-    # (Skip when already on Home, so this never loops.)
-    if not st.session_state.get("selected_league") and nav.url_path != home_page.url_path:
+    # (Skip when already on Home, so this never loops. League Admin is also
+    # exempt: it's league-agnostic and is where you add the *first* league.)
+    _gate_exempt = {home_page.url_path, league_admin_page.url_path}
+    if not st.session_state.get("selected_league") and nav.url_path not in _gate_exempt:
         st.switch_page(home_page)
     nav.run()
 

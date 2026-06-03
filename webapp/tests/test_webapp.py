@@ -96,9 +96,268 @@ def test_app_boots_and_registers_all_pages():
         "app did not register any pages in session_state['_pages']"
     pages = at.session_state["_pages"]
     expected = {"home", "eval", "card", "depth", "prospects", "free_agents",
-                "trade_targets", "farm_value", "league"}
+                "trade_targets", "farm_value", "league", "league_admin"}
     assert expected.issubset(set(pages)), \
         f"missing page registrations: {expected - set(pages)}"
+
+
+def test_league_admin_page_renders_readonly():
+    """League Admin renders its coverage matrix + per-league detail against the
+    real config/ with no exception (Phase 1 is read-only — no writes happen)."""
+    from streamlit.testing.v1 import AppTest
+
+    at = AppTest.from_string(_silo_script(
+        'import league_admin\n'
+        'league_admin.page()\n'
+    ), default_timeout=60)
+    at.run()
+    assert not at.exception, f"league_admin.page() raised: {at.exception}"
+    assert any("League Admin" in h.value for h in at.header), \
+        "League Admin header not rendered"
+
+
+def _admin_scaffold(tmp):
+    """Minimal config/ with one league + _comment, for write-path tests."""
+    import json
+    (tmp / "league_url.json").write_text(json.dumps({
+        "_comment": "keep", "ndl": "https://statsplus.net/ndl/api",
+    }), encoding="utf-8")
+    (tmp / "league_settings.json").write_text(json.dumps({
+        "ndl": {"rating_scale": "1-100", "org": "Seattle Whalers", "year": 2055},
+    }), encoding="utf-8")
+
+
+def test_league_admin_apply_edits_persists_only_changes():
+    """apply_edits writes just the changed fields, leaves _comment/siblings and
+    token untouched, and reports which fields changed."""
+    import json
+    import tempfile
+    import league_admin
+    from league_registry import LeagueRegistry
+
+    with tempfile.TemporaryDirectory() as t:
+        tmp = Path(t)
+        _admin_scaffold(tmp)
+        reg = LeagueRegistry(tmp)
+
+        changed = league_admin.apply_edits(
+            reg, "ndl", url="https://statsplus.net/ndl/api", token="",
+            rating_scale="1-100", org="Tucson Oilmen", year=2056,
+            min_comp=None, game_version="OOTP 27", sim_time="",
+        )
+        assert set(changed) == {"org", "year", "game_version"}, changed
+        urls = json.loads((tmp / "league_url.json").read_text(encoding="utf-8"))
+        assert urls.get("_comment") == "keep", "url _comment lost"
+        back = reg.load("ndl")
+        assert back.org == "Tucson Oilmen" and back.year == 2056
+        assert back.game_version == "OOTP 27"
+        assert not (tmp / "statsplus_tokens.json").exists(), \
+            "blank token must not write a tokens file"
+
+
+def test_league_admin_apply_edits_noop_and_token_and_invalid():
+    """No-op returns []; a provided token is written; an invalid URL raises."""
+    import tempfile
+    import league_admin
+    from league_registry import LeagueRegistry, RegistryError
+
+    with tempfile.TemporaryDirectory() as t:
+        tmp = Path(t)
+        _admin_scaffold(tmp)
+        reg = LeagueRegistry(tmp)
+
+        # identical values -> no change
+        noop = league_admin.apply_edits(
+            reg, "ndl", url="https://statsplus.net/ndl/api", token="",
+            rating_scale="1-100", org="Seattle Whalers", year=2055,
+            min_comp=None, game_version="", sim_time="",
+        )
+        assert noop == [], noop
+
+        # provide a token -> written
+        changed = league_admin.apply_edits(
+            reg, "ndl", url="https://statsplus.net/ndl/api",
+            token="019e134f-1287-7d89-bda3-fc8928b1cb68",
+            rating_scale="1-100", org="Seattle Whalers", year=2055,
+            min_comp=None, game_version="", sim_time="",
+        )
+        assert changed == ["token"], changed
+        assert reg.load("ndl").token.startswith("019e134f")
+
+        # invalid URL -> RegistryError, nothing persisted
+        try:
+            league_admin.apply_edits(
+                reg, "ndl", url="not-a-url", token="",
+                rating_scale="1-100", org="Seattle Whalers", year=2055,
+                min_comp=None, game_version="", sim_time="",
+            )
+            assert False, "invalid URL should raise"
+        except RegistryError:
+            pass
+
+
+def test_league_admin_structured_parsers():
+    """The UI-free parse_* helpers convert editor rows to the on-disk shapes,
+    dropping blanks and rejecting bad integers."""
+    import league_admin as la
+    from league_registry import RegistryError
+
+    ids = la.parse_league_ids([
+        {"Level": "ML", "League IDs": "200"},
+        {"Level": "AAA", "League IDs": "201, 202"},
+        {"Level": "_international", "League IDs": "217,218"},
+        {"Level": "", "League IDs": "999"},          # blank level dropped
+    ])
+    assert ids == {"ML": [200], "AAA": [201, 202], "_international": [217, 218]}, ids
+    try:
+        la.parse_league_ids([{"Level": "ML", "League IDs": "20x"}])
+        assert False, "non-integer ID should raise"
+    except RegistryError:
+        pass
+
+    assert la.parse_orgs([{"Org": "A"}, {"Org": " "}, {"Org": "B"}]) == ["A", "B"]
+
+    div = la.parse_divisions([
+        {"Sub-league": "AL", "Division": "East", "Team": "Spitters"},
+        {"Sub-league": "AL", "Division": "East", "Team": "Vice"},
+        {"Sub-league": "AL", "Division": "West", "Team": "Drifters"},
+        {"Sub-league": "NL", "Division": "East", "Team": "Cubs"},
+        {"Sub-league": "AL", "Division": "", "Team": "Orphan"},   # incomplete dropped
+    ])
+    assert div == {"AL": {"East": ["Spitters", "Vice"], "West": ["Drifters"]},
+                   "NL": {"East": ["Cubs"]}}, div
+
+    slack = la.parse_gm_slack([
+        {"Team": "Whalers", "Handle": "Alex"},
+        {"Team": "Vice", "Handle": ""},        # blank handle kept
+        {"Team": "", "Handle": "ghost"},       # blank team dropped
+    ])
+    assert slack == {"Whalers": "Alex", "Vice": ""}, slack
+
+
+def test_league_admin_structured_roundtrip():
+    """Saving parsed ID-map and divisions through the registry round-trips, and
+    leaves the league_url _comment + sibling intact."""
+    import json
+    import tempfile
+    import league_admin as la
+    from league_registry import LeagueRegistry, LeagueConfig
+
+    with tempfile.TemporaryDirectory() as t:
+        tmp = Path(t)
+        _admin_scaffold(tmp)
+        reg = LeagueRegistry(tmp)
+
+        ids = la.parse_league_ids([{"Level": "ML", "League IDs": "200"},
+                                   {"Level": "AAA", "League IDs": "201, 202"}])
+        reg.save(LeagueConfig(slug="ndl", league_ids=ids))
+        div = la.parse_divisions([{"Sub-league": "AL", "Division": "East", "Team": "Spitters"}])
+        reg.save(LeagueConfig(slug="ndl", divisions=div))
+
+        back = reg.load("ndl")
+        assert back.league_ids == {"ML": [200], "AAA": [201, 202]}
+        assert back.divisions == {"AL": {"East": ["Spitters"]}}
+        assert (tmp / "divisions-ndl.json").exists()
+        # untouched scalar settings + url comment survive the per-league writes
+        urls = json.loads((tmp / "league_url.json").read_text(encoding="utf-8"))
+        assert urls.get("_comment") == "keep"
+        assert back.org == "Seattle Whalers"
+
+
+# /teams sample (quoted CSV, per api.txt) + /ballparks sample (the real shape).
+_TEAMS_CSV = (
+    '"ID","Name","Nickname","Parent Team ID"\n'
+    '"31","Arizona","Diamondbacks","0"\n'
+    '"5","Reno","Aces","31"\n'
+    '"32","Boston","Beans",""\n'
+)
+_BALLPARKS = {
+    "league_id": 0,
+    "ballparks": [
+        {"team_id": 31, "league_id": 153, "park_id": 13, "name": "Arizona",
+         "nickname": "Diamondbacks", "display_name": "Arizona Diamondbacks",
+         "abbr": "ARI", "avg_r": 1, "avg_l": 1.06, "avg": 1.021, "d": 1.09,
+         "t": 1.67, "hr_r": 0.98, "hr_l": 1.01, "hr": 0.9905, "capacity": 48633,
+         "stadium_type": "Retractable Roof", "surface": "Grass"},
+        {"team_id": 32, "league_id": 153, "park_id": 14, "name": "Boston",
+         "nickname": "Beans", "display_name": "Boston Beans", "abbr": "BOS",
+         "avg_r": 1.0, "avg_l": 1.0, "avg": 1.0, "d": 1.0, "t": 1.0,
+         "hr_r": 1.0, "hr_l": 1.0, "hr": 1.0, "capacity": 38000,
+         "stadium_type": "Open", "surface": "Grass"},
+    ],
+}
+
+
+def test_provision_parsers_map_api_to_files():
+    """parse_teams_csv / build_park_factors / build_orgs convert the API
+    payloads to the on-disk shapes with neutral park adjustments."""
+    import league_provision as lp
+
+    teams = lp.parse_teams_csv(_TEAMS_CSV)
+    assert teams["31"] == {"Name": "Arizona", "Nickname": "Diamondbacks", "Parent": 0}
+    assert teams["5"]["Parent"] == 31
+    assert teams["32"]["Parent"] == 0  # blank parent -> 0
+
+    pf = lp.build_park_factors(_BALLPARKS)
+    ari = pf["teams"]["Arizona Diamondbacks"]
+    assert ari["team_info"] == {"team_name": "Arizona Diamondbacks",
+                                "team_code": "ARI", "park_name": ""}
+    raw = ari["raw_park_factors"]
+    assert (raw["avg_overall"], raw["avg_rhb"], raw["avg_lhb"]) == (1.021, 1.0, 1.06)
+    assert (raw["doubles"], raw["triples"], raw["hr_overall"]) == (1.09, 1.67, 0.9905)
+    assert (raw["hr_rhb"], raw["hr_lhb"]) == (0.98, 1.01)
+    # neutral adjustments across all tool groups
+    assert ari["tool_adjustments"]["batting"]["Pow"] == 1.0
+    assert ari["tool_adjustments"]["defense"]["OFR"] == 1.0
+    assert ari["tool_adjustments"]["pitcher_ability"]["Stuff"] == 1.0
+    assert ari["park_profile"]["capacity"] == 48633
+
+    assert lp.build_orgs(_BALLPARKS) == ["Arizona Diamondbacks", "Boston Beans"]
+    assert lp.ml_lid_from_ballparks(_BALLPARKS) == 153
+
+
+def test_provision_league_orchestration():
+    """provision_league writes the three files + registry entries from stubbed
+    fetchers, and refuses to clobber an existing league without overwrite."""
+    import tempfile
+    import league_provision as lp
+    from league_registry import LeagueRegistry
+
+    def text_fetcher(url, endpoint, token, **kw):
+        assert endpoint == "teams"
+        return _TEAMS_CSV
+
+    def json_fetcher(url, endpoint, token, **kw):
+        assert endpoint == "ballparks"
+        return _BALLPARKS
+
+    with tempfile.TemporaryDirectory() as t:
+        tmp = Path(t)
+        reg = LeagueRegistry(tmp)
+        manifest = lp.provision_league(
+            reg, "abc", "https://statsplus.net/abc/api", None,
+            settings={"org": "Arizona Diamondbacks", "rating_scale": "20-80", "year": 2050},
+            text_fetcher=text_fetcher, json_fetcher=json_fetcher,
+        )
+        assert manifest["teams_count"] == 3 and manifest["parks_count"] == 2
+        assert manifest["orgs_count"] == 2 and manifest["ml_lid"] == 153
+        assert (tmp / "teams-abc.json").exists()
+        assert (tmp / "abc-park-factors.json").exists()
+        assert (tmp / "abc_orgs.json").exists()
+
+        assert reg.exists("abc")
+        cfg = reg.load("abc")
+        assert cfg.url.endswith("/abc/api")
+        assert cfg.league_ids == {"ML": [153]}
+        assert cfg.org == "Arizona Diamondbacks" and cfg.year == 2050
+
+        # re-provision without overwrite is refused
+        try:
+            lp.provision_league(reg, "abc", "https://statsplus.net/abc/api", None,
+                                text_fetcher=text_fetcher, json_fetcher=json_fetcher)
+            assert False, "should refuse to clobber existing league"
+        except lp.ProvisionError:
+            pass
 
 
 def test_cold_boot_shows_league_select_no_autorun():
