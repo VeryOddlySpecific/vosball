@@ -31,6 +31,8 @@ from depth_chart import (  # noqa: E402
     build_position_depth_table, load_config, league_default_year,
     HITTER_POSITIONS, DEFAULT_CONFIG, DEFAULT_LEAGUE_URL, DEFAULT_LEAGUE_IDS,
 )
+from state import active_result, active_league  # noqa: E402  (per-league silo)
+from scoring import autorun_result  # noqa: E402  (auto-score on first visit)
 
 CONFIG_DIR = ROOT / "config"
 BULLPEN_ROLES = ["CL", "SU", "MR", "LR"]
@@ -184,7 +186,7 @@ def _bullpen_df(pslots) -> pd.DataFrame:
 # --- page -------------------------------------------------------------------
 
 def page() -> None:
-    result = st.session_state.get("result")
+    result = active_result() or autorun_result(active_league())
     if not result or not result.get("rows"):
         st.info("Run an evaluation on the **Eval Browser** page first — depth "
                 "charts use that league's scored players.")

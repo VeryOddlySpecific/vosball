@@ -24,6 +24,8 @@ import streamlit as st  # noqa: E402
 import pandas as pd  # noqa: E402
 
 import prospect_rankings as pr  # noqa: E402  (stdlib-only deps; safe to import)
+from state import active_result, active_league  # noqa: E402  (per-league silo)
+from scoring import autorun_result  # noqa: E402  (auto-score on first visit)
 
 CONFIG_DIR = ROOT / "config"
 DATA_DIR = ROOT / "data"
@@ -104,7 +106,7 @@ def _board_df(rows: List[Dict[str, Any]]) -> pd.DataFrame:
 # --- page -------------------------------------------------------------------
 
 def page() -> None:
-    result = st.session_state.get("result")
+    result = active_result() or autorun_result(active_league())
     if not result or not result.get("rows"):
         st.info("Run an evaluation on the **Eval Browser** page first — the "
                 "prospect board ranks that league's scored players.")
