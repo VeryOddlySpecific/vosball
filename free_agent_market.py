@@ -27,6 +27,8 @@ import csv
 import json
 import logging
 import re
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -86,6 +88,11 @@ def parse_args() -> argparse.Namespace:
                    help="Multi-level mode. Reads the latest existing depth chart batch in {league}/depth/ for the org "
                         "and produces FA upgrade recommendations per (level, position) slot in one combined report. "
                         "Ignores --level when set.")
+    p.add_argument("--no-auto-refresh", action="store_true",
+                   help="In --scan-depth-dir mode, don't regenerate depth charts even when the "
+                        "on-disk batch is older than the latest eval (or has no provenance). "
+                        "By default FA re-runs depth_chart.py against the latest eval first so "
+                        "recommendations always reflect current evaluations.")
     p.add_argument("--age-cap-override", type=int, default=None,
                    help="Override the per-level age cap in --scan-depth-dir mode. Defaults shipped per level (AA cap 30, A+/A cap 27, A-/R cap 24).")
     p.add_argument("--ignore-last-level", action="store_true",
@@ -805,6 +812,141 @@ def discover_latest_depth_batch(depth_dir: Path, org_slug: str) -> Optional[str]
     return sorted(timestamps)[-1]
 
 
+def read_depth_meta(depth_dir: Path, org_slug: str, ts: str) -> Optional[Dict[str, Any]]:
+    """Read the ``{org}_{ts}_depth_meta.json`` provenance sidecar for a batch,
+    or None if it doesn't exist / can't be parsed (legacy batches predating the
+    sidecar)."""
+    p = depth_dir / f"{org_slug}_{ts}_depth_meta.json"
+    if not p.exists():
+        return None
+    try:
+        with p.open(encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.warning("Couldn't read depth meta %s: %s", p, exc)
+        return None
+
+
+def depth_batch_source_eval_ts(depth_dir: Path, org_slug: str, ts: str) -> Optional[str]:
+    """Best-effort timestamp of the eval a depth batch was built from.
+
+    Prefers the per-batch meta sidecar; falls back to any per-level
+    starter_gaps sidecar from the same batch (depth_chart runs that had
+    --min-comp but predate the meta sidecar). Returns None when no provenance
+    exists at all — caller treats that as stale and regenerates.
+    """
+    meta = read_depth_meta(depth_dir, org_slug, ts)
+    if meta and meta.get("source_eval_ts"):
+        return meta["source_eval_ts"]
+    for p in sorted(depth_dir.glob(f"{org_slug}_*_{ts}_starter_gaps.json")):
+        data = dc.load_starter_gaps_sidecar(p)
+        if data.get("source_eval_ts"):
+            return data["source_eval_ts"]
+    return None
+
+
+def regenerate_depth_batch(
+    args: argparse.Namespace,
+    depth_dir: Path,
+    org_slug: str,
+    target_year: int,
+    prior_meta: Optional[Dict[str, Any]],
+) -> Optional[str]:
+    """Re-run depth_chart.py (subprocess) against the latest eval and return the
+    new batch timestamp, or None on failure.
+
+    Mirrors run_depth_chart_all.py's subprocess pattern (no in-process coupling
+    to depth_chart's batch state). Forces ``--org-code org_slug`` so the
+    regenerated files carry the exact slug FA discovers by, and replays the
+    starter min-comp thresholds from the prior batch's meta sidecar (falling
+    back to this run's --min-comp/--min-comp-pos) so the gap analysis survives.
+    """
+    cmd = [
+        sys.executable, str(SCRIPT_DIR / "depth_chart.py"),
+        "--league", args.league,
+        "--org", args.org,
+        "--org-code", org_slug,
+        "--year", str(target_year),
+        "--all-level-charts",
+        "--no-pdf",
+    ]
+    pf = args.park_factors or dc._default_park_factors_path(args.league)
+    if pf and Path(pf).exists():
+        cmd += ["--park-factors", str(pf)]
+
+    # Replay thresholds: prior batch's recorded settings win; else this run's CLI.
+    g_min = (prior_meta or {}).get("min_comp_global")
+    pp_min = (prior_meta or {}).get("min_comp_per_pos") or {}
+    if g_min is None and pp_min == {}:
+        g_min = args.min_comp
+        if args.min_comp_pos:
+            try:
+                pp_min = dc.parse_min_comp_pos(args.min_comp_pos)
+            except ValueError:
+                pp_min = {}
+    if g_min is not None:
+        cmd += ["--min-comp", str(g_min)]
+    if pp_min:
+        cmd += ["--min-comp-pos", ",".join(f"{k}:{v:g}" for k, v in pp_min.items())]
+
+    logger.info("Regenerating depth charts from latest eval: $ %s", " ".join(cmd))
+    rc = subprocess.run(cmd).returncode
+    if rc != 0:
+        logger.error("depth_chart regeneration failed (rc=%d).", rc)
+        return None
+    return discover_latest_depth_batch(depth_dir, org_slug)
+
+
+def ensure_fresh_depth_batch(
+    args: argparse.Namespace,
+    depth_dir: Path,
+    org_slug: str,
+    target_year: int,
+) -> Optional[str]:
+    """Return a depth-batch timestamp guaranteed to reflect the latest eval.
+
+    Compares the latest depth batch's source-eval timestamp against the current
+    latest eval. If the batch is older, has no provenance (legacy), or doesn't
+    exist at all, regenerates via depth_chart.py first. ``--no-auto-refresh``
+    skips regeneration and just warns. Returns None only when there's no batch
+    and regeneration is disabled or fails.
+    """
+    try:
+        latest_eval = dc.find_latest_eval(args.league, args.input, args.org_code)
+    except FileNotFoundError as exc:
+        logger.error("%s", exc)
+        return discover_latest_depth_batch(depth_dir, org_slug)
+    latest_eval_ts = dc.eval_ts_from_path(latest_eval)
+
+    ts = discover_latest_depth_batch(depth_dir, org_slug)
+    prior_meta = read_depth_meta(depth_dir, org_slug, ts) if ts else None
+
+    if ts is None:
+        reason = f"no depth batch on disk for '{org_slug}'"
+    else:
+        source_ts = depth_batch_source_eval_ts(depth_dir, org_slug, ts)
+        if source_ts is None:
+            reason = f"depth batch {ts} has no eval provenance (legacy)"
+        elif latest_eval_ts and source_ts < latest_eval_ts:
+            reason = (f"depth batch {ts} built from eval {source_ts}, "
+                      f"but latest eval is {latest_eval_ts}")
+        else:
+            logger.info("Depth batch %s is current with eval %s.", ts, latest_eval_ts)
+            return ts
+
+    if getattr(args, "no_auto_refresh", False):
+        logger.warning("Stale depth charts (%s) - --no-auto-refresh set, scanning as-is.", reason)
+        return ts
+
+    logger.info("Stale depth charts (%s) - regenerating from latest eval %s.",
+                reason, latest_eval.name)
+    new_ts = regenerate_depth_batch(args, depth_dir, org_slug, target_year, prior_meta)
+    if new_ts is None:
+        logger.error("Regeneration failed; falling back to existing batch (%s).", ts or "none")
+        return ts
+    return new_ts
+
+
 def levels_in_batch(depth_dir: Path, org_slug: str, ts: str) -> List[Tuple[str, str]]:
     """Return [(display_level, base_level), ...] ordered top-down for the batch.
 
@@ -1184,6 +1326,170 @@ def _slot_pos_score(starter: Optional[Dict[str, Any]], pos: str) -> float:
     return float(starter.get("composite", 0.0))
 
 
+def pro_service_days_of(pid: str, players_lookup: Dict[str, Dict[str, Any]]) -> Optional[int]:
+    """Pro service days for a player id from a /players lookup, or None when the
+    player isn't in /players or the field is blank/unparseable. None means
+    'unknown' — callers treat it as not-yet-a-pro for the service-time gate."""
+    meta = players_lookup.get((pid or "").strip())
+    if not meta:
+        return None
+    raw = (meta.get("pro_service_days") or "").strip()
+    if not raw:
+        return None
+    try:
+        return int(float(raw))
+    except (TypeError, ValueError):
+        return None
+
+
+def score_fa_records(
+    eval_rows: List[Dict[str, str]],
+    level_cfg: Dict[str, Any],
+    floors: Dict[str, float],
+    *,
+    hitters_stats: Optional[Dict[str, Dict[str, Any]]] = None,
+    pitchers_stats: Optional[Dict[str, Dict[str, Any]]] = None,
+    means_stds: Optional[Dict[str, Any]] = None,
+    players_lookup: Optional[Dict[str, Dict[str, Any]]] = None,
+    min_pro_service_days: int = 0,
+    exclude_retired: bool = True,
+) -> List[Dict[str, Any]]:
+    """Score the free-agent pool (eval rows with no Org) at one level, in-process.
+
+    Ratings-only by default (empty stat bundles + empty z-score context) — fully
+    offline, matching the depth UI page's default. Pass ``hitters_stats`` /
+    ``pitchers_stats`` and a ``means_stds`` dict (keys: p_means, p_stds, h_means,
+    h_stds, h_means_l, h_stds_l, h_means_r, h_stds_r) to blend in-season form.
+
+    ``players_lookup`` (the /players payload) drives two eligibility filters that
+    the eval CSV alone can't express, since unsigned amateurs and pro FAs both
+    have no Org:
+      • ``exclude_retired`` drops Retired=1 players.
+      • ``min_pro_service_days`` drops anyone below that many days of pro service
+        — including amateurs absent from /players (treated as 0). Matches the
+        CLI scan's conservative semantics (unknown ⇒ excluded). Only applied when
+        a non-empty ``players_lookup`` is supplied; with no /players data the
+        gate is skipped (can't verify), so the caller should warn.
+
+    Every record carries ``pro_service_days`` (int or None) for downstream use.
+    Returns enriched player records. No file IO — reusable by the UI and CLI.
+    """
+    hs = hitters_stats or {}
+    ps = pitchers_stats or {}
+    ms = means_stds or {}
+    pl = players_lookup or {}
+
+    def _g(k: str) -> Dict[str, float]:
+        return ms.get(k, {}) or {}
+
+    out: List[Dict[str, Any]] = []
+    for r in fa_pool(eval_rows):
+        pid = (r.get("ID") or "").strip()
+        if pl and exclude_retired and dc._bool_from_value(pl.get(pid, {}).get("retired")):
+            continue
+        rec = dc.build_player_record(
+            r, ps, hs, level_cfg, floors,
+            _g("p_means"), _g("p_stds"), _g("h_means"), _g("h_stds"),
+            _g("h_means_l"), _g("h_stds_l"), _g("h_means_r"), _g("h_stds_r"),
+        )
+        rec["last_level"] = (r.get("League_Level") or "").strip()
+        rec["pro_service_days"] = pro_service_days_of(pid, pl)
+        _attach_v10_passthrough(rec, r)
+        out.append(rec)
+
+    # Service-time gate — only meaningful when we actually have /players data.
+    if pl and min_pro_service_days > 0:
+        out = [rec for rec in out
+               if rec["pro_service_days"] is not None
+               and rec["pro_service_days"] >= min_pro_service_days]
+    return out
+
+
+def compute_fa_fit(
+    starters_by_pos: Dict[str, Optional[Dict[str, Any]]],
+    pitcher_slots: Dict[str, List[Dict[str, Any]]],
+    fa_hitters: List[Dict[str, Any]],
+    fa_pitchers: List[Dict[str, Any]],
+    thresholds: Dict[str, float],
+    top_n: int = 3,
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Biggest-holes-first FA targeting as plain data (no IO, no markdown).
+
+    A hitter position / pitcher role is a *hole* when its starter (or weakest
+    slotted pitcher) scores below the threshold for that slot; ``gap =
+    threshold - slot_score``. Holes are returned sorted by gap descending — your
+    biggest need first — each with the top-``top_n`` best-fit free agents.
+
+    Hitter fit uses the per-position blended score (``pos_scores_blended[pos]``);
+    pitcher fit uses ``composite`` within the SP/RP role bucket. Slots with no
+    threshold entry are skipped. Shared by the CLI and the in-process UI page.
+    """
+    def _fa_entry(p: Dict[str, Any], fit_score: float, slot_score: float) -> Dict[str, Any]:
+        return {
+            "pid": p.get("pid", ""),
+            "name": p.get("name", ""),
+            "age": p.get("age", ""),
+            "last_level": p.get("last_level", ""),
+            "fit_score": float(fit_score),
+            "vos": float(p.get("vos", 0.0) or 0.0),
+            "vos_tier": p.get("vos_tier", "") or "",
+            "edge": float(fit_score) - float(slot_score),
+            "fair_aav": p.get("fair_aav"),
+        }
+
+    hitter_holes: List[Dict[str, Any]] = []
+    for pos in HITTER_POSITIONS:
+        thr = thresholds.get(pos)
+        if thr is None:
+            continue
+        starter = starters_by_pos.get(pos)
+        slot_score = _slot_pos_score(starter, pos)
+        if slot_score >= float(thr):
+            continue
+        ranked = sorted(
+            (p for p in fa_hitters if (p.get("pos_scores_blended") or {}).get(pos, 0.0) > 0),
+            key=lambda p: -(p.get("pos_scores_blended") or {}).get(pos, 0.0),
+        )[:top_n]
+        hitter_holes.append({
+            "pos": pos,
+            "starter_name": starter["name"] if starter else "(empty)",
+            "slot_score": float(slot_score),
+            "threshold": float(thr),
+            "gap": float(thr) - float(slot_score),
+            "fas": [_fa_entry(p, (p.get("pos_scores_blended") or {}).get(pos, 0.0), slot_score)
+                    for p in ranked],
+        })
+
+    pitcher_holes: List[Dict[str, Any]] = []
+    for role in PITCHER_ROLES:
+        thr = thresholds.get(role)
+        if thr is None:
+            continue
+        slots = pitcher_slots.get(role, [])
+        weakest = min(slots, key=lambda r: r["composite"]) if slots else None
+        slot_comp = float(weakest["composite"]) if weakest else 0.0
+        if weakest is not None and slot_comp >= float(thr):
+            continue
+        fa_role = "RP" if role in {"CL", "SU", "MR", "LR"} else "SP"
+        ranked = sorted(
+            (p for p in fa_pitchers if p.get("proj_role", "") == fa_role),
+            key=lambda p: -float(p.get("composite", 0.0) or 0.0),
+        )[:top_n]
+        pitcher_holes.append({
+            "role": role,
+            "starter_name": weakest["name"] if weakest else "(empty)",
+            "slot_score": slot_comp,
+            "threshold": float(thr),
+            "gap": float(thr) - slot_comp,
+            "fas": [_fa_entry(p, float(p.get("composite", 0.0) or 0.0), slot_comp)
+                    for p in ranked],
+        })
+
+    hitter_holes.sort(key=lambda hgap: -hgap["gap"])
+    pitcher_holes.sort(key=lambda hgap: -hgap["gap"])
+    return {"hitter_holes": hitter_holes, "pitcher_holes": pitcher_holes}
+
+
 def _render_hitter_upgrade_table(
     starters_by_pos: Dict[str, Optional[Dict[str, Any]]],
     fa_hitters_sorted: List[Dict[str, Any]],
@@ -1493,10 +1799,13 @@ def run_multilevel(args: argparse.Namespace, cfg: Dict[str, Any]) -> int:
     # Discover the latest depth chart batch for the org
     depth_dir = args.output_dir or (SCRIPT_DIR / args.league / "depth")
     org_slug = (args.org_code or args.org).lower().replace(" ", "_")
-    ts = discover_latest_depth_batch(depth_dir, org_slug)
+    # Guarantee the depth charts we're about to scan reflect the latest eval —
+    # regenerates them first if the batch is stale, legacy, or missing.
+    ts = ensure_fresh_depth_batch(args, depth_dir, org_slug, target_year)
     if ts is None:
         logger.error(
-            "No depth chart files found for org '%s' in %s. Run depth_chart.py first.",
+            "No depth chart files found for org '%s' in %s, and auto-refresh "
+            "did not produce one. Run depth_chart.py first.",
             args.org, depth_dir,
         )
         return 2
@@ -1781,9 +2090,12 @@ def main() -> int:
 
     target_year = args.year or dc.league_default_year(args.league) or datetime.now().year
 
-    # Load eval
+    # Load eval. Single-level mode rebuilds the depth chart live from this eval
+    # below (org_pool → assign_positions), so it's inherently fresh — no on-disk
+    # depth batch is consumed. Only the starter min-comp thresholds come from a
+    # sidecar, and those aren't eval-dependent.
     eval_path = dc.find_latest_eval(args.league, args.input, args.org_code)
-    logger.info("Eval file: %s", eval_path)
+    logger.info("Eval file: %s (depth chart computed live - always current)", eval_path)
     eval_rows = dc.read_eval(eval_path)
 
     # Resolve lids — for FAs we want broad coverage; pull every level the league

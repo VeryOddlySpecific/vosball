@@ -516,6 +516,56 @@ def find_latest_eval(league: str, override: Optional[Path], org_code: Optional[s
     return matches[-1]
 
 
+_EVAL_TS_RE = re.compile(r"_(\d{8}_\d{6})\.csv$")
+
+
+def eval_ts_from_path(path: Optional[Path]) -> Optional[str]:
+    """Extract the ``YYYYMMDD_HHMMSS`` timestamp embedded in an eval filename
+    (``evaluation_summary_{league}_{ts}.csv``). Returns None when ``path`` is
+    None or the name doesn't carry a timestamp. Used for depth-batch provenance
+    so free_agent_market.py can tell a stale batch from a fresh one.
+    """
+    if path is None:
+        return None
+    m = _EVAL_TS_RE.search(path.name)
+    return m.group(1) if m else None
+
+
+def write_depth_meta(
+    out_dir: Path,
+    org_slug: str,
+    ts: str,
+    eval_path: Optional[Path],
+    levels: List[str],
+    args: argparse.Namespace,
+) -> Path:
+    """Write a per-batch provenance sidecar recording which eval the depth
+    charts were built from, the levels covered, and the starter min-comp
+    settings used.
+
+    Always written — even without ``--min-comp`` — because freshness must be
+    knowable regardless of whether a starter_gaps sidecar exists. Lets
+    free_agent_market.py detect a depth batch built from an older eval than the
+    current latest and regenerate before scanning, and replay the same
+    thresholds when it does.
+
+    Lands in ``{league}/depth/`` alongside the batch (per-league siloed) and
+    carries the batch ``ts`` so it archives with the rest of the run.
+    """
+    payload = {
+        "org_slug": org_slug,
+        "batch_ts": ts,
+        "source_eval": eval_path.name if eval_path else None,
+        "source_eval_ts": eval_ts_from_path(eval_path),
+        "levels": list(levels),
+        "min_comp_global": getattr(args, "min_comp", None),
+        "min_comp_per_pos": getattr(args, "min_comp_pos_map", {}) or {},
+    }
+    out_path = out_dir / f"{org_slug}_{ts}_depth_meta.json"
+    out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return out_path
+
+
 # -----------------------------------------------------------------------------
 # Eval CSV loading
 # -----------------------------------------------------------------------------
@@ -2457,6 +2507,7 @@ def run_one_level(
     multi_level_run: bool = False,
     affiliate: Optional[str] = None,
     base_level: Optional[str] = None,
+    eval_path: Optional[Path] = None,
 ) -> Tuple[int, Optional[Dict[str, Any]]]:
     """Build, render, and write the depth chart for one level.
 
@@ -2927,6 +2978,8 @@ def run_one_level(
         }
         gaps_payload = {
             "level": level,
+            "source_eval": eval_path.name if eval_path else None,
+            "source_eval_ts": eval_ts_from_path(eval_path),
             "global_min_comp": global_min,
             "min_comp_per_pos": per_pos_min,
             "thresholds": {k: v for k, v in thresholds_full.items() if v is not None},
@@ -3369,12 +3422,26 @@ def main() -> int:
                 display_lvl, args, cfg, eval_rows, target_year, ts,
                 multi_level_run=multi_levels,
                 affiliate=aff, base_level=base_lvl,
+                eval_path=eval_path,
             )
             if rc_lvl != 0:
                 overall_rc = rc_lvl
                 continue
             if level_data is not None:
                 collected.append(level_data)
+
+        # Provenance sidecar — records which eval this batch was built from so
+        # free_agent_market.py can detect a stale depth batch (built from an
+        # older eval than the current latest) and regenerate before scanning.
+        # Written for single- and multi-level runs alike, in {league}/depth/.
+        if collected:
+            meta_out_dir = args.output_dir or (SCRIPT_DIR / args.league / "depth")
+            meta_out_dir.mkdir(parents=True, exist_ok=True)
+            meta_path = write_depth_meta(
+                meta_out_dir, filename_org_slug(args), ts, eval_path,
+                [ld.get("level", "") for ld in collected], args,
+            )
+            logger.info("Wrote depth provenance: %s", meta_path)
 
         # Org-wide summary report — only when running multiple levels.
         if multi_levels and collected:
