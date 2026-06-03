@@ -1,7 +1,7 @@
 # VOSBall — Logic Update Process
 
 > How to safely change scoring logic or add tools on top of the layered
-> `vosball` package. Companion to [REFACTOR_LOG.md](REFACTOR_LOG.md), which
+> `vosball` package. Companion to [REFACTOR_LOG.md](archive/REFACTOR_LOG.md), which
 > records how the package was built. **Read this before editing anything in
 > `vosball/`.**
 
@@ -65,7 +65,7 @@ scoring, it belongs in `services.py`; the engine only *computes*.
 
 ## 2. The golden-harness workflow (always green)
 
-The contract is [tests/test_golden.py](tests/test_golden.py): two leagues
+The contract is [tests/test_golden.py](../tests/test_golden.py): two leagues
 (`wwoba` 20-80, `ndl` 1-100) over committed 200-row fixtures, each run through
 **two modes** — `cli` (the `run_vos.py` subprocess) and `service`
 (`evaluate_league` in-process) — asserted **byte-identical** (timestamps
@@ -93,11 +93,11 @@ py tests\test_golden.py --update   # ONLY after an intentional output change
 1. Edit the right `engine/` submodule. Keep the function **pure** (row dict +
    cfg dict in → number out; no I/O).
 2. If it's a new public function, add it to that submodule's `__all__`. It is
-   auto-re-exported: [engine/__init__.py](vosball/engine/__init__.py) does
+   auto-re-exported: [engine/__init__.py](../vosball/engine/__init__.py) does
    `from vosball.engine.<sub> import *` and aggregates every submodule's
    `__all__`, so `from vosball.engine import X` keeps working regardless of
    which file `X` lives in. (Same pattern for `data/` via the `loaders.py`
-   shim + [data/__init__.py](vosball/data/__init__.py).)
+   shim + [data/__init__.py](../vosball/data/__init__.py).)
 3. Decide intent:
    - **Not meant to move numbers?** Golden must stay green with no `--update`.
    - **Meant to move numbers?** `--update`, review the diff, note it in the
@@ -123,7 +123,7 @@ py tests\test_golden.py --update   # ONLY after an intentional output change
   problems and otherwise just return rows — the caller decides how to surface
   errors. No `argv`, no files written by the service itself.
 
-**Worked example — the web UI.** [webapp/app.py](webapp/app.py) (the local
+**Worked example — the web UI.** [webapp/app.py](../webapp/app.py) (the local
 Streamlit eval browser) is the canonical consumer to copy: it calls
 `evaluate_league(...)`, drops the returned rows into a table, and writes its CSV
 download through `vosball.reporting.write_output_csv` (so the export is
@@ -155,7 +155,7 @@ the three remaining real consumers — `player_card.py`, `what_if.py`,
 ## 6. Extending golden coverage
 
 When a new path becomes load-bearing, pin it. In
-[tests/test_golden.py](tests/test_golden.py):
+[tests/test_golden.py](../tests/test_golden.py):
 
 - **A new league / rating scale:** add a `(case_id, league)` to `CASES`, then
   `py tests\test_golden.py --update` to mint its snapshot (review it first).
@@ -174,7 +174,7 @@ When a new path becomes load-bearing, pin it. In
 This is still the **sandbox** (`F:\vosball`, fresh git, no remote). The live
 suite is `F:\ratings` (still the pre-refactor monolith) and has **not** been
 touched. Promoting the sandbox to live is a separate, deferred phase — see
-[REFACTOR_LOG.md](REFACTOR_LOG.md) §"Next phases → Cut-over". Key things not to
+[REFACTOR_LOG.md](archive/REFACTOR_LOG.md) §"Next phases → Cut-over". Key things not to
 forget when that day comes:
 
 - keep the `vos_v2.py` rollback path available as an escape hatch;

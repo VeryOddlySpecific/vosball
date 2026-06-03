@@ -7,7 +7,7 @@ picked up later.
 
 ## Current state
 
-[`draft_grades.py`](draft_grades.py) is **already functionally v10-compatible** in
+[`draft_grades.py`](../../tools/draft_grades.py) is **already functionally v10-compatible** in
 the sense that the grade math is purely rank-delta-based:
 
 1. Loads the master draft pool from `05_draft_pool.md` (now v10-enriched
@@ -31,7 +31,7 @@ pick beyond just the rank delta.
 
 ### 1. Extend `load_projections_from_md` to capture v10 columns
 
-**File:** [`draft_grades.py:118`](draft_grades.py)
+**File:** [`draft_grades.py:118`](../../tools/draft_grades.py)
 
 The function currently returns three dicts: `{name → projection_rank}`,
 `{name → projected_position}`, `{name → projected_margin_tier_id}`. Extend
@@ -45,7 +45,7 @@ fallback for pre-v10 MDs.
 
 ### 2. Annotate pick rows with v10 columns
 
-**File:** [`draft_grades.py:352`](draft_grades.py) (`compare_draft_to_projections`)
+**File:** [`draft_grades.py:352`](../../tools/draft_grades.py) (`compare_draft_to_projections`)
 
 Each row this function emits gets keys `Player Name`, `Team`, `Overall
 Pick`, `Projection Rank`, `Delta`, `Pick Grade`, `Stamp Type`, `Points`,
@@ -59,8 +59,8 @@ per-team eval CSV via `load_per_team_board`.
 
 ### 3. Update raw CSV / MD writers
 
-**File:** [`draft_grades.py:511`](draft_grades.py) (`write_raw_csv`) and
-[`draft_grades.py:520`](draft_grades.py) (`write_raw_md`).
+**File:** [`draft_grades.py:511`](../../tools/draft_grades.py) (`write_raw_csv`) and
+[`draft_grades.py:520`](../../tools/draft_grades.py) (`write_raw_md`).
 
 CSV fieldnames currently:
 ```
@@ -82,13 +82,13 @@ grade math (Delta / Pick Grade / Stamp Type / Points) trailing.
 
 ### 4. `_grade_pick` — no change
 
-The pick-grading function ([`draft_grades.py:297`](draft_grades.py)) is pure
+The pick-grading function ([`draft_grades.py:297`](../../tools/draft_grades.py)) is pure
 rank-delta logic. v10 doesn't change ranks (Ideal_Value stays as the
 sort key), so this function is correct as-is.
 
 ### 5. `load_per_team_board` — no change
 
-The per-team board ranking function ([`draft_grades.py:216`](draft_grades.py))
+The per-team board ranking function ([`draft_grades.py:216`](../../tools/draft_grades.py))
 sorts each team's eval by `Ideal_Value`. Same v10 column, same behavior.
 
 ### 6. Summary tables — no change
@@ -99,7 +99,7 @@ surface in the per-pick raw output. Summary stays untouched.
 
 ### 7. PDF writer (optional)
 
-[`draft_grades_pdf.py`](draft_grades_pdf.py) defines `DEFAULT_COLUMNS` at line
+[`draft_grades_pdf.py`](../../tools/draft_grades_pdf.py) defines `DEFAULT_COLUMNS` at line
 19. To surface v10 columns in the PDF, add column specs (`('Outlook',
 'Outlook', 0.45, 'CENTER', None)` etc.) for the per-pick layout. Pure
 cosmetic — no math change. Optional for phase 4; can be deferred.

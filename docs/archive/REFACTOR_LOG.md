@@ -1,6 +1,6 @@
 # VOSBall Layering Refactor — Work Log
 
-> **Status:** Phases 0–4 + Polish complete · **Date:** 2026-05-29 (layering), 2026-05-30 (polish) · **Sandbox:** `F:\vosball` (was `G:\vosball`) · **Deployed suite:** `F:\ratings` (untouched) · **Maintenance playbook:** [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md)
+> **Status:** Phases 0–4 + Polish complete · **Date:** 2026-05-29 (layering), 2026-05-30 (polish) · **Sandbox:** `F:\vosball` (was `G:\vosball`) · **Deployed suite:** `F:\ratings` (untouched) · **Maintenance playbook:** [LOGIC_UPDATE_PROCESS.md](../LOGIC_UPDATE_PROCESS.md)
 
 ## Overview
 
@@ -159,7 +159,7 @@ G:\vosball\
 
 ### 1. UI — **v1 DONE 2026-05-30** (local Streamlit eval browser)
 
-- **Status:** ✅ **v1 shipped.** A local web app lives in [`webapp/app.py`](webapp/app.py) (run via `py -m streamlit run webapp/app.py`, or `run_ui.bat` on Windows).
+- **Status:** ✅ **v1 shipped.** A local web app lives in [`webapp/app.py`](../../webapp/app.py) (run via `py -m streamlit run webapp/app.py`, or `run_ui.bat` on Windows).
 - **Decision:** **local web app**, not a WordPress plugin. WordPress would be a separate self-contained project — PHP can't call `evaluate_league` directly and would need a subprocess/HTTP bridge. The local app keeps the suite exactly as-is and gives a clean "clone the repo, run one command, opens in your browser" story other GMs could use later. Framework: **Streamlit**; v1 scope: the **core eval table**.
 - **How it attaches:** the app is a pure *consumer* of **`vosball.services.evaluate_league`** — pick a league + options → score → sortable/filterable/searchable table → CSV download. The download is written through `vosball.reporting.write_output_csv`, so it is **byte-identical to `run_vos.py` output** (verified against a real wwoba run). **Zero files in `vosball/` changed**, so the golden harness stayed green by construction. Leagues are auto-discovered from `data/PlayerData-*.csv` (9 today). Deps pinned in root `requirements.txt` (`streamlit`, `pandas`).
 - **Post-v1 iterations** (all UI-only; engine untouched, golden green throughout):
@@ -173,7 +173,7 @@ G:\vosball\
 
 ### 2. Polish (golden-protected, low risk) — **DONE 2026-05-30**
 
-All items below were guarded by the golden harness, so they carried low regression risk. **Completed 2026-05-30** (commits below); the suite-maintenance playbook this established is written up in [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
+All items below were guarded by the golden harness, so they carried low regression risk. **Completed 2026-05-30** (commits below); the suite-maintenance playbook this established is written up in [LOGIC_UPDATE_PROCESS.md](../LOGIC_UPDATE_PROCESS.md).
 
 - **(a) Split the two still-monolithic modules. ✅ DONE** (commits `58d53ff`, `d54b1e5`)
   - `vosball/engine/core.py` (~1,386 lines) → `context` / `park` / `reach` / `scoring` / `adjustments` / `war`, with `core.py` reduced to the `build_*_row` assemblers + `is_pitcher`.
@@ -196,7 +196,7 @@ All items below were guarded by the golden harness, so they carried low regressi
 
 ## How to pick up where we left off
 
-Everything lives in the **sandbox at `F:\vosball`** (fresh git, no remote; the refactor + UI v1 history starts at `8098f02`). The deployed suite at `F:\ratings` is untouched — start from the sandbox. **Phases 0–4 + Polish + UI v1 are done;** for how to make further changes safely, read [LOGIC_UPDATE_PROCESS.md](LOGIC_UPDATE_PROCESS.md).
+Everything lives in the **sandbox at `F:\vosball`** (fresh git, no remote; the refactor + UI v1 history starts at `8098f02`). The deployed suite at `F:\ratings` is untouched — start from the sandbox. **Phases 0–4 + Polish + UI v1 are done;** for how to make further changes safely, read [LOGIC_UPDATE_PROCESS.md](../LOGIC_UPDATE_PROCESS.md).
 
 Before and after any change, confirm zero output drift:
 

@@ -8,11 +8,11 @@ grading. Updated 2026-05-27 for the v10 refactor.
 
 | Stage | Script | Inputs | Outputs |
 |---|---|---|---|
-| 1 | [run_vos.py](run_vos.py) `--draft` | `data/PlayerData-{league}.csv` + `config/weights_v10.json` | `{league}/eval/[{org}/]draft_evaluation_{league}_{ts}.csv` |
-| 2 | [org_depth_analysis.py](org_depth_analysis.py) | eval CSV + org name | `{league}/org_depth/{team}_strength_{ts}_positions.csv` |
-| 3 | [draft_pool_analysis.py](draft_pool_analysis.py) | eval CSV + PlayerData + v10 weights | `{league}/drafts/{name}/05_draft_pool.md` + 7 sidecar reports |
-| 4 | [draft_board.py](draft_board.py) | strength CSV + draft pool MD | `{league}/drafts/{name}/draft_board_{team}_{ts}.md` + `.csv` |
-| 5 (post-draft) | [draft_grades.py](draft_grades.py) | draft pool MD + league `/draft` API | `{league}/drafts/{name}/draft_grades_raw.{csv,md}` + summary |
+| 1 | [run_vos.py](../run_vos.py) `--draft` | `data/PlayerData-{league}.csv` + `config/weights_v10.json` | `{league}/eval/[{org}/]draft_evaluation_{league}_{ts}.csv` |
+| 2 | [org_depth_analysis.py](../tools/org_depth_analysis.py) | eval CSV + org name | `{league}/org_depth/{team}_strength_{ts}_positions.csv` |
+| 3 | [draft_pool_analysis.py](../tools/draft_pool_analysis.py) | eval CSV + PlayerData + v10 weights | `{league}/drafts/{name}/05_draft_pool.md` + 7 sidecar reports |
+| 4 | [draft_board.py](../tools/draft_board.py) | strength CSV + draft pool MD | `{league}/drafts/{name}/draft_board_{team}_{ts}.md` + `.csv` |
+| 5 (post-draft) | [draft_grades.py](../tools/draft_grades.py) | draft pool MD + league `/draft` API | `{league}/drafts/{name}/draft_grades_raw.{csv,md}` + summary |
 
 The `{name}` is a folder name like `draft_pool_analysis_2061_test` or
 `draft_pool_analysis_{timestamp}` — whichever you choose in stage 3.
@@ -91,7 +91,7 @@ with `--draft`.
 `VOS_Reach`, `VOS_Career`, `VOS_Blended`, `Ideal_Value`,
 `Personality_Adj`, `Prone`, `BABIP`, `PotBABIP`, `Readiness_Adj`,
 `Draft_Age_Adj`, `Draft_RP_Penalty`. If any are missing, you're on a
-pre-v10 eval — re-run [run_vos.py](run_vos.py).
+pre-v10 eval — re-run [run_vos.py](../run_vos.py).
 
 ---
 
@@ -104,7 +104,7 @@ scores. Generate it for your team before drafting.
 py org_depth_analysis.py --league sahl --org "Houston Astros" --csv
 ```
 
-`--csv` writes the `*_positions.csv` file [draft_board.py](draft_board.py) expects.
+`--csv` writes the `*_positions.csv` file [draft_board.py](../tools/draft_board.py) expects.
 
 **Output:**
 - `{league}/org_depth/{team_slug}_strength_{ts}.md`
@@ -121,7 +121,7 @@ view, so don't skip this.)
 
 This is the heart of the v10 refactor. `draft_pool_analysis.py` reads
 the eval CSV, joins to PlayerData for the raw Pot* ratings, computes
-the new **Outlook** column via [`lib/draft_score.py`](lib/draft_score.py),
+the new **Outlook** column via [`lib/draft_score.py`](../lib/draft_score.py),
 and emits 8 reports.
 
 **Auto-resolve (recommended):**
@@ -217,7 +217,7 @@ Each score column tells you something slightly different:
   player's best position. Same metric the v3-v10 pipeline has used.
 - **Outlook** — Career-weights applied to Pot* ratings. "If this
   prospect realizes their ceiling, how good as an MLB player?" See
-  [`lib/draft_score.py`](lib/draft_score.py) for the math.
+  [`lib/draft_score.py`](../lib/draft_score.py) for the math.
 - **Reach** — logistic-model probability of reaching MLB. Independently
   trained; uses BABIP, personality, K%, etc. that the heuristic doesn't
   see.
@@ -249,17 +249,17 @@ the league's draft interface. Your draft board MD is the live reference.
 
 If you want to re-rank after early picks have happened (board changes
 when high-ranked players come off the board), just re-run
-[draft_board.py](draft_board.py) — it'll pick up the same draft pool MD
+[draft_board.py](../tools/draft_board.py) — it'll pick up the same draft pool MD
 but reflect updated need scores if your org_depth was regenerated.
 
 ---
 
 ## Stage 6 — Post-draft grading (Phase 4 — not yet refactored)
 
-Currently [draft_grades.py](draft_grades.py) works correctly under v10
+Currently [draft_grades.py](../tools/draft_grades.py) works correctly under v10
 (the grade math is rank-delta-based on Ideal_Value, which v10 preserves
 unchanged), but **doesn't yet surface the v10 columns** in its
-per-pick output. See [DRAFT_GRADES_PHASE4.md](DRAFT_GRADES_PHASE4.md)
+per-pick output. See [DRAFT_GRADES_PHASE4.md](archive/DRAFT_GRADES_PHASE4.md)
 for the planned refactor.
 
 To run it as-is:
@@ -385,9 +385,9 @@ existing prospects, not amateurs. v10 refactor for that is Phase 6.
 
 ## See also
 
-- [DRAFT_GRADES_PHASE4.md](DRAFT_GRADES_PHASE4.md) — what's left to do
+- [DRAFT_GRADES_PHASE4.md](archive/DRAFT_GRADES_PHASE4.md) — what's left to do
   on `draft_grades.py`
-- [lib/draft_score.py](lib/draft_score.py) — Outlook computation
+- [lib/draft_score.py](../lib/draft_score.py) — Outlook computation
 - [OOTP Study 27/v5_design.md](../OOTP Study 27/v5_design.md) — the
   two-track scoring architecture v10 inherits
 - [OOTP Study 27/career_logistic_followup.md](../OOTP Study 27/career_logistic_followup.md)

@@ -219,7 +219,7 @@ stale team/level labels and slightly stale level-sensitive scores. See
 ## Extending the UI
 
 The app is a pure consumer of `vosball.services` — see
-[`LOGIC_UPDATE_PROCESS.md`](../LOGIC_UPDATE_PROCESS.md) §4. To persist a new
+[`LOGIC_UPDATE_PROCESS.md`](../docs/LOGIC_UPDATE_PROCESS.md) §4. To persist a new
 preference (a default league, saved filters, a module's view options, …), reuse
 the generic settings store in `app.py`:
 

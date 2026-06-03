@@ -38,8 +38,8 @@ Audited whether `run_vos_all` and `run_depth_chart_all` (plus their component mo
 - Spawned task: fix `SyntaxWarning` from `\*` escape sequence at [trade_block.py:1111](trade_block.py:1111) (use raw string).
 
 ### Files touched
-- [run_vos_all.py](run_vos_all.py) — labels
-- [depth_chart.py](depth_chart.py) — one comment line
+- [run_vos_all.py](../../tools/run_vos_all.py) — labels
+- [depth_chart.py](../../core/depth_chart.py) — one comment line
 
 ---
 
@@ -71,10 +71,10 @@ Bulk orchestrator for `trade_targets.py`. Auto-resolves the statsplus session co
 Added `resolve_org_year(league, cli_org, cli_year, settings_path)` helper. Now `--org` and `--year` are optional and auto-resolved from `league_settings.json` when omitted. Matches the bulk-runner ergonomics already in place for other tools.
 
 ### Files created / touched
-- [waiver_wire.py](waiver_wire.py) (new)
-- [run_waiver_wire_all.py](run_waiver_wire_all.py) (new)
-- [run_trade_targets_all.py](run_trade_targets_all.py) (new)
-- [trade_targets.py](trade_targets.py) (auto-resolve helper)
+- [waiver_wire.py](../../tools/waiver_wire.py) (new)
+- [run_waiver_wire_all.py](../../tools/run_waiver_wire_all.py) (new)
+- [run_trade_targets_all.py](../../tools/run_trade_targets_all.py) (new)
+- [trade_targets.py](../../core/trade_targets.py) (auto-resolve helper)
 
 ---
 
@@ -93,9 +93,9 @@ The MD column headers `VOS` and `VOS Pot` were misleading (the underlying values
 **Internal in-memory dict keys** (`player.get("vos")` etc.) — intentionally **not** renamed. Those come from `dc.build_player_record` in `depth_chart.py` and are consumed by many other scripts. The rename happens inline at write time via key-mapping in the CSV/MD writers.
 
 ### Files touched
-- [trade_block.py](trade_block.py) — 2 MD headers, CSV fieldnames + writerow keys
-- [trade_targets.py](trade_targets.py) — 1 MD header, CSV fieldnames + writerow keys
-- [waiver_wire.py](waiver_wire.py) — 1 MD header, CSV fieldnames + writerow keys
+- [trade_block.py](../../core/trade_block.py) — 2 MD headers, CSV fieldnames + writerow keys
+- [trade_targets.py](../../core/trade_targets.py) — 1 MD header, CSV fieldnames + writerow keys
+- [waiver_wire.py](../../tools/waiver_wire.py) — 1 MD header, CSV fieldnames + writerow keys
 
 ---
 
@@ -197,10 +197,10 @@ Added two plain ID-per-line files alongside the existing MD + CSV outputs:
 For direct StatsPlus draft-prep import. Limited to `--top` (default 200) so MD/CSV/txt all stay in sync on the same flag.
 
 ### Files created / touched
-- [lib/draft_score.py](lib/draft_score.py) (new)
-- [draft_pool_analysis.py](draft_pool_analysis.py) (major refactor)
-- [draft_board.py](draft_board.py) (major refactor + .txt outputs + filename pattern fix)
-- [draft_grades.py](draft_grades.py) (v10 column surfacing — major changes happen in work stream 6)
+- [lib/draft_score.py](../../lib/draft_score.py) (new)
+- [draft_pool_analysis.py](../../tools/draft_pool_analysis.py) (major refactor)
+- [draft_board.py](../../tools/draft_board.py) (major refactor + .txt outputs + filename pattern fix)
+- [draft_grades.py](../../tools/draft_grades.py) (v10 column surfacing — major changes happen in work stream 6)
 
 ---
 
@@ -208,7 +208,7 @@ For direct StatsPlus draft-prep import. Limited to `--top` (default 200) so MD/C
 
 Wrote two reference docs alongside the draft refactor:
 
-### [DRAFT_WORKFLOW.md](DRAFT_WORKFLOW.md)
+### [DRAFT_WORKFLOW.md](../DRAFT_WORKFLOW.md)
 
 End-to-end guide for running a draft analysis under v10:
 - 6 stages (eval → org_depth → pool analysis → board → draft → grades)
@@ -430,8 +430,8 @@ Re-running with `--refresh` busts both caches; default behavior loads the render
 
 ### Files created
 
-- [hof_grade.py](hof_grade.py) — single-player HoF grader + batch mode
-- [awards_rank.py](awards_rank.py) — season awards rankings with AL/NL split
+- [hof_grade.py](../../core/hof_grade.py) — single-player HoF grader + batch mode
+- [awards_rank.py](../../tools/awards_rank.py) — season awards rankings with AL/NL split
 
 ### Files NOT changed (deliberate)
 
@@ -445,30 +445,30 @@ Re-running with `--refresh` busts both caches; default behavior loads the render
 
 ### `ratings/` — new files
 
-- [lib/draft_score.py](lib/draft_score.py) — Draft_Outlook computation
-- [waiver_wire.py](waiver_wire.py) — single-league waiver evaluator
-- [run_waiver_wire_all.py](run_waiver_wire_all.py) — bulk runner
-- [run_trade_targets_all.py](run_trade_targets_all.py) — bulk runner with cookie auto-resolve
-- [hof_grade.py](hof_grade.py) — Hall of Fame candidacy grader (single + batch)
-- [awards_rank.py](awards_rank.py) — season awards rankings with AL/NL split
+- [lib/draft_score.py](../../lib/draft_score.py) — Draft_Outlook computation
+- [waiver_wire.py](../../tools/waiver_wire.py) — single-league waiver evaluator
+- [run_waiver_wire_all.py](../../tools/run_waiver_wire_all.py) — bulk runner
+- [run_trade_targets_all.py](../../tools/run_trade_targets_all.py) — bulk runner with cookie auto-resolve
+- [hof_grade.py](../../core/hof_grade.py) — Hall of Fame candidacy grader (single + batch)
+- [awards_rank.py](../../tools/awards_rank.py) — season awards rankings with AL/NL split
 - [config/draft_grades.json](config/draft_grades.json) — tunable grading config
-- [DRAFT_WORKFLOW.md](DRAFT_WORKFLOW.md) — end-to-end usage guide
+- [DRAFT_WORKFLOW.md](../DRAFT_WORKFLOW.md) — end-to-end usage guide
 - [DRAFT_GRADES_PHASE4.md](DRAFT_GRADES_PHASE4.md) — phase 4 planning doc (implemented mid-session)
 - [SESSION_NOTES_2026-05-27.md](SESSION_NOTES_2026-05-27.md) — this doc
 
 ### `ratings/` — major refactors
 
-- [draft_pool_analysis.py](draft_pool_analysis.py) — auto-resolve, PlayerData loading, Outlook computation, v10 columns in MD, sort-by-Outlook, draft-pool-IDs filter
-- [draft_board.py](draft_board.py) — v10 columns in Board A, txt outputs for StatsPlus, filename pattern fix
-- [draft_grades.py](draft_grades.py) — v10 columns + config-driven tier system + Option C tiered grading
-- [trade_targets.py](trade_targets.py) — auto-resolve org/year, column renames
-- [trade_block.py](trade_block.py) — column renames (Career/Reach)
-- [waiver_wire.py](waiver_wire.py) — column renames (in same session as build)
+- [draft_pool_analysis.py](../../tools/draft_pool_analysis.py) — auto-resolve, PlayerData loading, Outlook computation, v10 columns in MD, sort-by-Outlook, draft-pool-IDs filter
+- [draft_board.py](../../tools/draft_board.py) — v10 columns in Board A, txt outputs for StatsPlus, filename pattern fix
+- [draft_grades.py](../../tools/draft_grades.py) — v10 columns + config-driven tier system + Option C tiered grading
+- [trade_targets.py](../../core/trade_targets.py) — auto-resolve org/year, column renames
+- [trade_block.py](../../core/trade_block.py) — column renames (Career/Reach)
+- [waiver_wire.py](../../tools/waiver_wire.py) — column renames (in same session as build)
 
 ### `ratings/` — minor edits
 
-- [run_vos_all.py](run_vos_all.py) — stale "v6" labels → "v10"
-- [depth_chart.py](depth_chart.py) — 1 stale comment line
+- [run_vos_all.py](../../tools/run_vos_all.py) — stale "v6" labels → "v10"
+- [depth_chart.py](../../core/depth_chart.py) — 1 stale comment line
 
 ### `OOTP Study 27/` — new files
 

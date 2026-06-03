@@ -177,6 +177,8 @@ ratings/
 │
 ├── webapp/                     # Local Streamlit UI (pure in-process consumer)
 │
+├── docs/                       # Tool guides & references (archive/ holds superseded notes)
+│
 ├── config/
 │   ├── weights_v10.json        # VOS v10 weights (current)
 │   ├── weights_rp_leverage_v1.json
