@@ -183,6 +183,82 @@ def build_player_rows(rank_rows: List[Dict[str, str]], vpc_base: float) -> List[
     return out
 
 
+def rank_org_values(org_rows: List[Dict[str, object]],
+                    key: str = "farm_value_total") -> List[Dict[str, object]]:
+    """Stamp a 1-based ``rank`` and ``num_orgs`` ("4 of 30") onto each org row,
+    ordered by ``key`` descending, in place. Returns the re-sorted list. Ties
+    take distinct ranks in sorted order (stable)."""
+    org_rows.sort(key=lambda r: float(r.get(key, 0.0) or 0.0), reverse=True)
+    n = len(org_rows)
+    for i, r in enumerate(org_rows, start=1):
+        r["rank"] = i
+        r["num_orgs"] = n
+    return org_rows
+
+
+def build_farm_values(
+    rank_rows: List[Dict[str, str]],
+    eval_rows: List[Dict[str, str]],
+    *,
+    salary_col: str = "Contract_salary0",
+    pot_col: str = "VOS_Potential",
+    vos_floor: float = 25.0,
+    winsor_lower: float = 0.025,
+    winsor_upper: float = 0.975,
+    players_lookup: Optional[Dict[str, Dict[str, str]]] = None,
+    non40_only: bool = False,
+    org_include_non_prospects: bool = False,
+    top_n: int = 12,
+    tail_weight: float = 0.25,
+) -> Dict[str, object]:
+    """Calibrate VPC, value every prospect, and roll up *ranked* org totals.
+
+    Pure (no I/O) — the shared seam for the CLI and the web UI, mirroring
+    trade_targets.build_trade_targets / free_agent_market.compute_fa_fit.
+
+    ``rank_rows`` are prospect-board rows (``prospect_score``, ``Org``, … — as
+    produced by prospect_rankings.compute_prospect_rows or a
+    prospect_rankings_*.csv board). ``eval_rows`` are evaluation-summary rows
+    used *only* for VPC calibration; they need contract columns
+    (``Contract_is_major`` / ``salary_col``) for a dollar VPC.
+
+    When the eval has no MLB contract rows to calibrate against, VPC falls back
+    to 1.0 and ``vpc_ok`` is False: farm_value then equals prospect_score, so the
+    *ranking* is still correct (VPC is a global scalar) while the magnitudes are
+    model points, not dollars.
+
+    Returns ``{vpc_base, mlb_count, vpc_ok, player_rows, org_rows}`` with
+    ``org_rows`` already ranked (``rank`` / ``num_orgs`` stamped) by
+    farm_value_total.
+    """
+    try:
+        vpc_base, mlb_count = compute_vpc_base(
+            rows=eval_rows, salary_col=salary_col, calib_col=pot_col,
+            vos_floor=vos_floor, winsor_lower=winsor_lower, winsor_upper=winsor_upper,
+            players_lookup=players_lookup,
+        )
+        vpc_ok = True
+    except ValueError as e:
+        logger.warning(
+            "VPC calibration failed (%s); falling back to VPC=1.0 -- farm values "
+            "are model points, not dollars (org ranking is unaffected).", e)
+        vpc_base, mlb_count, vpc_ok = 1.0, 0, False
+
+    player_rows = build_player_rows(rank_rows, vpc_base)
+    org_rows = summarize_org_values(
+        player_rows, non40_only=non40_only, top_n=top_n, tail_weight=tail_weight,
+        prospect_only_org=not org_include_non_prospects,
+    )
+    rank_org_values(org_rows)
+    return {
+        "vpc_base": vpc_base,
+        "mlb_count": mlb_count,
+        "vpc_ok": vpc_ok,
+        "player_rows": player_rows,
+        "org_rows": org_rows,
+    }
+
+
 def load_orgs_config(path: Optional[Path]) -> Optional[List[str]]:
     if path is None:
         return None
@@ -255,31 +331,27 @@ def main() -> int:
     )
 
     players_lookup = load_players_lookup_for_vpc(league_slug or args.league, args.base_url, args.league_url_config)
-    vpc_base, mlb_count = compute_vpc_base(
-        rows=eval_rows,
-        salary_col=args.salary_col,
-        calib_col=args.pot_col,
-        vos_floor=args.vos_floor,
-        winsor_lower=args.winsor_lower,
-        winsor_upper=args.winsor_upper,
-        players_lookup=players_lookup,
+    fv_res = build_farm_values(
+        rank_rows, eval_rows,
+        salary_col=args.salary_col, pot_col=args.pot_col,
+        vos_floor=args.vos_floor, winsor_lower=args.winsor_lower,
+        winsor_upper=args.winsor_upper, players_lookup=players_lookup,
+        non40_only=args.non40_only,
+        org_include_non_prospects=args.org_include_non_prospects,
     )
-    logger.info("Calibrated VPC (dollars per projected VOS): %.2f", vpc_base)
-    logger.info("MLB calibration sample size: %d", mlb_count)
+    vpc_base = fv_res["vpc_base"]
+    logger.info("Calibrated VPC (dollars per projected VOS): %.2f%s", vpc_base,
+                "" if fv_res["vpc_ok"] else "  [fallback — model points, not dollars]")
+    logger.info("MLB calibration sample size: %d", fv_res["mlb_count"])
 
-    farm_rows = build_player_rows(rank_rows, vpc_base)
+    farm_rows = fv_res["player_rows"]
     logger.info("Prospect rows valued: %d", len(farm_rows))
 
-    org_rows = summarize_org_values(
-        farm_rows,
-        non40_only=args.non40_only,
-        top_n=12,
-        tail_weight=0.25,
-        prospect_only_org=not args.org_include_non_prospects,
-    )
+    org_rows = fv_res["org_rows"]  # already ranked by build_farm_values
 
     output_org = args.output_org or default_org_output_path(rankings_input_path, league_slug, run_ts)
     org_fields = [
+        "rank",
         "Org",
         "farm_value_total",
         "farm_value_top12",
@@ -288,6 +360,7 @@ def main() -> int:
         "avg_value_per_player",
         "farm_value_non40",
         "num_non40",
+        "num_orgs",
     ]
     write_csv(output_org, org_rows, org_fields)
     logger.info("Wrote organization farm values: %s", output_org)
