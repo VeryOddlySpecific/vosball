@@ -254,10 +254,27 @@ def resolve_cookie(literal: Optional[str], file_path: Optional[Path]) -> Optiona
     return None
 
 
+def resolve_token(league: str) -> Optional[str]:
+    """Best-effort StatsPlus API token for ``league`` from
+    config/statsplus_tokens.json, reusing fetch_player_data.load_token_for (the
+    same resolver the ratings/contracts/career-WAR features use). Returns None
+    when no token is configured so the caller can fall back to cookie auth. The
+    import is local so trade_targets stays usable even if fetch_player_data is
+    absent in some stripped-down environment.
+    """
+    try:
+        from fetch_player_data import load_token_for
+        return load_token_for(league)
+    except Exception as exc:  # noqa: BLE001 — token is optional; degrade quietly
+        logger.debug("Token resolve failed for %s: %s", league, exc)
+        return None
+
+
 def fetch_tradeblock(
     base_url: str,
     cache_dir: Optional[Path] = None,
     cookie: Optional[str] = None,
+    token: Optional[str] = None,
 ) -> List[str]:
     """Fetch the league-wide tradeblock list. Returns pids as strings to match
     the convention used throughout depth_chart/stats (eval CSV's ID column is
@@ -265,15 +282,32 @@ def fetch_tradeblock(
 
     Empty list on network failure — caller decides whether that's fatal.
 
-    The /tradeblock endpoint is gated behind a statsplus session login. Pass
-    ``cookie`` as a raw Cookie-header string (e.g., ``"sessionid=abc; csrftoken=xyz"``)
-    captured from a logged-in browser session. Without it, the server returns
-    a plain-text "log in to a linked team" notice that won't parse as JSON.
+    The /tradeblock endpoint is auth-gated. Two ways to authenticate:
+
+    - ``token`` — a StatsPlus API token, appended as ``?token=`` exactly like
+      the stat/ratings endpoints. This is the preferred path: the CLI resolves
+      one automatically from config/statsplus_tokens.json (see ``resolve_token``)
+      so most runs need no flags at all.
+    - ``cookie`` — a raw Cookie-header string (e.g.
+      ``"sessionid=abc; csrftoken=xyz"``) from a logged-in browser session.
+      Fallback for when no token is configured.
+
+    A token, when present, wins over a cookie (cleaner auth) and the cookie is
+    not sent. With neither, the server returns a plain-text "log in to a linked
+    team" notice that won't parse as JSON, and this returns [].
     """
     url = f"{base_url.rstrip('/')}/tradeblock/"
+    # The token is kept out of ``url`` so it never lands in a cache filename or
+    # a log line; only the actual request (``req_url``) carries it.
+    if token:
+        req_url = f"{url}?token={token}"
+        cookie = None  # token wins — don't also send the cookie header
+    else:
+        req_url = url
 
     # Calendar-day cache, same shape stats._fetch_csv uses. We piggyback on
-    # _cache_path_for_url so cache layout is consistent across endpoints.
+    # _cache_path_for_url so cache layout is consistent across endpoints. Keyed
+    # on the token-less ``url`` so the cache is stable regardless of auth method.
     cache_path: Optional[Path] = None
     if cache_dir:
         cache_path = sapi._cache_path_for_url(url, cache_dir)
@@ -294,12 +328,13 @@ def fetch_tradeblock(
             except (OSError, ValueError) as e:
                 logger.warning("Tradeblock cache read failed (%s); refetching", e)
 
-    logger.info("Fetching %s", url)
+    logger.info("Fetching %s (auth: %s)", url,
+                "token" if token else "cookie" if cookie else "none")
     headers = {"User-Agent": _USER_AGENT, "Accept": "application/json"}
     if cookie:
         headers["Cookie"] = cookie
     try:
-        req = Request(url, headers=headers)
+        req = Request(req_url, headers=headers)
         with urlopen(req, timeout=60) as resp:
             payload = resp.read().decode("utf-8-sig", errors="replace")
     except (URLError, TimeoutError, ValueError) as e:
@@ -629,6 +664,90 @@ def categorize_target(
 
 
 # -----------------------------------------------------------------------------
+# Core orchestration — build org needs, evaluate the tradeblock pool, and
+# match / score / categorize / filter each candidate. Pure (no I/O): the caller
+# supplies the eval rows (already /players-overridden), the tradeblock pids, and
+# any stats. Shared by main() (CLI) and the web UI page so the two stay in
+# lockstep — mirrors free_agent_market.compute_fa_fit's role for Free Agents.
+# -----------------------------------------------------------------------------
+
+def build_trade_targets(
+    args: argparse.Namespace,
+    cfg: Dict[str, Any],
+    eval_rows: List[Dict[str, str]],
+    tradeblock_pids: List[str],
+    levels_to_run: List[str],
+    target_year: int,
+    hitter_stats: Dict[str, Dict[str, Any]],
+    pitcher_stats: Dict[str, Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Grade org needs, evaluate the tradeblock pool, and return scored targets.
+
+    Reads ``args.org`` (whose roster to grade needs for), ``args.min_composite``
+    (candidate floor), and ``args.include_no_need`` (keep 'Premium (no need)' /
+    'Pass' candidates). ``hitter_stats`` / ``pitcher_stats`` may be empty for a
+    ratings-only run (composite then comes from VOS alone).
+
+    Returns::
+
+        {
+            "targets": [...],           # one acquisition-need entry per pos/role
+            "scored": [...],            # filtered, scored candidate records,
+                                        #   each carrying _need_entry / _fit_pos /
+                                        #   _fit_score / _category
+            "all_org_hitters": [...],   # full org pools (callers may want them
+            "all_org_pitchers": [...],  #   for context / an empty-roster check)
+        }
+
+    Empty ``scored`` (not an error) when the tradeblock or the org pool is empty;
+    callers decide how to surface that. No files are written and no network is
+    touched here — all fetching happens in the caller.
+    """
+    all_org_hitters: List[Dict[str, Any]] = []
+    all_org_pitchers: List[Dict[str, Any]] = []
+    for level in levels_to_run:
+        h, p = tb.analyze_level(
+            level, args, cfg, eval_rows, target_year, hitter_stats, pitcher_stats,
+        )
+        all_org_hitters.extend(h)
+        all_org_pitchers.extend(p)
+
+    targets = tb.build_acquisition_targets(all_org_hitters, all_org_pitchers)
+    need_lookup = _build_need_lookup(targets)
+
+    candidates = build_candidate_records(
+        tradeblock_pids, args.org, eval_rows, cfg, hitter_stats, pitcher_stats,
+    )
+
+    scored: List[Dict[str, Any]] = []
+    for cand in candidates:
+        need_entry, fit_pos = match_candidate_to_need(cand, need_lookup, all_org_pitchers)
+        cand["_need_entry"] = need_entry
+        cand["_fit_pos"] = fit_pos
+        cand["_fit_score"] = compute_fit_score(cand, need_entry)
+        cand["_category"] = categorize_target(cand, need_entry)
+
+        # Floors. Drop anything below the composite floor unless it's a lottery
+        # ticket or the user asked for the full list via --include-no-need.
+        comp = float(cand.get("composite") or 0)
+        vos_pot = float(cand.get("vos_potential") or 0)
+        if comp < args.min_composite and vos_pot < LOTTERY_VOS_POT:
+            continue
+        # Filter out "no need" by default — the shopping list is more useful
+        # when scoped to actual gaps.
+        if cand["_category"] in ("Premium (no need)", "Pass") and not args.include_no_need:
+            continue
+        scored.append(cand)
+
+    return {
+        "targets": targets,
+        "scored": scored,
+        "all_org_hitters": all_org_hitters,
+        "all_org_pitchers": all_org_pitchers,
+    }
+
+
+# -----------------------------------------------------------------------------
 # Report rendering — mirrors trade_block.py's md/csv pair so the two outputs
 # read consistently when laid side-by-side.
 # -----------------------------------------------------------------------------
@@ -903,13 +1022,21 @@ def main() -> int:
         logger.info("Loaded %d pid(s) from local --tradeblock-input.", len(tradeblock_pids))
     elif base_url:
         cookie = resolve_cookie(args.cookie, args.cookie_file)
-        if not cookie:
+        # Prefer the configured API token when no explicit cookie was given —
+        # most runs then need no auth flags at all. An explicit --cookie still
+        # wins (the user asked for it).
+        token = None if cookie else resolve_token(args.league)
+        if not cookie and not token:
             logger.info(
-                "No --cookie / --cookie-file provided. /tradeblock requires "
+                "No --cookie / --cookie-file and no token in "
+                "config/statsplus_tokens.json for league %r. /tradeblock requires "
                 "an authenticated session; the request will likely fail unless "
-                "Dave whitelisted your league."
+                "Dave whitelisted your league.",
+                args.league,
             )
-        tradeblock_pids = fetch_tradeblock(base_url, cache_dir=cache_dir, cookie=cookie)
+        tradeblock_pids = fetch_tradeblock(
+            base_url, cache_dir=cache_dir, cookie=cookie, token=token,
+        )
     else:
         logger.error("No base URL for league '%s' and no --tradeblock-input — nothing to evaluate.",
                      args.league)
@@ -946,53 +1073,20 @@ def main() -> int:
             cache_dir=cache_dir,
         )
 
-    # --- Build own-org context for needs assessment -------------------------
-    # We need all_hitters / all_pitchers for the org so trade_block's
-    # build_acquisition_targets has the depth chart it expects. Reuse
-    # analyze_level — same code trade_block.main uses — so the needs output
-    # is identical to a fresh trade_block run.
-    all_org_hitters: List[Dict[str, Any]] = []
-    all_org_pitchers: List[Dict[str, Any]] = []
-    for level in levels_to_run:
-        h, p = tb.analyze_level(
-            level, args, cfg, eval_rows, target_year, hitter_stats, pitcher_stats,
-        )
-        all_org_hitters.extend(h)
-        all_org_pitchers.extend(p)
-
-    if not all_org_hitters and not all_org_pitchers:
+    # --- Build needs + evaluate tradeblock candidates -----------------------
+    # All the analysis lives in build_trade_targets so the web UI page can run
+    # the exact same pipeline. analyze_level (via the core) is the same code
+    # trade_block.main uses, so the needs output matches a fresh trade_block run.
+    result = build_trade_targets(
+        args, cfg, eval_rows, tradeblock_pids, levels_to_run,
+        target_year, hitter_stats, pitcher_stats,
+    )
+    if not result["all_org_hitters"] and not result["all_org_pitchers"]:
         logger.error("No players found for org '%s' at levels %s — cannot grade needs.",
                      args.org, levels_to_run)
         return 2
-
-    targets = tb.build_acquisition_targets(all_org_hitters, all_org_pitchers)
-    need_lookup = _build_need_lookup(targets)
-
-    # --- Evaluate tradeblock candidates -------------------------------------
-    candidates = build_candidate_records(
-        tradeblock_pids, args.org, eval_rows, cfg, hitter_stats, pitcher_stats,
-    )
-
-    scored: List[Dict[str, Any]] = []
-    for cand in candidates:
-        need_entry, fit_pos = match_candidate_to_need(cand, need_lookup, all_org_pitchers)
-        cand["_need_entry"] = need_entry
-        cand["_fit_pos"] = fit_pos
-        cand["_fit_score"] = compute_fit_score(cand, need_entry)
-        cand["_category"] = categorize_target(cand, need_entry)
-
-        # Floors. Drop anything below the composite floor unless it's a
-        # lottery ticket or the user asked for the full list via
-        # --include-no-need.
-        comp = float(cand.get("composite") or 0)
-        vos_pot = float(cand.get("vos_potential") or 0)
-        if comp < args.min_composite and vos_pot < LOTTERY_VOS_POT:
-            continue
-        # Filter out "no need" by default — the shopping list is more useful
-        # when scoped to actual gaps.
-        if cand["_category"] in ("Premium (no need)", "Pass") and not args.include_no_need:
-            continue
-        scored.append(cand)
+    targets = result["targets"]
+    scored = result["scored"]
 
     logger.info(
         "Targets: %d candidates after filtering (%d hitters, %d pitchers).",
