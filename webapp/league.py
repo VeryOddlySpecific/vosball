@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -50,10 +51,10 @@ MODULES = [
     {"label": "Player Card", "icon": "🪪", "page": "card", "blurb": "Single-player detail"},
     {"label": "Depth Charts", "icon": "📋", "page": "depth", "blurb": "Lineups & staff by level"},
     {"label": "Prospects", "icon": "🌱", "page": "prospects", "blurb": "Prospect board"},
-    {"label": "Farm Value", "icon": "💲", "page": None, "blurb": "Farm system $ values"},
-    {"label": "Trade Targets", "icon": "🔄", "page": None, "blurb": "Shopping list vs trade blocks"},
+    {"label": "Farm Value", "icon": "💲", "page": "farm_value", "blurb": "Farm system $ values"},
+    {"label": "Trade Targets", "icon": "🔄", "page": "trade_targets", "blurb": "Shopping list vs trade blocks"},
     {"label": "Draft Room", "icon": "🎯", "page": None, "blurb": "Pool tiers · board · values"},
-    {"label": "Free Agents", "icon": "🧢", "page": None, "blurb": "FA market & fair value"},
+    {"label": "Free Agents", "icon": "🧢", "page": "free_agents", "blurb": "Biggest holes & best-fit FAs"},
     {"label": "Finances", "icon": "🏦", "page": None, "blurb": "Payroll & budget audits"},
 ]
 
@@ -133,6 +134,53 @@ def _render_checklist(lg: str) -> None:
         st.rerun()
 
 
+def _run_fetch(lg: str) -> None:
+    """Pull fresh ratings for `lg`, streaming progress into an st.status panel.
+    On success, evict the league's cached evaluation so it re-scores off the new
+    file the next time it's opened."""
+    from fetch import fetch_league_ratings  # lazy: pulls in fetch_player_data
+    from state import drop_result
+
+    outcome = "error"
+    with st.status(f"Pulling fresh {lg.upper()} ratings…", expanded=True) as box:
+        for ev in fetch_league_ratings(lg):
+            kind = ev.get("type")
+            if kind == "progress":
+                box.write(ev["msg"])
+            elif kind == "done":
+                box.write("✅ " + ev["msg"])
+                box.update(label=f"{lg.upper()} ratings updated ✓", state="complete")
+                outcome = "done"
+            else:  # error
+                box.write("❌ " + ev["msg"])
+                box.update(label="Fetch failed", state="error")
+                outcome = "error"
+    if outcome == "done":
+        drop_result(lg)
+        st.success("Fresh ratings saved. Evaluations, depth charts and prospects "
+                   "will re-score with the new data the next time you open them.")
+
+
+def _render_data_controls(lg: str) -> None:
+    """Show this league's ratings-data freshness and a button to pull a new pull."""
+    from scoring import player_data_mtime  # lazy: avoids import cost on cold pages
+
+    mtime = player_data_mtime(lg)
+    left, right = st.columns([2, 1])
+    with left:
+        if mtime:
+            st.caption("Ratings data: "
+                       f"{datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M}")
+        else:
+            st.caption("No ratings data pulled for this league yet.")
+    clicked = right.button(
+        "⟳ Pull fresh ratings", key=f"fetch_btn_{lg}", use_container_width=True,
+        help="Fetch the latest player ratings from StatsPlus for this league. "
+             "The export can take a few minutes to build; progress shows below.")
+    if clicked:
+        _run_fetch(lg)
+
+
 def _render_modules(lg: str) -> None:
     st.subheader("Modules")
     st.caption("Quick-links to manage this team. Greyed tiles are planned.")
@@ -172,6 +220,8 @@ def page() -> None:
     if bits:
         st.caption(" · ".join(bits))
 
+    _render_data_controls(lg)
+    st.divider()
     _render_checklist(lg)
     st.divider()
     _render_modules(lg)

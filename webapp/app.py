@@ -19,9 +19,7 @@ Nothing in vosball/ changes for the UI to exist — see LOGIC_UPDATE_PROCESS.md 
 from __future__ import annotations
 
 import json
-import os
 import sys
-import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -36,14 +34,9 @@ for _p in (ROOT, APP_DIR):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))  # ROOT: vosball pkg + sibling tools; APP_DIR: sibling pages (depth.py)
 
-DATA_DIR = ROOT / "data"
-CONFIG_DIR = ROOT / "config"
-
 import streamlit as st  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from vosball.services import evaluate_league  # noqa: E402
-from vosball.reporting import write_output_csv  # noqa: E402
 from vosball.data import (  # noqa: E402
     RATING_SCALES, DEFAULT_RATING_SCALE, load_player_data,
     load_weights, load_id_maps, load_teams, load_park_factors,
@@ -63,11 +56,23 @@ import status  # noqa: E402  (persistent export-status header band)
 import league as league_hub  # noqa: E402  (aliased: `league` is a local var in
 # eval_browser_page (the selected slug), which would otherwise shadow the module)
 import prospects  # noqa: E402  (Prospect Board page)
+import free_agents  # noqa: E402  (Free Agents — biggest-holes-first targeting)
+# Trade Targets page. Named *_page so it doesn't collide with the root-level
+# trade_targets.py core module on sys.path (APP_DIR precedes ROOT) — same reason
+# depth.py / free_agents.py differ from their depth_chart.py / free_agent_market.py cores.
+import trade_targets_page  # noqa: E402  (Trade Targets — block scored vs your needs)
+import farm_value_page  # noqa: E402  (Farm Value — org farm systems, ranked)
+import home  # noqa: E402  (cold-boot league-select landing)
 import career_war  # noqa: E402  (opt-in accumulated-WAR fetch for the player card)
 
-# Leagues whose PlayerData exports component ratings on a 1-100 scale. Everything
-# else defaults to 20-80 (weights_v10 native). Always overridable in the sidebar.
-LEAGUE_SCALE_DEFAULTS: Dict[str, str] = {"ndl": "1-100"}
+from state import (  # noqa: E402  per-league result silo + active-league helpers
+    set_result, get_result, clear_results, active_league, active_result,
+)
+from scoring import (  # noqa: E402  shared data-discovery + scoring + auto-run
+    DATA_DIR, CONFIG_DIR, discover_leagues, default_scale_for,
+    park_factors_path_for, player_data_mtime, to_csv_bytes,
+    cached_eval, autorun_result,
+)
 
 # Columns shown by default; "Show all columns" reveals the full output schema.
 DEFAULT_COLUMNS = [
@@ -78,71 +83,7 @@ DEFAULT_COLUMNS = [
 VOS_SCORE_COLUMNS = ["VOS_Reach", "VOS_Career", "VOS_Blended"]
 
 
-# --- Streamlit-free core (importable + unit-testable) -----------------------
-
-def discover_leagues() -> List[str]:
-    """League slugs for which PlayerData exists, sorted. No hard-coded list."""
-    return sorted(p.name[len("PlayerData-"):-len(".csv")]
-                  for p in DATA_DIR.glob("PlayerData-*.csv"))
-
-
-def default_scale_for(league: str) -> str:
-    """Smart default rating scale for a league (overridable in the UI)."""
-    return LEAGUE_SCALE_DEFAULTS.get(league, DEFAULT_RATING_SCALE)
-
-
-def park_factors_path_for(league: str) -> Path | None:
-    """Path to the league's park-factors file if one is shipped in config/."""
-    p = CONFIG_DIR / f"{league}-park-factors.json"
-    return p if p.exists() else None
-
-
-def player_data_mtime(league: str) -> float:
-    """Modification time of the league's PlayerData CSV (0.0 if absent).
-
-    Folded into the score cache key so a fresh `fetch_*_player_data.py` pull
-    auto-invalidates the cache — same file → instant hit, new file → re-scored.
-    """
-    p = DATA_DIR / f"PlayerData-{league}.csv"
-    return p.stat().st_mtime if p.exists() else 0.0
-
-
-def evaluate(
-    league: str,
-    rating_scale: str,
-    draft: bool,
-    contracts: bool,
-    apply_park: bool,
-) -> List[Dict[str, Any]]:
-    """Score a league via the same services seam the CLI uses; return row-dicts.
-
-    Pure glue — no Streamlit. Raises ValueError / FileNotFoundError on fatal
-    input problems (missing weights, no players, missing contract base URL),
-    exactly as evaluate_league does, for the caller to surface.
-    """
-    park_path = park_factors_path_for(league) if apply_park else None
-    return evaluate_league(
-        league,
-        data_dir=DATA_DIR,
-        config_dir=CONFIG_DIR,
-        rating_scale=rating_scale,
-        draft=draft,
-        contracts=contracts,
-        park_factors_path=str(park_path) if park_path else None,
-    )
-
-
-def to_csv_bytes(rows: List[Dict[str, Any]], draft: bool, contracts: bool) -> bytes:
-    """Serialize rows through the canonical writer → byte-identical CLI CSV."""
-    fd, name = tempfile.mkstemp(suffix=".csv")
-    os.close(fd)  # close the handle so Windows lets us unlink it afterward
-    tmp = Path(name)
-    try:
-        write_output_csv(rows, tmp, draft_mode=draft, include_contracts=contracts)
-        return tmp.read_bytes()
-    finally:
-        tmp.unlink(missing_ok=True)
-
+# --- Card-specific scoring helpers (shared discovery/scoring is in scoring.py) -
 
 @st.cache_data(show_spinner=False)
 def raw_player_rows(league: str, rating_scale: str,
@@ -318,16 +259,26 @@ def main() -> None:
     # and the League Hub's quick-links can target them via st.switch_page /
     # st.page_link. (depth.page and league.page are both named `page`, so give
     # them explicit unique url_paths — st.Page otherwise infers from the name.)
-    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
+    home_page = st.Page(home.page, title="Home", icon="🏠", url_path="home",
                         default=True)
-    card_page = st.Page(player_card_page, title="Player Card", icon="🪪")
+    eval_page = st.Page(eval_browser_page, title="Eval Browser", icon="📊",
+                        url_path="eval")
+    card_page = st.Page(player_card_page, title="Player Card", icon="🪪", url_path="card")
     depth_page = st.Page(depth.page, title="Depth Charts", icon="📋", url_path="depth")
     prospects_page = st.Page(prospects.page, title="Prospects", icon="🌱",
                              url_path="prospects")
+    free_agents_page = st.Page(free_agents.page, title="Free Agents", icon="🧢",
+                               url_path="free_agents")
+    trade_targets_pg = st.Page(trade_targets_page.page, title="Trade Targets",
+                               icon="🔄", url_path="trade_targets")
+    farm_value_pg = st.Page(farm_value_page.page, title="Farm Value",
+                            icon="💲", url_path="farm_value")
     league_page = st.Page(league_hub.page, title="League Hub", icon="🏟️", url_path="league")
     st.session_state["_pages"] = {
-        "eval": eval_page, "card": card_page, "depth": depth_page,
-        "prospects": prospects_page, "league": league_page,
+        "home": home_page, "eval": eval_page, "card": card_page, "depth": depth_page,
+        "prospects": prospects_page, "free_agents": free_agents_page,
+        "trade_targets": trade_targets_pg, "farm_value": farm_value_pg,
+        "league": league_page,
     }
     _PAGES["card"] = card_page  # existing eval→card bridge
 
@@ -346,12 +297,19 @@ def main() -> None:
             help="Switch the Deep Space 9 color scheme. Your choice is remembered.")
         st.divider()
 
-    nav = st.navigation([eval_page, card_page, depth_page, prospects_page, league_page])
+    nav = st.navigation([home_page, eval_page, card_page, depth_page,
+                         prospects_page, free_agents_page, trade_targets_pg,
+                         farm_value_pg, league_page])
     # A header chip sets _pending_page; navigate now that the pages are
     # registered (switch_page from the pre-nav chrome isn't reliable).
     goto = st.session_state.pop("_pending_page", None)
     if goto and goto in st.session_state["_pages"]:
         st.switch_page(st.session_state["_pages"][goto])
+    # Cold-boot gate: until a league is chosen, force the Home league-select
+    # landing — even if a module page is opened directly from the sidebar nav.
+    # (Skip when already on Home, so this never loops.)
+    if not st.session_state.get("selected_league") and nav.url_path != home_page.url_path:
+        st.switch_page(home_page)
     nav.run()
 
 
@@ -369,39 +327,66 @@ def eval_browser_page() -> None:
                  "Expected files like `data/PlayerData-wwoba.csv`.")
         return
 
+    # Defensive: an active league that's configured but has no PlayerData file
+    # can't be scored — say so plainly instead of silently using another league.
+    # (All currently-configured leagues have data, so this is future-proofing for
+    # a league added to league_url.json before its data is fetched.)
+    active = st.session_state.get("selected_league")
+    if active and active not in leagues:
+        st.warning(f"**{active.upper()}** has no PlayerData file yet — fetch it "
+                   f"(e.g. `fetch_player_data.py {active}`), then re-open. "
+                   "Pick a league with data from the sidebar to continue.")
+
     # --- Sidebar: run controls ---
     with st.sidebar:
         st.header("Evaluate")
-        league = st.selectbox("League", leagues, index=0)
+        # The active league (set by the League Hub, a header status chip, or this
+        # picker) drives the selector, so opening Evaluations from a league hub
+        # lands on that league. We only force the picker when the active league
+        # changed *externally* and is evaluable — a manual pick here is left
+        # untouched, then mirrored back to selected_league for the other pages.
+        desired = st.session_state.get("selected_league")
+        if desired in leagues and st.session_state.get("_eval_synced_league") != desired:
+            st.session_state["eval_league_select"] = desired
+            st.session_state["_eval_synced_league"] = desired
+        st.session_state.setdefault("eval_league_select", leagues[0])
+        league = st.selectbox("League", leagues, key="eval_league_select")
+        st.session_state["selected_league"] = league
+        st.session_state["_eval_synced_league"] = league
 
         mtime = player_data_mtime(league)
         if mtime:
             st.caption(f"Data updated: {datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M}")
 
+        # Re-seed the rating-scale + park toggles to this league's smart defaults
+        # whenever the active league changes, so each league starts from its own
+        # defaults instead of carrying the previous league's (and so the sidebar
+        # matches what the auto-run used). A manual change sticks within a league.
+        if st.session_state.get("_eval_opts_league") != league:
+            st.session_state["_eval_opts_league"] = league
+            st.session_state["eval_scale"] = default_scale_for(league)
+            st.session_state["eval_apply_park"] = park_factors_path_for(league) is not None
+
         scales = list(RATING_SCALES)
-        default_scale = default_scale_for(league)
         rating_scale = st.radio(
-            "Rating scale",
-            scales,
-            index=scales.index(default_scale) if default_scale in scales else 0,
-            help="Scale of the component ratings in PlayerData-{league}.csv. "
-                 "Most leagues are 20-80; some export 1-100 (remapped at load).",
-        )
+            "Rating scale", scales, key="eval_scale",
+            help="Scale of the component ratings in this league's PlayerData CSV. "
+                 "Most leagues are 20-80; some export 1-100 (remapped at load).")
 
         draft = st.checkbox(
-            "Draft mode", value=False,
+            "Draft mode", value=False, key="eval_draft",
             help="Enable draft-specific adjustments (readiness, draft age, "
                  "draft-role penalty). Adds draft columns to the output.")
 
         park_path = park_factors_path_for(league)
         apply_park = st.checkbox(
-            "Apply park factors", value=park_path is not None,
+            "Apply park factors", key="eval_apply_park",
             disabled=park_path is None,
             help=(f"Use config/{league}-park-factors.json."
                   if park_path else "No park-factors file shipped for this league."))
 
         contracts = st.checkbox(
-            "Include contracts", value=False,
+            "Include contracts", value=False, key="eval_contracts",
             help="Fetch live contract + extension data from the league API. "
                  "Requires the league's base URL in config/league_url.json and "
                  "network access.")
@@ -413,16 +398,10 @@ def eval_browser_page() -> None:
         if st.button("Clear cache & re-score", use_container_width=True,
                      help="Force a fresh score, e.g. after re-fetching data."):
             st.cache_data.clear()
-            st.session_state.pop("result", None)
+            clear_results()
             st.rerun()
 
-    # Cache scoring so re-renders (sorting/filtering) don't re-score ~12k players.
-    # data_mtime is part of the cache key (not used in the body): when the
-    # PlayerData CSV changes on disk, the key changes and the league is re-scored.
-    @st.cache_data(show_spinner=False)
-    def cached_eval(league, rating_scale, draft, contracts, apply_park, data_mtime):
-        return evaluate(league, rating_scale, draft, contracts, apply_park)
-
+    # Scoring is cached in scoring.cached_eval (shared with the auto-run below).
     # Persist the last run across reruns triggered by filter widgets.
     if run:
         with st.spinner(f"Scoring {league}…"):
@@ -432,14 +411,20 @@ def eval_browser_page() -> None:
             except (ValueError, FileNotFoundError) as e:
                 st.error(str(e))
                 return
-        st.session_state["result"] = {
+        set_result(league, {
             "rows": rows, "league": league, "draft": draft, "contracts": contracts,
             "rating_scale": rating_scale, "apply_park": apply_park,
-        }
+        })
 
-    result = st.session_state.get("result")
-    if not result:
-        st.info("Pick a league and options in the sidebar, then **Run evaluation**.")
+    # Auto-run on first visit: opening this league's Evaluations card (or just
+    # landing here for a league not yet scored) auto-scores it with offline-safe
+    # defaults instead of showing an empty prompt. A prior manual run is reused.
+    result = get_result(league)
+    if result is None:
+        result = autorun_result(league)
+    if result is None:
+        st.info("Pick a league and options in the sidebar, then **Run evaluation**. "
+                "(If this league has no PlayerData yet, fetch it first.)")
         return
 
     rows = result["rows"]
@@ -660,7 +645,7 @@ def _role_war_df(sp: Dict[str, Any], rp: Dict[str, Any]):
 
 
 def player_card_page() -> None:
-    result = st.session_state.get("result")
+    result = active_result() or autorun_result(active_league())
     if not result or not result.get("rows"):
         st.info("Run an evaluation on the **Eval Browser** page first, then pick "
                 "a player here.")
