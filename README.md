@@ -45,13 +45,13 @@ python depth_chart.py --league <slug> --all-orgs
 
 **`org_strength_report.py`** — Rolls up per-level depth charts into a positional strength report. Composites are z-scored within level; surfaces holes, surpluses, and essential players.
 ```bash
-python org_strength_report.py --league <slug> --org <org>
-python org_strength_report.py --league <slug> --all-orgs
+python tools/org_strength_report.py --league <slug> --org <org>
+python tools/org_strength_report.py --league <slug> --all-orgs
 ```
 
 **`project_season.py`** — Pythagorean win projection (Pythagenpat method) from a depth chart roster's run scoring and prevention components.
 ```bash
-python project_season.py --league <slug> --org <org> --level MLB
+python tools/project_season.py --league <slug> --org <org> --level MLB
 ```
 
 ---
@@ -70,7 +70,7 @@ python trade_targets.py --league <slug> --org <org>
 
 **`waiver_wire.py`** — Grades the current waiver wire against your depth needs. Uses lower composite thresholds than trade targets (cost is a roster spot, not a trade asset); includes a "Stash" tier for high-upside fliers.
 ```bash
-python waiver_wire.py --league <slug> --org <org>
+python tools/waiver_wire.py --league <slug> --org <org>
 ```
 
 ---
@@ -79,12 +79,12 @@ python waiver_wire.py --league <slug> --org <org>
 
 **`draft_pool_analysis.py`** — Comprehensive pre-draft analysis from a VOS evaluation. Produces six reports: summary, position distribution, position strength, ideal-value distribution, prospect tiers, and a full draft board.
 ```bash
-python draft_pool_analysis.py --league <slug>
+python tools/draft_pool_analysis.py --league <slug>
 ```
 
 **`draft_grades.py`** — Post-draft grader. Compares picks against the pre-draft VOS pool projections, awards "VOS Stamps" for players taken at or after their projection slot, and produces A–F grades per org.
 ```bash
-python draft_grades.py --league <slug>
+python tools/draft_grades.py --league <slug>
 ```
 
 ---
@@ -93,8 +93,8 @@ python draft_grades.py --league <slug>
 
 **`contract_audit.py`** — Classifies every contract in the league as OVERPRICED, FAIR, or UNDERPRICED using VPC (Value Per Contract) + age-curve + risk discount. Produces a league summary, per-org rollup, and top steals/overpays list.
 ```bash
-python contract_audit.py --league <slug>
-python contract_audit.py --league <slug> --org <org>
+python tools/contract_audit.py --league <slug>
+python tools/contract_audit.py --league <slug> --org <org>
 ```
 
 **`contract_builder.py`**, **`budget_audit.py`**, **`payroll_audit.py`**, **`parse_financials.py`** — Supporting tools for building contracts, auditing payroll against budget, and parsing financial exports.
@@ -105,8 +105,8 @@ python contract_audit.py --league <slug> --org <org>
 
 **`player_card.py`** — Single-player profile: name, VOS/Potential scores, full ratings block, all positional composite scores.
 ```bash
-python player_card.py --league <slug> --id <player_id>
-python player_card.py --league <slug> --id <player_id> --compare
+python tools/player_card.py --league <slug> --id <player_id>
+python tools/player_card.py --league <slug> --id <player_id> --compare
 ```
 
 **`farm_value.py`** — Farm system dollar valuation from prospect rankings using VPC calibration. Supports reach/career/blended as the score source.
@@ -121,7 +121,7 @@ python hof_grade.py --league <slug> --id <player_id>
 
 **`awards_rank.py`** — Season-end awards rankings (MVP, Cy Young, ROTY, Gold Glove, Silver Slugger) using a transparent WAR + context blend. Supports AL/NL splits when division configs are present.
 ```bash
-python awards_rank.py --league <slug> --year <year>
+python tools/awards_rank.py --league <slug> --year <year>
 ```
 
 ---
@@ -138,20 +138,45 @@ python awards_rank.py --league <slug> --year <year>
 
 ```
 ratings/
-├── run_vos.py                  # Core VOS v10 evaluation engine
+├── run_vos.py                  # Core VOS v10 evaluation engine (entry point)
+│
+│   # Root keeps the engine entry point plus the modules the web UI imports
+│   # in-process; everything else lives under tools/ (see below).
 ├── depth_chart.py              # Depth charts and lineup construction
-├── project_season.py           # Pythagorean win projections
 ├── free_agent_market.py        # Free agent ranking by roster fit
 ├── trade_targets.py            # Trade block analysis
-├── waiver_wire.py              # Waiver wire grader
-├── draft_pool_analysis.py      # Pre-draft pool reports
-├── draft_grades.py             # Post-draft VOS stamp grader
-├── contract_audit.py           # Contract valuation audit
-├── player_card.py              # Single-player profile
+├── trade_block.py              # Trade-block fetch/parse helpers
+├── prospect_rankings.py        # Prospect board
 ├── farm_value.py               # Farm system dollar valuation
+├── farm_value_old.py           # Legacy farm core (still imported by farm_value et al.)
+├── contract.py                 # Contract modelling
+├── contract_builder.py         # Contract construction helpers
 ├── hof_grade.py                # Hall of Fame candidacy grader
-├── awards_rank.py              # Season awards rankings
 ├── stats.py                    # StatsPlus stat fetcher / aggregator
+├── fetch_player_data.py        # Pull a league's player-data export
+├── preflight.py                # Export-status / freshness checks
+├── org_summary_pdf.py          # Org summary PDF rendering
+├── what_if.py                  # Rating field groups for scenarios
+│
+├── tools/                      # Standalone CLI tools (run as `python tools/<x>.py`)
+│   ├── project_season.py       #   Pythagorean win projections
+│   ├── waiver_wire.py          #   Waiver wire grader
+│   ├── draft_pool_analysis.py  #   Pre-draft pool reports
+│   ├── draft_grades.py         #   Post-draft VOS stamp grader
+│   ├── draft_board.py · draft_values.py · draft_grades_pdf.py
+│   ├── contract_audit.py · budget_audit.py · payroll_audit.py · parse_financials.py
+│   ├── player_card.py          #   Single-player profile (CLI)
+│   ├── awards_rank.py          #   Season awards rankings
+│   ├── org_strength_report.py · org_depth_analysis.py
+│   ├── bullpen_builder.py · playoff_planner.py · spring_training_invites.py
+│   ├── rule5_draft.py · rule5_protect.py · park_recommender.py
+│   ├── fa_cohort_analysis.py · current_standings.py · top_salary_avg.py
+│   ├── check_exports.py · prune_outputs.py · scrape_prospects.py
+│   ├── fetch_all_player_data.py · statsplus_paper_news.py
+│   ├── vos_v2.py               #   Legacy v2 engine (rollback escape hatch)
+│   └── run_vos_all.py · run_depth_chart_all.py · run_trade_targets_all.py · run_waiver_wire_all.py  # batch runners
+│
+├── webapp/                     # Local Streamlit UI (pure in-process consumer)
 │
 ├── config/
 │   ├── weights_v10.json        # VOS v10 weights (current)
@@ -179,14 +204,9 @@ ratings/
 │   ├── waiver_wire/            # Waiver wire reports
 │   └── org_depth/              # Org strength reports
 │
-├── lib/
-│   ├── vos_decay.py
-│   └── draft_score.py
-│
-└── run_vos_all.py              # Batch runners
-    run_depth_chart_all.py
-    run_trade_targets_all.py
-    run_waiver_wire_all.py
+└── lib/
+    ├── vos_decay.py
+    └── draft_score.py
 ```
 
 ---
