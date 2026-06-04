@@ -66,6 +66,7 @@ import farm_value_page  # noqa: E402  (Farm Value — org farm systems, ranked)
 import home  # noqa: E402  (cold-boot league-select landing)
 import league_admin  # noqa: E402  (League Admin — per-league settings management)
 import career_war  # noqa: E402  (opt-in accumulated-WAR fetch for the player card)
+import ui  # noqa: E402  (shared LCARS components: metric_row / lcars_section / chip_line)
 
 from state import (  # noqa: E402  per-league result silo + active-league helpers
     set_result, get_result, clear_results, active_league, active_result,
@@ -202,6 +203,45 @@ h1, h2, h3, h4 {{
 .lcars-topbar .b2 {{ width:70px; background:var(--lcars-accent); }}
 .lcars-topbar .b3 {{ width:34px; background:var(--lcars-accent2);
   border-radius:0 23px 23px 0; }}
+/* LCARS section header (rendered by ui.lcars_section) — a mini topbar that
+   introduces a panel of content. Cap + filled label + trailing rule. */
+.lcars-section {{ display:flex; align-items:stretch; gap:6px; height:26px;
+  margin:20px 0 8px 0; }}
+.lcars-section .cap {{ width:26px; background:var(--lcars-accent3);
+  border-radius:13px 0 0 13px; }}
+.lcars-section .label {{ display:flex; align-items:center; padding:0 14px;
+  background:var(--lcars-accent3); color:#000; font-family:var(--lcars-font);
+  font-weight:700; font-size:1.0rem; letter-spacing:2px; text-transform:uppercase; }}
+.lcars-section .bar {{ flex:1 1 auto; background:transparent;
+  border-bottom:2px solid var(--lcars-accent3); }}
+/* LCARS identity header (ui.identity_header) — big name + a data bar that
+   fills the row to its right (handedness / position / qualified positions). */
+.lcars-id {{ display:flex; align-items:center; gap:12px; margin:2px 0 10px 0; }}
+.lcars-id .name {{ font-family:var(--lcars-font); font-size:2.0rem;
+  font-weight:700; letter-spacing:2px; text-transform:uppercase; line-height:1;
+  color:var(--lcars-primary); white-space:nowrap; }}
+.lcars-id .idbar {{ flex:1 1 auto; display:flex; align-items:stretch; gap:5px;
+  height:32px; min-width:0; }}
+.lcars-id .idbar .cell {{ display:flex; flex-direction:column;
+  justify-content:center; padding:0 14px; background:var(--lcars-accent3);
+  color:#000; line-height:1.05; white-space:nowrap; overflow:hidden; }}
+.lcars-id .idbar .cell:nth-child(even) {{ background:var(--lcars-accent2); }}
+.lcars-id .idbar .cell:first-child {{ border-radius:16px 0 0 16px;
+  padding-left:18px; }}
+.lcars-id .idbar .cell.grow {{ flex:1 1 auto; border-radius:0 16px 16px 0;
+  min-width:0; }}
+.lcars-id .idbar .cell .lbl {{ font-family:var(--lcars-font); font-size:0.56rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:1.5px; opacity:0.55; }}
+.lcars-id .idbar .cell .val {{ font-family:var(--lcars-font); font-size:0.95rem;
+  font-weight:600; letter-spacing:1px; overflow:hidden; text-overflow:ellipsis; }}
+/* LCARS chip pills (ui.lcars_chips) — bio / tier metadata. */
+.lcars-chips {{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 8px 0; }}
+.lcars-chips .chip {{ font-family:var(--lcars-font); font-size:0.82rem;
+  letter-spacing:1px; padding:2px 11px; border-radius:11px;
+  background:var(--lcars-panel); border:1px solid var(--lcars-accent3);
+  color:var(--lcars-text); }}
+.lcars-chips.tier .chip {{ border-color:var(--lcars-accent2);
+  color:var(--lcars-accent2); }}
 /* Sidebar = LCARS side panel */
 [data-testid="stSidebar"] {{ background: var(--lcars-panel);
   border-right: 3px solid var(--lcars-primary); }}
@@ -566,6 +606,17 @@ def _is_pitcher_row(r: Dict[str, Any]) -> bool:
     return (r.get("Pos") or "").strip().upper() in {"SP", "RP", "CL", "P"}
 
 
+def _whole(v: Any) -> str:
+    """Display a scouted rating rounded to the nearest whole number; pass blanks
+    and non-numeric values through unchanged (mirrors what_if._fmt_val). Uses the
+    same half-to-even rounding as _num so scores and ratings stay consistent."""
+    s = wi._fmt_val(v)
+    try:
+        return f"{float(s):.0f}"
+    except (TypeError, ValueError):
+        return s
+
+
 def _ratings_df(raw: Dict[str, str], fields: List, with_pot: bool):
     """Build a small DataFrame from a what_if field group, dropping blank rows.
 
@@ -577,14 +628,14 @@ def _ratings_df(raw: Dict[str, str], fields: List, with_pot: bool):
         if with_pot:
             lbl, cur_col = entry[0], entry[1]
             pot_col = entry[2] if len(entry) == 3 else None
-            cur = wi._fmt_val(raw.get(cur_col, ""))
-            pot = wi._fmt_val(raw.get(pot_col, "")) if pot_col else "—"
+            cur = _whole(raw.get(cur_col, ""))
+            pot = _whole(raw.get(pot_col, "")) if pot_col else "—"
             if cur == "—" and pot == "—":
                 continue
             data.append({"Rating": lbl, "Cur": cur, "Pot": pot})
         else:
             lbl, col = entry[0], entry[1]
-            v = wi._fmt_val(raw.get(col, ""))
+            v = _whole(raw.get(col, ""))
             if v == "—":
                 continue
             data.append({"Rating": lbl, "Val": v})
@@ -596,8 +647,36 @@ def _ratings_into(container, label: str, raw: Dict[str, str],
     df = _ratings_df(raw, fields, with_pot)
     if df is None:
         return
-    container.caption(label)
+    if label:
+        container.caption(label)
     container.dataframe(df, hide_index=True, use_container_width=True)
+
+
+def _paired_ratings_df(raw: Dict[str, str], left_fields: List,
+                       right_fields: List, headers: tuple):
+    """Two single-value field groups side by side as a 4-column table:
+    (left label, left val, right label, right val). Blank values are dropped
+    within each group, then the groups are padded to equal length. Returns None
+    if both groups are empty. (Used for the Defense table: infield | outfield.)
+    The two value columns use whitespace-only headers so they stay blank yet
+    distinct — pandas rejects truly duplicate column labels.
+    """
+    def rows(fields):
+        out = []
+        for entry in fields:
+            v = _whole(raw.get(entry[1], ""))
+            if v != "—":
+                out.append((entry[0], v))
+        return out
+
+    left, right = rows(left_fields), rows(right_fields)
+    if not left and not right:
+        return None
+    n = max(len(left), len(right))
+    left += [("", "")] * (n - len(left))
+    right += [("", "")] * (n - len(right))
+    data = [[left[i][0], left[i][1], right[i][0], right[i][1]] for i in range(n)]
+    return pd.DataFrame(data, columns=[headers[0], " ", headers[1], "  "])
 
 
 def _pitcher_dual(raw: Dict[str, str], result: Dict[str, Any]):
@@ -630,13 +709,13 @@ def _role_df(sp: Dict[str, Any], rp: Dict[str, Any], metrics):
 
 
 _ROLE_SCORE_METRICS = [
-    ("VOS Reach", "VOS_Reach", 2), ("VOS Career", "VOS_Career", 2),
-    ("VOS Blended", "VOS_Blended", 2), ("Ability", "Pitching_Ability_Score", 2),
-    ("Ability (Pot)", "Pitching_Ability_Potential", 2),
-    ("Arsenal", "Pitching_Arsenal_Score", 2), ("Ideal value", "Ideal_Value", 2),
+    ("VOS Reach", "VOS_Reach", 0), ("VOS Career", "VOS_Career", 0),
+    ("VOS Blended", "VOS_Blended", 0), ("Ability", "Pitching_Ability_Score", 0),
+    ("Ability (Pot)", "Pitching_Ability_Potential", 0),
+    ("Arsenal", "Pitching_Arsenal_Score", 0), ("Ideal value", "Ideal_Value", 0),
 ]
 _ROLE_WAR_METRICS = [
-    ("VOS Ceiling", "VOS_Ceiling", 2), ("Career WAR", "Arch_Career_WAR", 1),
+    ("VOS Ceiling", "VOS_Ceiling", 0), ("Career WAR", "Arch_Career_WAR", 1),
     ("Career WAR (hi)", "Arch_Career_WAR_Hi", 1), ("Remaining WAR", "Remaining_WAR", 1),
     ("Proj. debut age", "Proj_Debut_Age", 0),
 ]
@@ -686,31 +765,44 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     # Pitchers: grade as SP and RP once; shared by the role-score and WAR tables.
     sp_eval, rp_eval = _pitcher_dual(raw, result) if is_pit else (None, None)
 
-    st.subheader(f"{row.get('Name', '?')} — {(row.get('Pos') or '').strip()}")
-    bio = [b for b in (
-        f"Age {row.get('Age')}" if str(row.get("Age", "")).strip() else "",
-        str(row.get("Team", "")).strip(),
-        f"Org {row.get('Org')}" if str(row.get("Org", "")).strip() else "",
-        f"Level {row.get('League_Level')}" if str(row.get("League_Level", "")).strip() else "",
-    ) if b]
-    if bio:
-        st.caption(" · ".join(bio))
-    tiers = [f"{lbl}: {row.get(col)}" for lbl, col in (
-        ("Tier", "VOS_Tier"), ("Potential", "VOS_Potential_Tier"),
-        ("Ceiling", "Ceiling_Tier")) if str(row.get(col, "")).strip()]
-    if tiers:
-        st.caption(" · ".join(tiers))
-
-    # Headline VOS metrics
-    m = st.columns(4)
-    m[0].metric("VOS Reach", _num(row.get("VOS_Reach")))
-    m[1].metric("VOS Career", _num(row.get("VOS_Career")))
-    m[2].metric("VOS Blended", _num(row.get("VOS_Blended")))
-    m[3].metric("VOS Ceiling", _num(row.get("VOS_Ceiling")))
+    # Identity panel: name + an LCARS data bar (handedness / position /
+    # qualified positions), bio & tier as pill chips, and the headline VOS
+    # readout — bound into one bordered LCARS block.
+    bats = str((raw or {}).get("Bats", "")).strip()
+    throws = str((raw or {}).get("Throws", "")).strip()
+    hand = f"{bats or '–'} / {throws or '–'}" if (bats or throws) else "—"
+    cur_pos = (row.get("Pos") or "").strip()
+    # "Qualified" = the other positions he projects to play effectively
+    # (Projected_Viable_Pos_List, minus his current spot). Blank for pitchers.
+    viable = [p.strip() for p in
+              str(row.get("Projected_Viable_Pos_List", "")).split(",") if p.strip()]
+    elsewhere = [p for p in viable if p.upper() != cur_pos.upper()]
+    with st.container(border=True):
+        ui.identity_header(row.get("Name", "?"), [
+            ("Bat / Thr", hand),
+            ("Pos", cur_pos or "—"),
+            ("Qualified", ", ".join(elsewhere) if elsewhere else "—"),
+        ])
+        ui.lcars_chips([
+            f"Age {row.get('Age')}" if str(row.get("Age", "")).strip() else "",
+            str(row.get("Team", "")).strip(),
+            f"Org {row.get('Org')}" if str(row.get("Org", "")).strip() else "",
+            f"Level {row.get('League_Level')}" if str(row.get("League_Level", "")).strip() else "",
+        ])
+        ui.lcars_chips((f"{lbl}: {row.get(col)}" for lbl, col in (
+            ("Tier", "VOS_Tier"), ("Potential", "VOS_Potential_Tier"),
+            ("Ceiling", "Ceiling_Tier")) if str(row.get(col, "")).strip()),
+            variant="tier")
+        ui.metric_row([
+            ("VOS Reach", _num(row.get("VOS_Reach"), 0)),
+            ("VOS Career", _num(row.get("VOS_Career"), 0)),
+            ("VOS Blended", _num(row.get("VOS_Blended"), 0)),
+            ("VOS Ceiling", _num(row.get("VOS_Ceiling"), 0)),
+        ])
 
     # Component scores
     if is_pit:
-        st.markdown("**Role comparison — SP vs RP**")
+        ui.lcars_section("Role comparison — SP vs RP")
         if sp_eval is not None:
             st.dataframe(_role_df(sp_eval, rp_eval, _ROLE_SCORE_METRICS),
                          hide_index=True, use_container_width=True)
@@ -718,17 +810,32 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
                        "matching his listed position equals the headline VOS above.")
         else:
             # Fallback: the single auto-role scores from the eval row.
-            c = st.columns(3)
-            c[0].metric("Ability", _num(row.get("Pitching_Ability_Score")))
-            c[1].metric("Ability (Pot)", _num(row.get("Pitching_Ability_Potential")))
-            c[2].metric("Arsenal", _num(row.get("Pitching_Arsenal_Score")))
+            ui.metric_row([
+                ("Ability", _num(row.get("Pitching_Ability_Score"), 0)),
+                ("Ability (Pot)", _num(row.get("Pitching_Ability_Potential"), 0)),
+                ("Arsenal", _num(row.get("Pitching_Arsenal_Score"), 0)),
+            ])
     else:
-        st.markdown("**Component scores**")
-        c = st.columns(4)
-        c[0].metric("Batting", _num(row.get("Batting_Score")))
-        c[1].metric("Batting (Pot)", _num(row.get("Batting_Potential")))
-        c[2].metric("Defense", _num(row.get("Defense_Score")))
-        c[3].metric("Baserunning", _num(row.get("Baserunning_Score")))
+        # Three columns by component — each headed by its score, with that
+        # component's scouted-ratings table beneath. raw may be None (no
+        # PlayerData row); _ratings_into is a no-op on the empty dict.
+        ui.lcars_section("Component scores")
+        raw_g = raw or {}
+        bcol, dcol, rcol = st.columns(3)
+        bcol.metric("Batting (cur / pot)",
+                    f"{_num(row.get('Batting_Score'), 0)} / {_num(row.get('Batting_Potential'), 0)}")
+        _ratings_into(bcol, "", raw_g, wi.HITTER_RATING_FIELDS, True)
+        dcol.metric("Defense", _num(row.get("Defense_Score"), 0))
+        # 4-col table: infield (IFR/IFE/IFA/TDP) | outfield+catcher. Catcher
+        # skills (CBlk/CArm/CFrm) ride the right column — blank, so hidden, for
+        # non-catchers; visible for catchers (they show nowhere else).
+        def_df = _paired_ratings_df(raw_g, wi.HITTER_DEFENSE_FIELDS[:4],
+                                    wi.HITTER_DEFENSE_FIELDS[4:],
+                                    ("Infield", "Outfield"))
+        if def_df is not None:
+            dcol.dataframe(def_df, hide_index=True, use_container_width=True)
+        rcol.metric("Baserunning", _num(row.get("Baserunning_Score"), 0))
+        _ratings_into(rcol, "", raw_g, wi.HITTER_BASERUNNING_FIELDS, False)
 
     # Adjustments
     adj_specs = [("Development", "Development_Adj"), ("Age", "Age_Adj"),
@@ -736,10 +843,8 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     if result.get("draft"):
         adj_specs += [("Readiness", "Readiness_Adj"), ("Draft age", "Draft_Age_Adj"),
                       ("Draft RP pen.", "Draft_RP_Penalty")]
-    st.markdown("**Adjustments**")
-    ac = st.columns(len(adj_specs))
-    for col, (lbl, key) in zip(ac, adj_specs):
-        col.metric(lbl, _num(row.get(key)))
+    ui.lcars_section("Adjustments")
+    ui.metric_row([(lbl, _num(row.get(key))) for lbl, key in adj_specs])
 
     # Career WAR (actual + remaining) — opt-in, fetches this player's accumulated
     # MLB WAR and adds the projected remaining. For a player with no MLB WAR this
@@ -768,16 +873,18 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
             pct = proj["pct"]
             pace = ">p90" if pct > 90 else "<p50" if pct < 50 else f"~p{round(pct)}"
 
-            st.markdown("**Projected career WAR** — actual accumulated + "
-                        "percentile-adjusted remaining")
-            w = st.columns(3)
-            w[0].metric("Career WAR (actual)", f"{actual:.1f}")
-            w[1].metric("Tier pace", pace)
-            w[2].metric("= projected career WAR", f"{proj['projected']:.1f}")
-            r = st.columns(3)
-            r[0].metric("Remaining (median)", f"{_wf('Remaining_WAR'):.1f}")
-            r[1].metric("Remaining (p90)", f"{_wf('Remaining_WAR_Hi'):.1f}")
-            r[2].metric("Remaining (used)", f"{proj['remaining_adj']:.1f}")
+            ui.lcars_section("Projected career WAR")
+            st.caption("Actual accumulated + percentile-adjusted remaining.")
+            ui.metric_row([
+                ("Career WAR (actual)", f"{actual:.1f}"),
+                ("Tier pace", pace),
+                ("= projected career WAR", f"{proj['projected']:.1f}"),
+            ])
+            ui.metric_row([
+                ("Remaining (median)", f"{_wf('Remaining_WAR'):.1f}"),
+                ("Remaining (p90)", f"{_wf('Remaining_WAR_Hi'):.1f}"),
+                ("Remaining (used)", f"{proj['remaining_adj']:.1f}"),
+            ])
             st.caption(
                 f"Actual = {data['hit']:.1f} batting + {data['pit']:.1f} pitching WAR "
                 f"over {data['seasons']} ML season(s). **Tier pace** = where his actual "
@@ -791,19 +898,20 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
     if is_pit:
         war_df = _role_war_df(sp_eval, rp_eval) if sp_eval is not None else None
         if war_df is not None:
-            st.markdown("**Projected career WAR — SP vs RP** — archetype average "
-                        "for this profile, *not* a per-player forecast")
+            ui.lcars_section("Projected career WAR — SP vs RP")
+            st.caption("Archetype average for this profile, *not* a per-player forecast.")
             st.dataframe(war_df, hide_index=True, use_container_width=True)
     else:
         if str(row.get("Arch_Career_WAR", "")).strip():
-            st.markdown("**Projected career WAR** — archetype average for this "
-                        "profile, *not* a per-player forecast")
-            w = st.columns(4)
-            w[0].metric("Career WAR", _num(row.get("Arch_Career_WAR"), 1))
-            w[1].metric("Career WAR (hi)", _num(row.get("Arch_Career_WAR_Hi"), 1))
-            w[2].metric("Remaining WAR", _num(row.get("Remaining_WAR"), 1))
+            ui.lcars_section("Projected career WAR")
+            st.caption("Archetype average for this profile, *not* a per-player forecast.")
             debut = str(row.get("Proj_Debut_Age", "")).strip()
-            w[3].metric("Proj. debut age", debut or "—")
+            ui.metric_row([
+                ("Career WAR", _num(row.get("Arch_Career_WAR"), 1)),
+                ("Career WAR (hi)", _num(row.get("Arch_Career_WAR_Hi"), 1)),
+                ("Remaining WAR", _num(row.get("Remaining_WAR"), 1)),
+                ("Proj. debut age", debut or "—"),
+            ])
 
         insights = [f"**{lbl}:** {row.get(col)}" for lbl, col in (
             ("Current pos", "Current_Position"), ("Projected pos", "Projected_Position"),
@@ -814,10 +922,11 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
             ("Ideal value", "Ideal_Value"),
         ) if str(row.get(col, "")).strip()]
         if insights:
-            st.markdown("**Projection insights**")
+            ui.lcars_section("Projection insights")
             st.markdown("  ·  ".join(insights))
 
-        st.markdown("**Positional scores** (Current / Potential)")
+        ui.lcars_section("Positional scores")
+        st.caption("Current / Potential")
         ideal_cur = (row.get("Current_Position") or "").strip()
         ideal_pot = (row.get("Projected_Position") or "").strip()
         prows = []
@@ -830,8 +939,8 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
                 marker = "◀ projected"
             else:
                 marker = ""
-            prows.append({"Pos": pos, "Current": _num(row.get(f"{pos}_Score")),
-                          "Potential": _num(row.get(f"{pos}_Potential")), " ": marker})
+            prows.append({"Pos": pos, "Current": _num(row.get(f"{pos}_Score"), 0),
+                          "Potential": _num(row.get(f"{pos}_Potential"), 0), " ": marker})
         st.dataframe(pd.DataFrame(prows), hide_index=True, use_container_width=True)
 
     # Scouted ratings — raw PlayerData (fetched above), shown at the run's rating
@@ -845,10 +954,10 @@ def _render_card(row: Dict[str, Any], result: Dict[str, Any]) -> None:
                 _ratings_into(right, "Pitches", raw, wi.PITCH_FIELDS, True)
                 _ratings_into(right, "Personality", raw, wi.PERSONALITY_FIELDS, False)
             else:
-                _ratings_into(left, "Batting", raw, wi.HITTER_RATING_FIELDS, True)
+                # Batting / Defense / Baserunning tables now live in the
+                # Component scores section above (beside each score). What
+                # remains here is position eligibility + personality.
                 _ratings_into(left, "Position ratings", raw, wi.POS_RATING_COLS, True)
-                _ratings_into(right, "Defense", raw, wi.HITTER_DEFENSE_FIELDS, False)
-                _ratings_into(right, "Baserunning", raw, wi.HITTER_BASERUNNING_FIELDS, False)
                 _ratings_into(right, "Personality", raw, wi.PERSONALITY_FIELDS, False)
 
     # Park / injury
@@ -874,7 +983,7 @@ def _render_contract(row: Dict[str, Any]) -> None:
         except (TypeError, ValueError):
             return 0
 
-    st.markdown("**Contract**")
+    ui.lcars_section("Contract")
     years = ci("Contract_years")
     if years < 1:
         st.caption("No active contract (free agent / unsigned).")
