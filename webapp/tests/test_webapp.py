@@ -177,12 +177,12 @@ def test_league_admin_apply_edits_noop_and_token_and_invalid():
         # provide a token -> written
         changed = league_admin.apply_edits(
             reg, "ndl", url="https://statsplus.net/ndl/api",
-            token="019e134f-1287-7d89-bda3-fc8928b1cb68",
+            token="019e1111-0000-7000-8000-000000000001",
             rating_scale="1-100", org="Seattle Whalers", year=2055,
             min_comp=None, game_version="", sim_time="",
         )
         assert changed == ["token"], changed
-        assert reg.load("ndl").token.startswith("019e134f")
+        assert reg.load("ndl").token.startswith("019e1111")
 
         # invalid URL -> RegistryError, nothing persisted
         try:

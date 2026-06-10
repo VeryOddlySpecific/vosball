@@ -460,7 +460,7 @@ class LeagueRegistry:
         if not isinstance(token, str) or not _TOKEN_RE.match(token):
             raise RegistryError(
                 f"Invalid token {token!r}: expected a UUID like "
-                "'019e134f-1287-7d89-bda3-fc8928b1cb68'."
+                "'019e0000-0000-7000-8000-000000000000'."
             )
 
     @staticmethod

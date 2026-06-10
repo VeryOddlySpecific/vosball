@@ -44,7 +44,7 @@ def _scaffold(tmp: Path) -> None:
     (tmp / "statsplus_tokens.json").write_text(json.dumps({
         "_comment": "tokens",
         "_default": "019e0000-0000-7000-8000-000000000000",
-        "ndl": "019e134f-1287-7d89-bda3-fc8928b1cb68",
+        "ndl": "019e1111-0000-7000-8000-000000000001",
         # sahl intentionally omitted -> should resolve to _default
     }, indent=2), encoding="utf-8")
 
@@ -95,7 +95,7 @@ def main() -> int:
         reg = lr.LeagueRegistry(tmp)
         ndl = reg.load("ndl")
         check(ndl.url.endswith("/therealndl/api"), "load: url")
-        check(ndl.token == "019e134f-1287-7d89-bda3-fc8928b1cb68", "load: explicit token")
+        check(ndl.token == "019e1111-0000-7000-8000-000000000001", "load: explicit token")
         check(ndl.uses_default_token is False, "load: explicit token -> not using default")
         check(ndl.rating_scale == "1-100" and ndl.year == 2055 and ndl.org == "Seattle Whalers",
               "load: settings scalars")
@@ -146,7 +146,7 @@ def main() -> int:
         reg = lr.LeagueRegistry(tmp)
         newc = lr.LeagueConfig(
             slug="bwb", url="https://atl-02.statsplus.net/bwb/api",
-            token="019e32e2-3492-7f45-b60f-d9dd5cea9b57",
+            token="019e2222-0000-7000-8000-000000000002",
             rating_scale="20-80", org="Chihuahua Guerreros", year=2028,
             league_ids={"ML": [203]}, orgs=["Chihuahua Guerreros"],
         )
@@ -156,7 +156,7 @@ def main() -> int:
         check(urls["bwb"].endswith("/bwb/api") and "ndl" in urls, "add: url written, siblings intact")
         check((tmp / "bwb_orgs.json").exists(), "add: per-league orgs file created")
         back = reg.load("bwb")
-        check(back.year == 2028 and back.token.startswith("019e32e2"), "add: reload new league")
+        check(back.year == 2028 and back.token.startswith("019e2222"), "add: reload new league")
 
     # ---- None fields are skipped on save ----
     with tempfile.TemporaryDirectory() as t:
@@ -234,7 +234,7 @@ def main() -> int:
 
     good = lr.LeagueConfig(
         slug="ndl", url="https://statsplus.net/ndl/api",
-        token="019e134f-1287-7d89-bda3-fc8928b1cb68",
+        token="019e1111-0000-7000-8000-000000000001",
         rating_scale="1-100", year=2055, min_comp=55.0,
         league_ids={"ML": [200], "_international": [225]},
     )
