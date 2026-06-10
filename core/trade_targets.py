@@ -102,6 +102,12 @@ MIN_TARGET_COMPOSITE = 42.0      # below this, not really a useful acquisition
 LOTTERY_VOS_POT = tb.LOTTERY_VOS_POT
 LOTTERY_AGE_CEILING = tb.LOTTERY_AGE_CEILING
 
+# A candidate only counts as a *platoon* bat when his split composite beats his
+# overall composite by at least this many points (20-80 scale). Smaller gaps
+# are just normal variance — and an everywhere-good hitter already shows up in
+# the main shopping list, so the platoon sections stay specialists-only.
+PLATOON_EDGE_MIN = 2.0
+
 
 # -----------------------------------------------------------------------------
 # CLI
@@ -669,6 +675,83 @@ def categorize_target(
     if vos_pot >= LOTTERY_VOS_POT and age <= LOTTERY_AGE_CEILING:
         return "Lottery"
     return "Pass"
+
+
+# -----------------------------------------------------------------------------
+# Platoon targets — side-specific needs + platoon-bat matching. The overall
+# pipeline above is handedness-blind: needs are graded on overall composites
+# and candidates score on their overall blend, so a true platoon bat (or a
+# "fine overall, helpless vs LHP" position) averages out invisibly. This pass
+# re-runs the same needs assessment per split and surfaces ONLY the
+# specialists. Hitters only — the stat model has hitter L/R splits; pitchers
+# face both hands.
+# -----------------------------------------------------------------------------
+
+def build_platoon_targets(
+    split: str,
+    all_org_hitters: List[Dict[str, Any]],
+    candidates: List[Dict[str, Any]],
+    *,
+    min_composite: float = MIN_TARGET_COMPOSITE,
+) -> Dict[str, Any]:
+    """Side-specific shopping list for one handedness split (``vs_l``/``vs_r``).
+
+    ``all_org_hitters`` / ``candidates`` are the records build_trade_targets /
+    build_candidate_records produce. Both must come from a WITH-stats run —
+    the split keys (``composite_vs_*``, from depth_chart.build_player_record)
+    only exist when stat bundles were available; candidates without them are
+    skipped (no split evidence = can't be judged a platoon bat).
+
+    A candidate qualifies when ALL of:
+      - hitter with split stats for this side,
+      - split composite ≥ ``min_composite``,
+      - split composite beats his overall composite by ≥ PLATOON_EDGE_MIN
+        (a genuine specialist, not just a good hitter — those are already in
+        the main list),
+      - he fills a non-Set need at a viable position when the org's depth is
+        re-graded against this hand only.
+
+    Returns ``{"needs": [...], "targets": [...]}`` — needs are the per-position
+    split-graded entries (assess_position_need shape); targets are candidate
+    copies with ``composite`` swapped to the split blend, plus ``_need_entry``,
+    ``_fit_pos``, ``_fit_score`` (compute_fit_score on the split composite, so
+    it sorts on the same scale as the main list), ``_platoon_edge`` and
+    ``_overall_composite``. Sorted by fit, best first.
+    """
+    # Re-grade hitter-position needs with org composites swapped to the split
+    # blend. Position viability (raw pos_scores) and _level tags are untouched
+    # — only the quality judgment changes hands.
+    org_split = [{**p, "composite": p.get(f"composite_{split}", p.get("composite"))}
+                 for p in all_org_hitters]
+    needs = [tb.assess_position_need(pos, org_split) for pos in HITTER_POSITIONS]
+    need_lookup = _build_need_lookup(needs)
+
+    out: List[Dict[str, Any]] = []
+    for cand in candidates:
+        if cand.get("is_pitcher"):
+            continue
+        split_comp = cand.get(f"composite_{split}")
+        if split_comp is None:
+            continue
+        split_comp = float(split_comp)
+        overall = float(cand.get("composite") or 0)
+        edge = split_comp - overall
+        if edge < PLATOON_EDGE_MIN or split_comp < min_composite:
+            continue
+        c2 = {**cand, "composite": split_comp}
+        # Pitcher list is irrelevant here (hitters only) — pass empty.
+        need_entry, fit_pos = match_candidate_to_need(c2, need_lookup, [])
+        if not need_entry or need_entry.get("tier") == "Set":
+            continue
+        c2["_need_entry"] = need_entry
+        c2["_fit_pos"] = fit_pos
+        c2["_fit_score"] = compute_fit_score(c2, need_entry)
+        c2["_platoon_edge"] = edge
+        c2["_overall_composite"] = overall
+        out.append(c2)
+
+    out.sort(key=lambda c: -c["_fit_score"])
+    return {"needs": needs, "targets": out}
 
 
 # -----------------------------------------------------------------------------

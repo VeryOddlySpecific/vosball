@@ -131,9 +131,21 @@ def build_targets_context(_eval_rows, eval_sig, league, org, year, block_sig, _p
         res = tt.build_trade_targets(
             args, cfg, rows, list(_pids), levels, year, hitter_stats, pitcher_stats,
         )
+
+        # Platoon sections (stats runs only — split keys don't exist without
+        # stats, and split-graded needs would equal overall ones). Floors wide
+        # open here too; the page applies its min-composite slider on top.
+        platoon: Dict[str, Any] = {}
+        if hitter_stats:
+            platoon = {s: tt.build_platoon_targets(
+                           s, res["all_org_hitters"], res["scored"],
+                           min_composite=0.0)
+                       for s in ("vs_l", "vs_r")}
+
         return {
             "targets": res["targets"],
             "scored_all": res["scored"],
+            "platoon": platoon,
             "org_pool": bool(res["all_org_hitters"] or res["all_org_pitchers"]),
             "players_available": bool(players_lookup),
             "stats_available": bool(hitter_stats or pitcher_stats),
@@ -184,6 +196,27 @@ def _cand_df(cands: List[Dict[str, Any]]) -> pd.DataFrame:
             "Career": round(float(c.get("vos") or 0), 1),
             "Reach": round(float(c.get("vos_potential") or 0), 1),
             "Comp": round(float(c.get("composite") or 0), 1),
+            "Fit": round(float(c.get("_fit_score") or 0), 1),
+            "Flags": c.get("_status_flags") or "—",
+        })
+    return pd.DataFrame(rows)
+
+
+def _platoon_df(cands: List[Dict[str, Any]]) -> pd.DataFrame:
+    """Platoon candidate table — split composite next to overall, with the
+    edge spelled out. Already fit-sorted by build_platoon_targets."""
+    rows = []
+    for c in cands:
+        rows.append({
+            "Name": c.get("name", ""),
+            "Current Org": c.get("_current_org", "") or "—",
+            "Lvl": c.get("_level", "") or "—",
+            "Age": _fmt(c.get("age"), 0),
+            "Fit Need": c.get("_fit_pos") or "—",
+            "Need Tier": (c.get("_need_entry") or {}).get("tier", "—"),
+            "Split Comp": round(float(c.get("composite") or 0), 1),
+            "Overall": round(float(c.get("_overall_composite") or 0), 1),
+            "Edge": f"+{float(c.get('_platoon_edge') or 0):.1f}",
             "Fit": round(float(c.get("_fit_score") or 0), 1),
             "Flags": c.get("_status_flags") or "—",
         })
@@ -329,3 +362,36 @@ def page() -> None:
                          ("Priority Target", "Need Fit"))):
             st.caption(blurb)
             st.dataframe(_cand_df(cands), hide_index=True, use_container_width=True)
+
+    # --- Platoon targets (side-specific) ------------------------------------
+    # Needs re-graded per pitcher-hand; only genuine specialists listed (split
+    # composite ≥ overall + PLATOON_EDGE_MIN). The main list above is untouched.
+    platoon = ctx.get("platoon") or {}
+    if platoon:
+        st.markdown("### ⚖️ Platoon targets — side-specific holes")
+        st.caption(
+            "Your needs re-graded against one pitcher hand at a time, matched "
+            "with bats whose split composite beats their overall by ≥ "
+            f"{tt.PLATOON_EDGE_MIN:.0f} pts — specialists the handedness-blind "
+            "list above averages away. Hitters only. **Min composite** applies "
+            "to the split composite.")
+        for split, label, who in (
+            ("vs_l", "vs LHP", "lefty-mashers to start against LHP"),
+            ("vs_r", "vs RHP", "righty-mashers to start against RHP"),
+        ):
+            data = platoon.get(split) or {}
+            cands = [c for c in (data.get("targets") or [])
+                     if float(c.get("composite") or 0) >= min_comp]
+            needs = data.get("needs") or []
+            n_crit = sum(1 for t in needs if t["tier"] == "Critical")
+            n_major = sum(1 for t in needs if t["tier"] == "Major")
+            st.markdown(f"**{label} platoon targets · {len(cands)}** — {who}")
+            with st.expander(f"Your needs {label} — {n_crit} Critical · "
+                             f"{n_major} Major", expanded=False):
+                st.dataframe(_needs_df(needs), hide_index=True,
+                             use_container_width=True)
+            if cands:
+                st.dataframe(_platoon_df(cands), hide_index=True,
+                             use_container_width=True)
+            else:
+                st.caption(f"No {label} platoon fits on the block right now.")
