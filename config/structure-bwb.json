@@ -1,0 +1,2470 @@
+{
+ "leagues": [
+  {
+   "league_id": 203,
+   "name": "Bushwood Baseball League",
+   "abbr": "BWB",
+   "level": 1,
+   "state": 3,
+   "parent_league_id": 0
+  },
+  {
+   "league_id": 204,
+   "name": "International League",
+   "abbr": "IL",
+   "level": 2,
+   "state": 2,
+   "parent_league_id": 203
+  },
+  {
+   "league_id": 206,
+   "name": "Eastern League",
+   "abbr": "EL",
+   "level": 3,
+   "state": 4,
+   "parent_league_id": 203
+  },
+  {
+   "league_id": 211,
+   "name": "Midwest League",
+   "abbr": "MWL",
+   "level": 4,
+   "state": 4,
+   "parent_league_id": 203
+  },
+  {
+   "league_id": 212,
+   "name": "California League",
+   "abbr": "CAL",
+   "level": 4,
+   "state": 4,
+   "parent_league_id": 203
+  },
+  {
+   "league_id": 217,
+   "name": "Arizona Complex League",
+   "abbr": "ACL",
+   "level": 6,
+   "state": 4,
+   "parent_league_id": 203
+  }
+ ],
+ "subleagues": [
+  {
+   "league_id": 203,
+   "sub_league_id": 0,
+   "name": "Ty Webb League",
+   "abbr": "TWL",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 203,
+   "sub_league_id": 1,
+   "name": "Al Czervik League",
+   "abbr": "ACL",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 204,
+   "sub_league_id": 0,
+   "name": "",
+   "abbr": "",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 204,
+   "sub_league_id": 1,
+   "name": "Sub League 2",
+   "abbr": "SL2",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 206,
+   "sub_league_id": 0,
+   "name": "",
+   "abbr": "",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 206,
+   "sub_league_id": 1,
+   "name": "Sub League 2",
+   "abbr": "SL2",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 211,
+   "sub_league_id": 0,
+   "name": "",
+   "abbr": "",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 211,
+   "sub_league_id": 1,
+   "name": "Sub League 2",
+   "abbr": "SL2",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 212,
+   "sub_league_id": 0,
+   "name": "",
+   "abbr": "",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 212,
+   "sub_league_id": 1,
+   "name": "Sub League 2",
+   "abbr": "SL2",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 217,
+   "sub_league_id": 0,
+   "name": "",
+   "abbr": "AZL",
+   "designated_hitter": 1
+  },
+  {
+   "league_id": 217,
+   "sub_league_id": 1,
+   "name": "Sub League 2",
+   "abbr": "SL2",
+   "designated_hitter": 1
+  }
+ ],
+ "divisions": [
+  {
+   "division_id": 0,
+   "league_id": 203,
+   "sub_league_id": 0,
+   "name": "The Links Division"
+  },
+  {
+   "division_id": 1,
+   "league_id": 203,
+   "sub_league_id": 0,
+   "name": "The Meadows Division"
+  },
+  {
+   "division_id": 2,
+   "league_id": 203,
+   "sub_league_id": 0,
+   "name": "The Valley Division"
+  },
+  {
+   "division_id": 0,
+   "league_id": 203,
+   "sub_league_id": 1,
+   "name": "The Bay Division"
+  },
+  {
+   "division_id": 1,
+   "league_id": 203,
+   "sub_league_id": 1,
+   "name": "The Crest Division"
+  },
+  {
+   "division_id": 2,
+   "league_id": 203,
+   "sub_league_id": 1,
+   "name": "The Oaks Division"
+  },
+  {
+   "division_id": 0,
+   "league_id": 204,
+   "sub_league_id": 0,
+   "name": "East Division"
+  },
+  {
+   "division_id": 1,
+   "league_id": 204,
+   "sub_league_id": 0,
+   "name": "West Division"
+  },
+  {
+   "division_id": 2,
+   "league_id": 204,
+   "sub_league_id": 0,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 204,
+   "sub_league_id": 1,
+   "name": "Division 1"
+  },
+  {
+   "division_id": 1,
+   "league_id": 204,
+   "sub_league_id": 1,
+   "name": "Division 2"
+  },
+  {
+   "division_id": 2,
+   "league_id": 204,
+   "sub_league_id": 1,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 206,
+   "sub_league_id": 0,
+   "name": "Northeast Division"
+  },
+  {
+   "division_id": 1,
+   "league_id": 206,
+   "sub_league_id": 0,
+   "name": "Southwest Division"
+  },
+  {
+   "division_id": 2,
+   "league_id": 206,
+   "sub_league_id": 0,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 206,
+   "sub_league_id": 1,
+   "name": "Division 1"
+  },
+  {
+   "division_id": 1,
+   "league_id": 206,
+   "sub_league_id": 1,
+   "name": "Division 2"
+  },
+  {
+   "division_id": 2,
+   "league_id": 206,
+   "sub_league_id": 1,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 211,
+   "sub_league_id": 0,
+   "name": "East"
+  },
+  {
+   "division_id": 1,
+   "league_id": 211,
+   "sub_league_id": 0,
+   "name": "West"
+  },
+  {
+   "division_id": 2,
+   "league_id": 211,
+   "sub_league_id": 0,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 211,
+   "sub_league_id": 1,
+   "name": "Division 1"
+  },
+  {
+   "division_id": 1,
+   "league_id": 211,
+   "sub_league_id": 1,
+   "name": "Division 2"
+  },
+  {
+   "division_id": 2,
+   "league_id": 211,
+   "sub_league_id": 1,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 212,
+   "sub_league_id": 0,
+   "name": "Northern Division"
+  },
+  {
+   "division_id": 1,
+   "league_id": 212,
+   "sub_league_id": 0,
+   "name": "Southern Division"
+  },
+  {
+   "division_id": 2,
+   "league_id": 212,
+   "sub_league_id": 0,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 212,
+   "sub_league_id": 1,
+   "name": "Division 1"
+  },
+  {
+   "division_id": 1,
+   "league_id": 212,
+   "sub_league_id": 1,
+   "name": "Division 2"
+  },
+  {
+   "division_id": 2,
+   "league_id": 212,
+   "sub_league_id": 1,
+   "name": "Division 3"
+  },
+  {
+   "division_id": 0,
+   "league_id": 217,
+   "sub_league_id": 0,
+   "name": "Arizona Complex League East"
+  },
+  {
+   "division_id": 1,
+   "league_id": 217,
+   "sub_league_id": 0,
+   "name": "Arizona Complex League Central"
+  },
+  {
+   "division_id": 2,
+   "league_id": 217,
+   "sub_league_id": 0,
+   "name": "Arizona Complex League West"
+  },
+  {
+   "division_id": 0,
+   "league_id": 217,
+   "sub_league_id": 1,
+   "name": "Division 1"
+  },
+  {
+   "division_id": 1,
+   "league_id": 217,
+   "sub_league_id": 1,
+   "name": "Division 2"
+  },
+  {
+   "division_id": 2,
+   "league_id": 217,
+   "sub_league_id": 1,
+   "name": "Division 3"
+  }
+ ],
+ "teams": [
+  {
+   "team_id": 284,
+   "name": "Austin",
+   "nickname": "Aggies",
+   "abbr": "AUS",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 283,
+   "name": "Austin",
+   "nickname": "Ironmen",
+   "abbr": "AUS",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 287,
+   "name": "Boise",
+   "nickname": "War Dogs",
+   "abbr": "BOI",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 286,
+   "name": "Bushwood",
+   "nickname": "Bombers",
+   "abbr": "BB",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 279,
+   "name": "Chicago",
+   "nickname": "Mad Dogs",
+   "abbr": "CHI",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 289,
+   "name": "Dallas",
+   "nickname": "Attack",
+   "abbr": "DAL",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 280,
+   "name": "Dallas",
+   "nickname": "Waves",
+   "abbr": "DAL",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 268,
+   "name": "Glendale",
+   "nickname": "Desert Dogs",
+   "abbr": "GLE",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 292,
+   "name": "Grand Rapids",
+   "nickname": "Peaches",
+   "abbr": "GR",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 288,
+   "name": "Jacksonville",
+   "nickname": "Orioles",
+   "abbr": "JAC",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 296,
+   "name": "Lexington",
+   "nickname": "Silver Sox",
+   "abbr": "LEX",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 295,
+   "name": "Long Beach",
+   "nickname": "Hot Rods",
+   "abbr": "LB",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 285,
+   "name": "Manhattan",
+   "nickname": "Mobsters",
+   "abbr": "MM",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 263,
+   "name": "Mesa",
+   "nickname": "Solar Sox",
+   "abbr": "MES",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 290,
+   "name": "Michigan",
+   "nickname": "Martians",
+   "abbr": "LGM",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 266,
+   "name": "Peoria",
+   "nickname": "Javelinas",
+   "abbr": "PEO",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 291,
+   "name": "Portland",
+   "nickname": "Snake Eyes",
+   "abbr": "POR",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 282,
+   "name": "Riverside",
+   "nickname": "Gators",
+   "abbr": "RIV",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 264,
+   "name": "Salt River",
+   "nickname": "Rafters",
+   "abbr": "SR",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 293,
+   "name": "San Antonio",
+   "nickname": "Hammerheads",
+   "abbr": "SA",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 265,
+   "name": "Scottsdale",
+   "nickname": "Scorpions",
+   "abbr": "SCO",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 281,
+   "name": "Shreveport",
+   "nickname": "Headhunters",
+   "abbr": "SHR",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 267,
+   "name": "Surprise",
+   "nickname": "Saguaros",
+   "abbr": "SUR",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 294,
+   "name": "Tucson",
+   "nickname": "Blasters",
+   "abbr": "TUC",
+   "league_id": 70,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 274,
+   "name": "Aberdeen",
+   "nickname": "IronBirds",
+   "abbr": "ABE",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 312,
+   "name": "Baltimore",
+   "nickname": "Sand Gnats",
+   "abbr": "BAL",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 300,
+   "name": "Baton Rouge",
+   "nickname": "Red Sox",
+   "abbr": "BR",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 314,
+   "name": "Boston",
+   "nickname": "Green Devils",
+   "abbr": "BOS",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 308,
+   "name": "Boston",
+   "nickname": "Hurons",
+   "abbr": "BOS",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 309,
+   "name": "Brooklyn",
+   "nickname": "Ghostriders",
+   "abbr": "BRO",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 313,
+   "name": "Bushwood",
+   "nickname": "Bombers",
+   "abbr": "BB",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 297,
+   "name": "Chandler",
+   "nickname": "Bulls",
+   "abbr": "CHA",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 303,
+   "name": "Chicago",
+   "nickname": "Copper Kings",
+   "abbr": "CHI",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 305,
+   "name": "Chicago",
+   "nickname": "Sluggers",
+   "abbr": "CHI",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 304,
+   "name": "Columbus",
+   "nickname": "Black Gold",
+   "abbr": "COL",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 307,
+   "name": "Indianapolis",
+   "nickname": "Oilmen",
+   "abbr": "IND",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 311,
+   "name": "Irving",
+   "nickname": "Tempest",
+   "abbr": "IRV",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 310,
+   "name": "Jackson",
+   "nickname": "Bearcats",
+   "abbr": "JAC",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 3,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 306,
+   "name": "Laredo",
+   "nickname": "Miners",
+   "abbr": "LAR",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 298,
+   "name": "Los Angeles",
+   "nickname": "Knighthawks",
+   "abbr": "LA",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 271,
+   "name": "Manhattan",
+   "nickname": "Mobsters",
+   "abbr": "MM",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 301,
+   "name": "Plano",
+   "nickname": "Alpines",
+   "abbr": "PLA",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 302,
+   "name": "San Francisco",
+   "nickname": "Aeros",
+   "abbr": "SF",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 272,
+   "name": "State College",
+   "nickname": "Spikes",
+   "abbr": "SC",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 299,
+   "name": "Traverse City",
+   "nickname": "Little Green Men",
+   "abbr": "LGM",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 269,
+   "name": "Trenton",
+   "nickname": "Thunder",
+   "abbr": "TT",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 270,
+   "name": "West Virginia",
+   "nickname": "Black Bears",
+   "abbr": "WV",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 273,
+   "name": "Williamsport",
+   "nickname": "Crosscutters",
+   "abbr": "WP",
+   "league_id": 75,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 9
+  },
+  {
+   "team_id": 4,
+   "name": "Boston",
+   "nickname": "Red Sox",
+   "abbr": "BOS",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 3,
+   "name": "Bushwood",
+   "nickname": "Bombers",
+   "abbr": "BB",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 15,
+   "name": "Chihuahua",
+   "nickname": "Guerreros",
+   "abbr": "CG",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 9,
+   "name": "Colorado",
+   "nickname": "Rockies",
+   "abbr": "COL",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 21,
+   "name": "Columbus",
+   "nickname": "Crushers",
+   "abbr": "CC",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 8,
+   "name": "David",
+   "nickname": "R",
+   "abbr": "DLR",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 10,
+   "name": "Detroit",
+   "nickname": "Tigers",
+   "abbr": "DET",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 7,
+   "name": "Fremont Street",
+   "nickname": "Heffalumps",
+   "abbr": "FSH",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 1,
+   "name": "Fresno",
+   "nickname": "Pharaohs",
+   "abbr": "FrPh",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 12,
+   "name": "Houston",
+   "nickname": "Astros",
+   "abbr": "HOU",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 20,
+   "name": "Jose",
+   "nickname": "G.",
+   "abbr": "JG",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 6,
+   "name": "Manhattan",
+   "nickname": "Mobsters",
+   "abbr": "MHM",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 17,
+   "name": "Minnesota",
+   "nickname": "Twins",
+   "abbr": "MIN",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 19,
+   "name": "New York",
+   "nickname": "Mets",
+   "abbr": "NYM",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 22,
+   "name": "Pittsburgh",
+   "nickname": "Pirates",
+   "abbr": "PIT",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 25,
+   "name": "San Francisco",
+   "nickname": "Giants",
+   "abbr": "SF",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 26,
+   "name": "St. Louis",
+   "nickname": "Cardinals",
+   "abbr": "STL",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 28,
+   "name": "Texas",
+   "nickname": "Rangers",
+   "abbr": "TEX",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 5,
+   "name": "Tim",
+   "nickname": "",
+   "abbr": "T",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 11,
+   "name": "Tom",
+   "nickname": "L.",
+   "abbr": "TL",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 29,
+   "name": "Toronto",
+   "nickname": "Blue Jays",
+   "abbr": "TOR",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 2,
+   "name": "Traverse City",
+   "nickname": "Little Green Men",
+   "abbr": "LGM",
+   "league_id": 203,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 14,
+   "name": "Vancouver",
+   "nickname": "Mounties",
+   "abbr": "VM",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 27,
+   "name": "Zach",
+   "nickname": "Zach",
+   "abbr": "ZZ",
+   "league_id": 203,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 0,
+   "level": 1
+  },
+  {
+   "team_id": 51,
+   "name": "Buffalo",
+   "nickname": "Bisons",
+   "abbr": "BUF",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 1,
+   "level": 2
+  },
+  {
+   "team_id": 39,
+   "name": "Charlotte",
+   "nickname": "Knights",
+   "abbr": "CHR",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 20,
+   "level": 2
+  },
+  {
+   "team_id": 33,
+   "name": "Columbus",
+   "nickname": "Clippers",
+   "abbr": "CLM",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 21,
+   "level": 2
+  },
+  {
+   "team_id": 40,
+   "name": "Durham",
+   "nickname": "Bulls",
+   "abbr": "DUR",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 4,
+   "level": 2
+  },
+  {
+   "team_id": 42,
+   "name": "Gwinnett",
+   "nickname": "Stripers",
+   "abbr": "GWI",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 7,
+   "level": 2
+  },
+  {
+   "team_id": 44,
+   "name": "Indianapolis",
+   "nickname": "Indians",
+   "abbr": "IND",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 8,
+   "level": 2
+  },
+  {
+   "team_id": 47,
+   "name": "Iowa",
+   "nickname": "Cubs",
+   "abbr": "IOW",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 9,
+   "level": 2
+  },
+  {
+   "team_id": 191,
+   "name": "Jacksonville",
+   "nickname": "Jumbo Shrimp",
+   "abbr": "JAC",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 3,
+   "level": 2
+  },
+  {
+   "team_id": 34,
+   "name": "Lehigh Valley",
+   "nickname": "IronPigs",
+   "abbr": "LHV",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 17,
+   "level": 2
+  },
+  {
+   "team_id": 45,
+   "name": "Louisville",
+   "nickname": "Bats",
+   "abbr": "LOU",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 10,
+   "level": 2
+  },
+  {
+   "team_id": 275,
+   "name": "Lubbock",
+   "nickname": "Renegades",
+   "abbr": "LUB",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 28,
+   "level": 2
+  },
+  {
+   "team_id": 276,
+   "name": "Lucien",
+   "nickname": "Alpines",
+   "abbr": "LUC",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 5,
+   "level": 2
+  },
+  {
+   "team_id": 48,
+   "name": "Memphis",
+   "nickname": "Redbirds",
+   "abbr": "MEM",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 27,
+   "level": 2
+  },
+  {
+   "team_id": 49,
+   "name": "Nashville",
+   "nickname": "Sounds",
+   "abbr": "NAS",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 26,
+   "level": 2
+  },
+  {
+   "team_id": 41,
+   "name": "Norfolk",
+   "nickname": "Tides",
+   "abbr": "NOR",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 2,
+   "level": 2
+  },
+  {
+   "team_id": 277,
+   "name": "North Hempstead",
+   "nickname": "Flight",
+   "abbr": "NH",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 29,
+   "level": 2
+  },
+  {
+   "team_id": 50,
+   "name": "Omaha",
+   "nickname": "Storm Chasers",
+   "abbr": "OMA",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 25,
+   "level": 2
+  },
+  {
+   "team_id": 278,
+   "name": "Owls Head",
+   "nickname": "Lumberjacks",
+   "abbr": "OH",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 14,
+   "level": 2
+  },
+  {
+   "team_id": 36,
+   "name": "Rochester",
+   "nickname": "Red Wings",
+   "abbr": "ROC",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 11,
+   "level": 2
+  },
+  {
+   "team_id": 37,
+   "name": "Scranton WB",
+   "nickname": "RailRiders",
+   "abbr": "SCR",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 6,
+   "level": 2
+  },
+  {
+   "team_id": 190,
+   "name": "St. Paul",
+   "nickname": "Saints",
+   "abbr": "STP",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 22,
+   "level": 2
+  },
+  {
+   "team_id": 43,
+   "name": "Syracuse",
+   "nickname": "Mets",
+   "abbr": "SYR",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 15,
+   "level": 2
+  },
+  {
+   "team_id": 46,
+   "name": "Toledo",
+   "nickname": "Mud Hens",
+   "abbr": "TOL",
+   "league_id": 204,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 19,
+   "level": 2
+  },
+  {
+   "team_id": 35,
+   "name": "Worcester",
+   "nickname": "Red Sox",
+   "abbr": "WOR",
+   "league_id": 204,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 12,
+   "level": 2
+  },
+  {
+   "team_id": 65,
+   "name": "Akron",
+   "nickname": "RubberDucks",
+   "abbr": "AKR",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 7,
+   "level": 3
+  },
+  {
+   "team_id": 66,
+   "name": "Altoona",
+   "nickname": "Curve",
+   "abbr": "ALT",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 8,
+   "level": 3
+  },
+  {
+   "team_id": 85,
+   "name": "Amarillo",
+   "nickname": "Sod Poodles",
+   "abbr": "AMA",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 25,
+   "level": 3
+  },
+  {
+   "team_id": 79,
+   "name": "Arkansas",
+   "nickname": "Travelers",
+   "abbr": "ARK",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 2,
+   "level": 3
+  },
+  {
+   "team_id": 72,
+   "name": "Biloxi",
+   "nickname": "Shuckers",
+   "abbr": "BIL",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 29,
+   "level": 3
+  },
+  {
+   "team_id": 60,
+   "name": "Binghamton",
+   "nickname": "Rumble Ponies",
+   "abbr": "BIN",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 1,
+   "level": 3
+  },
+  {
+   "team_id": 74,
+   "name": "Birmingham",
+   "nickname": "Barons",
+   "abbr": "BIR",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 28,
+   "level": 3
+  },
+  {
+   "team_id": 78,
+   "name": "Chattanooga",
+   "nickname": "Lookouts",
+   "abbr": "CHT",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 5,
+   "level": 3
+  },
+  {
+   "team_id": 67,
+   "name": "Chesapeake",
+   "nickname": "Baysox",
+   "abbr": "CHE",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 9,
+   "level": 3
+  },
+  {
+   "team_id": 75,
+   "name": "Columbus",
+   "nickname": "Clingstones",
+   "abbr": "CBS",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 14,
+   "level": 3
+  },
+  {
+   "team_id": 86,
+   "name": "Corpus Christi",
+   "nickname": "Hooks",
+   "abbr": "CC",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 26,
+   "level": 3
+  },
+  {
+   "team_id": 68,
+   "name": "Erie",
+   "nickname": "SeaWolves",
+   "abbr": "ERI",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 10,
+   "level": 3
+  },
+  {
+   "team_id": 83,
+   "name": "Frisco",
+   "nickname": "RoughRiders",
+   "abbr": "FRI",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 27,
+   "level": 3
+  },
+  {
+   "team_id": 69,
+   "name": "Harrisburg",
+   "nickname": "Senators",
+   "abbr": "HAR",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 15,
+   "level": 3
+  },
+  {
+   "team_id": 61,
+   "name": "Hartford",
+   "nickname": "Yard Goats",
+   "abbr": "HAR",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 20,
+   "level": 3
+  },
+  {
+   "team_id": 73,
+   "name": "Knoxville",
+   "nickname": "Smokies",
+   "abbr": "KNO",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 6,
+   "level": 3
+  },
+  {
+   "team_id": 62,
+   "name": "New Hampshire",
+   "nickname": "Fisher Cats",
+   "abbr": "NHA",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 4,
+   "level": 3
+  },
+  {
+   "team_id": 82,
+   "name": "Northwest Arkansas",
+   "nickname": "Naturals",
+   "abbr": "NWA",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 17,
+   "level": 3
+  },
+  {
+   "team_id": 71,
+   "name": "Pensacola",
+   "nickname": "Blue Wahoos",
+   "abbr": "PEN",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 11,
+   "level": 3
+  },
+  {
+   "team_id": 64,
+   "name": "Portland",
+   "nickname": "Sea Dogs",
+   "abbr": "POR",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 3,
+   "level": 3
+  },
+  {
+   "team_id": 70,
+   "name": "Reading",
+   "nickname": "Fightin Phils",
+   "abbr": "REA",
+   "league_id": 206,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 12,
+   "level": 3
+  },
+  {
+   "team_id": 80,
+   "name": "Springfield",
+   "nickname": "Cardinals",
+   "abbr": "SPF",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 19,
+   "level": 3
+  },
+  {
+   "team_id": 81,
+   "name": "Tulsa",
+   "nickname": "Drillers",
+   "abbr": "TUL",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 21,
+   "level": 3
+  },
+  {
+   "team_id": 193,
+   "name": "Wichita",
+   "nickname": "Wind Surge",
+   "abbr": "WIC",
+   "league_id": 206,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 22,
+   "level": 3
+  },
+  {
+   "team_id": 212,
+   "name": "Asheville",
+   "nickname": "Tourists",
+   "abbr": "ASH",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 27,
+   "level": 4
+  },
+  {
+   "team_id": 202,
+   "name": "Beloit",
+   "nickname": "Sky Carp",
+   "abbr": "BEL",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 7,
+   "level": 4
+  },
+  {
+   "team_id": 213,
+   "name": "Bowling Green",
+   "nickname": "Hot Rods",
+   "abbr": "BGN",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 28,
+   "level": 4
+  },
+  {
+   "team_id": 209,
+   "name": "Brooklyn",
+   "nickname": "Cyclones",
+   "abbr": "BRO",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 26,
+   "level": 4
+  },
+  {
+   "team_id": 203,
+   "name": "Cedar Rapids",
+   "nickname": "Kernels",
+   "abbr": "CED",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 8,
+   "level": 4
+  },
+  {
+   "team_id": 196,
+   "name": "Dayton",
+   "nickname": "Dragons",
+   "abbr": "DTO",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 1,
+   "level": 4
+  },
+  {
+   "team_id": 217,
+   "name": "Eugene",
+   "nickname": "Emeralds",
+   "abbr": "EUG",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 19,
+   "level": 4
+  },
+  {
+   "team_id": 197,
+   "name": "Fort Wayne",
+   "nickname": "TinCaps",
+   "abbr": "FWA",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 20,
+   "level": 4
+  },
+  {
+   "team_id": 208,
+   "name": "Frederick",
+   "nickname": "Keys",
+   "abbr": "FRE",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 25,
+   "level": 4
+  },
+  {
+   "team_id": 198,
+   "name": "Great Lakes",
+   "nickname": "Loons",
+   "abbr": "GRE",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 4,
+   "level": 4
+  },
+  {
+   "team_id": 214,
+   "name": "Greensboro",
+   "nickname": "Grasshoppers",
+   "abbr": "GRB",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 22,
+   "level": 4
+  },
+  {
+   "team_id": 215,
+   "name": "Greenville",
+   "nickname": "Drive",
+   "abbr": "GRE",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 5,
+   "level": 4
+  },
+  {
+   "team_id": 221,
+   "name": "Hillsboro",
+   "nickname": "Hops",
+   "abbr": "HIL",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 6,
+   "level": 4
+  },
+  {
+   "team_id": 260,
+   "name": "Hub City",
+   "nickname": "Spartanburgers",
+   "abbr": "HUB",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 29,
+   "level": 4
+  },
+  {
+   "team_id": 211,
+   "name": "Jersey Shore",
+   "nickname": "BlueClaws",
+   "abbr": "JER",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 11,
+   "level": 4
+  },
+  {
+   "team_id": 199,
+   "name": "Lake County",
+   "nickname": "Captains",
+   "abbr": "LAK",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 3,
+   "level": 4
+  },
+  {
+   "team_id": 200,
+   "name": "Lansing",
+   "nickname": "Lugnuts",
+   "abbr": "LAN",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 17,
+   "level": 4
+  },
+  {
+   "team_id": 204,
+   "name": "Peoria",
+   "nickname": "Chiefs",
+   "abbr": "PEO",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 9,
+   "level": 4
+  },
+  {
+   "team_id": 216,
+   "name": "Rome",
+   "nickname": "Emperors",
+   "abbr": "ROM",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 14,
+   "level": 4
+  },
+  {
+   "team_id": 206,
+   "name": "South Bend",
+   "nickname": "Cubs",
+   "abbr": "SBE",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 10,
+   "level": 4
+  },
+  {
+   "team_id": 219,
+   "name": "Spokane",
+   "nickname": "Indians",
+   "abbr": "SPO",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 2,
+   "level": 4
+  },
+  {
+   "team_id": 220,
+   "name": "Tri-City",
+   "nickname": "Dust Devils",
+   "abbr": "TRC",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 15,
+   "level": 4
+  },
+  {
+   "team_id": 222,
+   "name": "Vancouver",
+   "nickname": "Canadians",
+   "abbr": "VAN",
+   "league_id": 211,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 12,
+   "level": 4
+  },
+  {
+   "team_id": 88,
+   "name": "Winston-Salem",
+   "nickname": "Dash",
+   "abbr": "WS",
+   "league_id": 211,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 21,
+   "level": 4
+  },
+  {
+   "team_id": 90,
+   "name": "Augusta",
+   "nickname": "GreenJackets",
+   "abbr": "AUG",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 2,
+   "level": 4
+  },
+  {
+   "team_id": 233,
+   "name": "Bradenton",
+   "nickname": "Marauders",
+   "abbr": "BRA",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 22,
+   "level": 4
+  },
+  {
+   "team_id": 91,
+   "name": "Charleston",
+   "nickname": "RiverDogs",
+   "abbr": "CHA",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 27,
+   "level": 4
+  },
+  {
+   "team_id": 234,
+   "name": "Clearwater",
+   "nickname": "Threshers",
+   "abbr": "CLE",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 21,
+   "level": 4
+  },
+  {
+   "team_id": 228,
+   "name": "Daytona",
+   "nickname": "Tortugas",
+   "abbr": "DAY",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 7,
+   "level": 4
+  },
+  {
+   "team_id": 89,
+   "name": "Delmarva",
+   "nickname": "Shorebirds",
+   "abbr": "DEL",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 3,
+   "level": 4
+  },
+  {
+   "team_id": 229,
+   "name": "Dunedin",
+   "nickname": "Blue Jays",
+   "abbr": "DUN",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 29,
+   "level": 4
+  },
+  {
+   "team_id": 238,
+   "name": "Fayetteville",
+   "nickname": "Woodpeckers",
+   "abbr": "FAY",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 12,
+   "level": 4
+  },
+  {
+   "team_id": 230,
+   "name": "Fort Myers",
+   "nickname": "Mighty Mussels",
+   "abbr": "FMY",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 17,
+   "level": 4
+  },
+  {
+   "team_id": 241,
+   "name": "Fresno",
+   "nickname": "Grizzlies",
+   "abbr": "FRE",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 9,
+   "level": 4
+  },
+  {
+   "team_id": 261,
+   "name": "Hickory",
+   "nickname": "Crawdads",
+   "abbr": "HIC",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 28,
+   "level": 4
+  },
+  {
+   "team_id": 237,
+   "name": "Hill City",
+   "nickname": "Howlers",
+   "abbr": "HIL",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 8,
+   "level": 4
+  },
+  {
+   "team_id": 224,
+   "name": "Jupiter",
+   "nickname": "Hammerheads",
+   "abbr": "JUP",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 11,
+   "level": 4
+  },
+  {
+   "team_id": 92,
+   "name": "Kannapolis",
+   "nickname": "Cannon Ballers",
+   "abbr": "KAN",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 5,
+   "level": 4
+  },
+  {
+   "team_id": 231,
+   "name": "Lakeland",
+   "nickname": "Flying Tigers",
+   "abbr": "LAK",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 10,
+   "level": 4
+  },
+  {
+   "team_id": 240,
+   "name": "Myrtle Beach",
+   "nickname": "Pelicans",
+   "abbr": "MYR",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 6,
+   "level": 4
+  },
+  {
+   "team_id": 248,
+   "name": "Ontario",
+   "nickname": "Tower Buzzers",
+   "abbr": "ONT",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 15,
+   "level": 4
+  },
+  {
+   "team_id": 223,
+   "name": "Palm Beach",
+   "nickname": "Cardinals",
+   "abbr": "PB",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 26,
+   "level": 4
+  },
+  {
+   "team_id": 246,
+   "name": "Rancho Cucamonga",
+   "nickname": "Quakes",
+   "abbr": "RAN",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 14,
+   "level": 4
+  },
+  {
+   "team_id": 235,
+   "name": "Salem",
+   "nickname": "RidgeYaks",
+   "abbr": "SAL",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 4,
+   "level": 4
+  },
+  {
+   "team_id": 243,
+   "name": "San Jose",
+   "nickname": "Giants",
+   "abbr": "SJO",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 25,
+   "level": 4
+  },
+  {
+   "team_id": 227,
+   "name": "St. Lucie",
+   "nickname": "Mets",
+   "abbr": "STL",
+   "league_id": 212,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 19,
+   "level": 4
+  },
+  {
+   "team_id": 244,
+   "name": "Stockton",
+   "nickname": "Ports",
+   "abbr": "STO",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 20,
+   "level": 4
+  },
+  {
+   "team_id": 245,
+   "name": "Visalia",
+   "nickname": "Rawhide",
+   "abbr": "VIS",
+   "league_id": 212,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 1,
+   "level": 4
+  },
+  {
+   "team_id": 99,
+   "name": "ACL",
+   "nickname": "Athletics",
+   "abbr": "AOAK",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 20,
+   "level": 6
+  },
+  {
+   "team_id": 137,
+   "name": "Arizona (ACL)",
+   "nickname": "Diamondbacks",
+   "abbr": "AARB",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 1,
+   "level": 6
+  },
+  {
+   "team_id": 105,
+   "name": "Atlanta (FCL)",
+   "nickname": "Braves",
+   "abbr": "FATL",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 2,
+   "level": 6
+  },
+  {
+   "team_id": 115,
+   "name": "Baltimore (FCL)",
+   "nickname": "Orioles",
+   "abbr": "FBOB",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 3,
+   "level": 6
+  },
+  {
+   "team_id": 113,
+   "name": "Boston (FCL)",
+   "nickname": "Red Sox",
+   "abbr": "FBOS",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 4,
+   "level": 6
+  },
+  {
+   "team_id": 173,
+   "name": "Chicago A (ACL)",
+   "nickname": "White Sox",
+   "abbr": "ACHA",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 5,
+   "level": 6
+  },
+  {
+   "team_id": 96,
+   "name": "Chicago N (ACL)",
+   "nickname": "Cubs",
+   "abbr": "ACBl",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 6,
+   "level": 6
+  },
+  {
+   "team_id": 112,
+   "name": "Cincinnati (ACL)",
+   "nickname": "Reds",
+   "abbr": "ACIN",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 7,
+   "level": 6
+  },
+  {
+   "team_id": 110,
+   "name": "Cleveland (ACL)",
+   "nickname": "Guardians",
+   "abbr": "ACLG",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 1,
+   "parent_team_id": 8,
+   "level": 6
+  },
+  {
+   "team_id": 189,
+   "name": "Colorado (ACL)",
+   "nickname": "Rockies",
+   "abbr": "ACOL",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 9,
+   "level": 6
+  },
+  {
+   "team_id": 108,
+   "name": "Detroit (FCL)",
+   "nickname": "Tigers",
+   "abbr": "FDET",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 10,
+   "level": 6
+  },
+  {
+   "team_id": 135,
+   "name": "Houston (FCL)",
+   "nickname": "Astros",
+   "abbr": "FCLA",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 12,
+   "level": 6
+  },
+  {
+   "team_id": 97,
+   "name": "Los Angeles A (ACL)",
+   "nickname": "Angels",
+   "abbr": "ALAA",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 14,
+   "level": 6
+  },
+  {
+   "team_id": 101,
+   "name": "Los Angeles N (ACL)",
+   "nickname": "Dodgers",
+   "abbr": "ALA1",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 15,
+   "level": 6
+  },
+  {
+   "team_id": 103,
+   "name": "Miami (FCL)",
+   "nickname": "Marlins",
+   "abbr": "FMIA",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 11,
+   "level": 6
+  },
+  {
+   "team_id": 114,
+   "name": "Minnesota (FCL)",
+   "nickname": "Twins",
+   "abbr": "FMIN",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 17,
+   "level": 6
+  },
+  {
+   "team_id": 138,
+   "name": "New York N (FCL)",
+   "nickname": "Mets",
+   "abbr": "FNYN",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 19,
+   "level": 6
+  },
+  {
+   "team_id": 106,
+   "name": "Philadelphia (FCL)",
+   "nickname": "Phillies",
+   "abbr": "FPHI",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 21,
+   "level": 6
+  },
+  {
+   "team_id": 111,
+   "name": "Pittsburgh (FCL)",
+   "nickname": "Pirates",
+   "abbr": "FPIT",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 22,
+   "level": 6
+  },
+  {
+   "team_id": 100,
+   "name": "San Francisco (ACL)",
+   "nickname": "Giants",
+   "abbr": "ASFO",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 0,
+   "parent_team_id": 25,
+   "level": 6
+  },
+  {
+   "team_id": 104,
+   "name": "St. Louis (FCL)",
+   "nickname": "Cardinals",
+   "abbr": "FSTL",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 0,
+   "parent_team_id": 26,
+   "level": 6
+  },
+  {
+   "team_id": 136,
+   "name": "Tampa Bay (FCL)",
+   "nickname": "Rays",
+   "abbr": "FTBR",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 2,
+   "parent_team_id": 27,
+   "level": 6
+  },
+  {
+   "team_id": 95,
+   "name": "Texas (ACL)",
+   "nickname": "Rangers",
+   "abbr": "ATEX",
+   "league_id": 217,
+   "sub_league_id": 0,
+   "division_id": 2,
+   "parent_team_id": 28,
+   "level": 6
+  },
+  {
+   "team_id": 107,
+   "name": "Toronto (FCL)",
+   "nickname": "Blue Jays",
+   "abbr": "FTOR",
+   "league_id": 217,
+   "sub_league_id": 1,
+   "division_id": 1,
+   "parent_team_id": 29,
+   "level": 6
+  }
+ ]
+}

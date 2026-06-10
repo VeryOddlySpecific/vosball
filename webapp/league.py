@@ -2,8 +2,9 @@
 
 The per-league landing page reached by clicking a status chip in the header band
 (or via the sidebar nav). Shows a per-sim checklist (interactive, persisted per
-league) transcribed from DAILY_CHECKLIST.md, plus a quick-link grid of modules —
-links to the built pages and "coming soon" placeholders for the rest.
+league) transcribed from DAILY_CHECKLIST.md, current standings for any league in
+the game world (via the /lgdata endpoint — core/lgdata.py), plus a quick-link
+grid of modules — links to the built pages and "coming soon" placeholders.
 
 A pure consumer: reads config + st.session_state; nothing in vosball/ changes.
 """
@@ -13,14 +14,17 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import streamlit as st  # noqa: E402
+import pandas as pd  # noqa: E402
 
+import lgdata  # noqa: E402  (core: /lgdata fetch + structure/standings helpers)
+import stats as sapi  # noqa: E402  (core: resolve_base_url)
 from status import configured_leagues  # noqa: E402  (reuse the league list)
 
 CONFIG_DIR = ROOT / "config"
@@ -102,6 +106,146 @@ def league_entry(league: str) -> Dict[str, Any]:
 
 def _item_ids() -> List[str]:
     return [f"{s}_{i}" for s, (_, items) in enumerate(CHECKLIST) for i in range(len(items))]
+
+
+# --- standings (/lgdata) ------------------------------------------------------
+
+@st.cache_data(show_spinner=False)
+def _lgdata_for(league: str, nonce: int) -> Optional[Dict[str, Any]]:
+    """The /lgdata document for `league`. Session-cached; `nonce` busts it on a
+    manual ⟳ (which also evicts the calendar-day disk cache — see the button).
+    Persists the structure snapshot (config/structure-{league}.json) on every
+    successful fetch. None = unavailable (no base URL, offline, no endpoint)."""
+    base = sapi.resolve_base_url(league, None, CONFIG_DIR / "league_url.json")
+    if not base:
+        return None
+    data = lgdata.fetch_lgdata(base, cache_dir=ROOT / league / "cache" / "stats",
+                               token=lgdata.resolve_token(league))
+    if data:
+        lgdata.write_structure_snapshot(league, data)
+    return data
+
+
+def _fmt_streak(n: int) -> str:
+    return f"W{n}" if n > 0 else f"L{-n}" if n < 0 else "—"
+
+
+def _fmt_magic(n: int) -> str:
+    # Server conventions: -1 = clinched, >=1000 = not applicable (non-leaders).
+    return "✓" if n < 0 else "—" if n >= 1000 else str(n)
+
+
+def _standings_df(rows: List[Dict[str, Any]]) -> pd.DataFrame:
+    show_ties = any(r["t"] for r in rows)
+    out = []
+    for r in rows:
+        row = {"Pos": r["pos"], "Team": r["team"], "W": r["w"], "L": r["l"]}
+        if show_ties:
+            row["T"] = r["t"]
+        row.update({"Pct": f"{r['pct']:.3f}",
+                    "GB": "—" if r["gb"] == 0 else f"{r['gb']:g}",
+                    "Strk": _fmt_streak(r["streak"]),
+                    "Magic#": _fmt_magic(r["magic_number"])})
+        out.append(row)
+    return pd.DataFrame(out)
+
+
+def _render_standings(lg: str) -> None:
+    st.subheader("Standings")
+    st.session_state.setdefault("standings_nonce", 0)
+    with st.spinner("Loading standings…"):
+        data = _lgdata_for(lg, st.session_state["standings_nonce"])
+    if not data:
+        st.info(f"Standings unavailable for {lg.upper()} — the /lgdata endpoint "
+                "didn't answer (no base URL/token configured, offline, or the "
+                "site doesn't serve it yet).")
+        if st.button("⟳ Retry", key=f"standings_retry_{lg}"):
+            st.session_state["standings_nonce"] += 1
+            st.rerun()
+        return
+
+    # Level picker — ML / AAA / AA / … (level ids translated via id_maps.json).
+    # One level can span several game-world leagues (AAA = IL + PCL).
+    level_labels = lgdata.load_level_labels()
+    by_level = lgdata.leagues_by_level(data)
+
+    def _lvl_label(opt) -> str:
+        lvl, lgs = opt
+        name = level_labels.get(lvl, f"Level {lvl}")
+        return f"{name} — " + " · ".join(l.get("abbr", "?") for l in lgs)
+
+    left, right = st.columns([3, 1])
+    _, level_leagues = left.selectbox(
+        "Level", by_level, key=f"standings_lvl_{lg}",
+        format_func=_lvl_label, label_visibility="collapsed")
+    if right.button("⟳", key=f"standings_refresh_{lg}", use_container_width=True,
+                    help="Re-pull /lgdata now (otherwise cached for the "
+                         "session / calendar day)."):
+        base = sapi.resolve_base_url(lg, None, CONFIG_DIR / "league_url.json")
+        if base:
+            lgdata.evict_cache(base, ROOT / lg / "cache" / "stats")
+        st.session_state["standings_nonce"] += 1
+        st.rerun()
+
+    # Build display blocks. A block is one column-worth of grouping that must
+    # stay contiguous: a game-world league (IL | PCL at AAA) — or, when the
+    # level is a single league, its subleagues (AL | NL). Each block holds
+    # (header, [(table label, rows)], games_played).
+    blocks: List[Any] = []
+    if len(level_leagues) == 1:
+        only = level_leagues[0]
+        tables = lgdata.division_standings(data, only["league_id"])
+        gp = lgdata.max_games_played(data, only["league_id"])
+        sub_ids = list(dict.fromkeys(t["sub_league_id"] for t in tables))
+        if len(sub_ids) > 1:
+            for sid in sub_ids:
+                subs = [t for t in tables if t["sub_league_id"] == sid]
+                blocks.append((subs[0]["subleague"] or None,
+                               [(t["division"], t["rows"]) for t in subs], gp))
+        else:
+            # Single league, single subleague: no grouping to honor — round-
+            # robin its divisions across two columns like before.
+            blocks.append((None, [(t["label"], t["rows"]) for t in tables], gp))
+    else:
+        for l in level_leagues:
+            tables = lgdata.division_standings(data, l["league_id"])
+            blocks.append((f"{l.get('abbr', '?')} — {l.get('name', '?')}",
+                           [(t["label"], t["rows"]) for t in tables],
+                           lgdata.max_games_played(data, l["league_id"])))
+
+    if not any(tbls for _, tbls, _ in blocks):
+        st.caption("No teams found at this level in /lgdata.")
+        return
+    if all(gp == 0 for _, _, gp in blocks):
+        st.caption("0 games played — this level's season hasn't started; "
+                   "order shown is the seeded/default one.")
+
+    def _table(lab, rows) -> None:
+        st.markdown(f"**{lab}**")
+        st.dataframe(_standings_df(rows), hide_index=True,
+                     use_container_width=True)
+
+    if len(blocks) == 1:
+        # No grouping to honor — round-robin the divisions across two columns.
+        _, tbls, _ = blocks[0]
+        cols = st.columns(2)
+        for i, (lab, rows) in enumerate(tbls):
+            with cols[i % 2]:
+                _table(lab, rows)
+    else:
+        # One column per block when it fits; beyond 3 blocks (e.g. six A-ball
+        # leagues) round-robin whole blocks across 2 columns — a league still
+        # never splits across columns.
+        ncols = len(blocks) if len(blocks) <= 3 else 2
+        cols = st.columns(ncols)
+        for i, (header, tbls, gp) in enumerate(blocks):
+            with cols[i % ncols]:
+                if header:
+                    st.markdown(f"#### {header}")
+                if gp == 0 and any(g > 0 for _, _, g in blocks):
+                    st.caption("Season not started (0 games).")
+                for lab, rows in tbls:
+                    _table(lab, rows)
 
 
 # --- render -----------------------------------------------------------------
@@ -223,5 +367,7 @@ def page() -> None:
     _render_data_controls(lg)
     st.divider()
     _render_checklist(lg)
+    st.divider()
+    _render_standings(lg)
     st.divider()
     _render_modules(lg)
