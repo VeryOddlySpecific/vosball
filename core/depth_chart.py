@@ -2186,10 +2186,21 @@ def build_player_record(
     }
 
     if not pitcher and pid in hitters:
-        # Cache per-split composites for lineup decisions.
+        # Cache per-split composites for lineup decisions, plus split-blended
+        # position scores / overall composites so callers can build a separate
+        # vs-LHP / vs-RHP depth chart (same renormalized blend as the overall
+        # composite above, with the split's own sample weight).
         for split, m, s in (("vs_l", hitter_means_l, hitter_stds_l), ("vs_r", hitter_means_r, hitter_stds_r)):
-            score, _ = hitter_stat_score(pid, hitters, m, s, split, floors)
+            score, w = hitter_stat_score(pid, hitters, m, s, split, floors)
             rec[f"split_score_{split}"] = score
+            eff = sw * w
+            tot = rw + eff
+            s_rw, s_sw = (rw / tot, eff / tot) if tot > 0 else (1.0, 0.0)
+            rec[f"composite_{split}"] = s_rw * vos + s_sw * score
+            rec[f"pos_scores_blended_{split}"] = {
+                _pos: (s_rw * _raw + s_sw * score) if _raw and _raw > 0 else 0.0
+                for _pos, _raw in pos_scores.items()
+            }
 
     return rec
 

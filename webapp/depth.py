@@ -5,8 +5,9 @@ the suggested position depth, lineup(s), and pitching staff for that level.
 
 A pure consumer of depth_chart.py's in-process slotting (no files written) and of
 the eval rows the Eval Browser already produced (st.session_state['result']).
-VOS-ratings-only by default (fully offline); an opt-in toggle blends in-season
-stats from the StatsPlus API and unlocks true vs-LHP / vs-RHP lineup splits.
+Blends in-season stats from the StatsPlus API by default — this unlocks true
+vs-LHP / vs-RHP lineups AND per-split position depth charts (platoons). Untick
+the toggle for a fully-offline, VOS-ratings-only chart.
 """
 from __future__ import annotations
 
@@ -113,14 +114,50 @@ def build_depth(_eval_rows, eval_sig, league, org, level, use_stats, target_year
                            for pos in HITTER_POSITIONS}
         starters = [starters_by_pos[pos] for pos in HITTER_POSITIONS if starters_by_pos[pos]]
         util_count = int(level_cfg.get("util_count_per_pos", 2))
+
+        # Per-split depth charts (stats runs only): re-run the position
+        # assignment over the same pool with each player's blended scores
+        # swapped for the split variants (composite_vs_*/pos_scores_blended_vs_*
+        # from build_player_record). Starters CAN differ per split — that's the
+        # platoon. Players without stats keep their overall blend (fallback).
+        # Each split's LINEUP is then built from that split's own starters, so
+        # the vs-LHP lineup is exactly the vs-LHP depth chart's starting nine.
+        split_tables: Dict[str, Any] = {}
+        split_lineups: Dict[str, Any] = {}
+        split_posmap: Dict[str, Any] = {}
+        if use_stats:
+            for split in ("vs_l", "vs_r"):
+                sp = [{**p,
+                       "pos_scores_blended": p.get(f"pos_scores_blended_{split}")
+                                             or p.get("pos_scores_blended"),
+                       "composite": p.get(f"composite_{split}", p.get("composite"))}
+                      for p in pool["hitter_pool"]]
+                placed_s = assign_positions(sp, level_cfg)
+                sbp = {pos: (placed_s[pos][0] if placed_s.get(pos) else None)
+                       for pos in HITTER_POSITIONS}
+                split_tables[split] = build_position_depth_table(
+                    sp, sbp, util_count=util_count)
+                s_starters = [sbp[pos] for pos in HITTER_POSITIONS if sbp[pos]]
+                split_lineups[split] = build_lineup(s_starters, split)
+                split_posmap[split] = {p["pid"]: pos
+                                       for pos, p in sbp.items() if p}
+
         return {
             "depth_table": build_position_depth_table(
                 pool["hitter_pool"], starters_by_pos, util_count=util_count),
-            "lineup_r": build_lineup(starters, "vs_r"),
-            "lineup_l": build_lineup(starters, "vs_l"),
+            "depth_table_l": split_tables.get("vs_l"),
+            "depth_table_r": split_tables.get("vs_r"),
+            # Stats runs draw each lineup from its split chart's starters;
+            # ratings-only runs fall back to the overall starters (the two
+            # lineups are identical there anyway — no split data).
+            "lineup_r": split_lineups.get("vs_r") or build_lineup(starters, "vs_r"),
+            "lineup_l": split_lineups.get("vs_l") or build_lineup(starters, "vs_l"),
             # Map a starter's id to the position he's slotted at, so the lineup
             # shows the fielding slot (not his raw primary_pos, which can repeat).
+            # Per-split maps too: a platoon means who-plays-where differs by split.
             "pos_by_pid": {sp["pid"]: pos for pos, sp in starters_by_pos.items() if sp},
+            "pos_by_pid_r": split_posmap.get("vs_r"),
+            "pos_by_pid_l": split_posmap.get("vs_l"),
             "pitcher_slots": pslots,
             "util_count": util_count,
             "n_hitters": len(pool["hitter_pool"]),
@@ -213,10 +250,11 @@ def page() -> None:
         st.header("Depth Charts")
         org = st.selectbox("Organization", orgs, key="depth_org")
         use_stats = st.checkbox(
-            "Blend in-season stats (network)", value=False,
-            help="Fetch StatsPlus in-season stats to blend with VOS and enable "
-                 "true vs-LHP/vs-RHP lineup splits. Needs network access and "
-                 "the league in config/league_ids.json.")
+            "Blend in-season stats (network)", value=True,
+            help="Fetch StatsPlus in-season stats to blend with VOS — enables "
+                 "true vs-LHP/vs-RHP lineups and per-split depth charts. Needs "
+                 "network access and the league in config/league_ids.json. "
+                 "Untick for an offline, ratings-only chart.")
 
     st.subheader(f"{org} — depth chart")
 
@@ -253,8 +291,10 @@ def page() -> None:
 
     st.markdown(f"### {level} · {depth['n_hitters']} hitters · {depth['n_pitchers']} pitchers")
     if depth["used_stats"]:
-        st.caption("Composite blends VOS ratings with in-season stats; lineups "
-                   "are split by handedness.")
+        st.caption("Composite blends VOS ratings with in-season stats; position "
+                   "depth is split by pitcher handedness, and each lineup is "
+                   "drawn from its own split chart's starters — platoons show "
+                   "up in both views.")
     else:
         st.caption("VOS-ratings-only (no in-season stats) — vs-LHP / vs-RHP "
                    "lineups are identical here; flip **Blend in-season stats** "
@@ -266,16 +306,28 @@ def page() -> None:
     if depth["used_stats"]:
         a, b = st.columns(2)
         a.caption("vs RHP")
-        a.dataframe(_lineup_df(depth["lineup_r"], pbp), hide_index=True, use_container_width=True)
+        a.dataframe(_lineup_df(depth["lineup_r"], depth.get("pos_by_pid_r") or pbp),
+                    hide_index=True, use_container_width=True)
         b.caption("vs LHP")
-        b.dataframe(_lineup_df(depth["lineup_l"], pbp), hide_index=True, use_container_width=True)
+        b.dataframe(_lineup_df(depth["lineup_l"], depth.get("pos_by_pid_l") or pbp),
+                    hide_index=True, use_container_width=True)
     else:
         st.dataframe(_lineup_df(depth["lineup_r"], pbp), hide_index=True, use_container_width=True)
 
-    # Position depth
+    # Position depth — split tabs when stats are on (vs-RHP / vs-LHP charts can
+    # platoon: position assignment is re-run on the split-blended scores).
     st.markdown("**Position depth**")
-    st.dataframe(_depth_df(depth["depth_table"], depth["util_count"]),
-                 hide_index=True, use_container_width=True)
+    if depth["used_stats"] and depth.get("depth_table_r") and depth.get("depth_table_l"):
+        tab_all, tab_r, tab_l = st.tabs(["Overall", "vs RHP", "vs LHP"])
+        tab_all.dataframe(_depth_df(depth["depth_table"], depth["util_count"]),
+                          hide_index=True, use_container_width=True)
+        tab_r.dataframe(_depth_df(depth["depth_table_r"], depth["util_count"]),
+                        hide_index=True, use_container_width=True)
+        tab_l.dataframe(_depth_df(depth["depth_table_l"], depth["util_count"]),
+                        hide_index=True, use_container_width=True)
+    else:
+        st.dataframe(_depth_df(depth["depth_table"], depth["util_count"]),
+                     hide_index=True, use_container_width=True)
 
     # Pitching staff
     st.markdown("**Pitching staff**")
