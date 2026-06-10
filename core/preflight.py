@@ -60,6 +60,7 @@ class PreflightResult:
     league: str
     skip: bool
     reason: str  # human-readable; printed in the per-league line
+    current_date: Optional[str] = None  # league sim date from /exports, when known
 
 
 # -----------------------------------------------------------------------------
@@ -161,11 +162,13 @@ def check_league(league: str) -> PreflightResult:
     if team_id in todays:
         return PreflightResult(
             league, True,
-            f"export current as of {current_date} (team_id {team_id} present)"
+            f"export current as of {current_date} (team_id {team_id} present)",
+            current_date,
         )
     return PreflightResult(
         league, False,
-        f"no export for {org!r} (team_id {team_id}) on {current_date} (will run)"
+        f"no export for {org!r} (team_id {team_id}) on {current_date} (will run)",
+        current_date,
     )
 
 

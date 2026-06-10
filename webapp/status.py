@@ -10,6 +10,7 @@ in vosball/ or the CLI tools changes.
 """
 from __future__ import annotations
 
+import html
 import json
 import sys
 from datetime import datetime
@@ -59,7 +60,8 @@ def export_status(leagues: Tuple[str, ...], nonce: int) -> Dict[str, Any]:
     try:
         res = check_leagues(list(leagues))
         return {"checked_at": checked_at,
-                "results": {L: {"skip": bool(r.skip), "reason": r.reason}
+                "results": {L: {"skip": bool(r.skip), "reason": r.reason,
+                                "date": r.current_date}
                             for L, r in res.items()}}
     except Exception as e:  # noqa: BLE001 — per-league failures already fail open
         return {"checked_at": checked_at, "error": str(e), "results": {}}
@@ -78,6 +80,11 @@ def _chip_color_css(leagues: List[str], results: Dict[str, dict]) -> str:
             f'!important; color:#000 !important; border:none !important; '
             f'font-family:var(--lcars-font, sans-serif); font-weight:700; '
             f'letter-spacing:1px; }}')
+    rules.append(
+        '.league-date { text-align:center; '
+        'font-family:var(--lcars-font, sans-serif); font-weight:700; '
+        'font-size:0.95rem; letter-spacing:1.5px; '
+        'color:var(--lcars-accent, #E8A33D); margin-top:-4px; }')
     rules.append("</style>")
     return "".join(rules)
 
@@ -114,6 +121,10 @@ def render_band() -> None:
             # in the same run.
             st.session_state["selected_league"] = lg
             st.session_state["_pending_page"] = "league"
+        # League sim date (from /exports), prominent under the chip. Same cache
+        # as the status itself, so it refreshes on ⟳.
+        col.markdown(f'<div class="league-date">{html.escape(r.get("date") or "—")}</div>',
+                     unsafe_allow_html=True)
     if cols[-1].button("⟳", key="recheck_exports", use_container_width=True,
                        help="Re-check league export status now (one API call per league)."):
         st.session_state["exports_nonce"] += 1
